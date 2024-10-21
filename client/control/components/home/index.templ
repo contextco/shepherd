@@ -1,0 +1,32 @@
+package home 
+
+templ Index() {
+    @layout() {
+        <div class="font-bold text-2xl">
+            OnPrem
+        </div>
+    }
+}
+
+templ layout() {
+	<html>
+		<head>
+			<title>Home</title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+				<link rel="stylesheet" href="/static/application.css"/>
+		</head>
+		<body>
+			<main class="mx-auto max-w-screen-md">
+				{ children... }
+			</main>
+			<footer>
+				<p>&copy; 2023 My Website. All rights reserved.</p>
+			</footer>
+			<script src="/static/application.js"></script>
+		</body>
+	</html>
+}
+
+
+
