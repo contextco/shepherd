@@ -33,17 +33,6 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 
-VCR.configure do |config|
-  config.cassette_library_dir = 'vcr/cassettes'
-  config.hook_into :faraday
-  config.filter_sensitive_data('<OPENAI_API_KEY>') { ENV.fetch('OPENAI_API_KEY', nil) }
-  # config.debug_logger = $stderr
-
-  config.default_cassette_options = { match_requests_on: %i[method uri path body] }
-  config.configure_rspec_metadata!
-end
-
-
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::ControllerHelpers, type: :view
