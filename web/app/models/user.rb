@@ -8,6 +8,9 @@ class User < ApplicationRecord
          :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2]
 
+  belongs_to :team, optional: true
+  has_many :ssh_public_keys, dependent: :destroy
+
   class << self
     def from_omniauth!(access_token)
       data = access_token.info
