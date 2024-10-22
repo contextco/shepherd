@@ -123,6 +123,7 @@ GEM
       logger
     faraday-net_http (3.3.0)
       net-http
+    ffaker (2.23.0)
     ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-aarch64-linux-musl)
     ffi (1.17.0-arm-linux-gnu)
@@ -448,6 +449,7 @@ DEPENDENCIES
   dotenv
   factory_bot_rails
   faraday (~> 2.12)
+  ffaker
   flipper
   flipper-active_record
   flipper-ui (~> 1.3)
