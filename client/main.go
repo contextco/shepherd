@@ -16,7 +16,7 @@ import (
 var (
 	tsKey = config.Define(
 		"ts-key",
-		"tskey-auth-ke2dUVj1Jj11CNTRL-kt8tigwFfx3bb7sTrSm2x39nwDLM6GQp8",
+		"",
 		"The key for the tailscale instance",
 	)
 )
