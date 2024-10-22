@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -37,8 +39,7 @@ class User < ApplicationRecord
         first_name: data["first_name"],
         last_name: data["last_name"],
         profile_picture_url: data["image"],
-        password: Devise.friendly_token[0, 20],
-        credits: User::STARTING_CREDITS,
+        password: Devise.friendly_token[0, 20]
         )
     end
   end
