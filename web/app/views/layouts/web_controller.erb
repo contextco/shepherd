@@ -65,7 +65,7 @@
     <div class="grow min-h-0 relative">
       <%= render BurgerMenuContentComponent.new do |burger| %>
         <% burger.with_burger_menu_content do %>
-          <div class="flex flex-col w-full divide-y divide-stone-500" data-action="click->burger-menu#closeMenu">
+          <div class="shadow-lg border-b border-stone-500 flex flex-col w-full divide-y divide-stone-500" data-action="click->burger-menu#closeMenu">
             <%= link_to root_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>
               My Dashboard
             <% end %>
