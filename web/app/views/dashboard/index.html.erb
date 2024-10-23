@@ -2,7 +2,6 @@
   <% if current_user.nil? %>
     Please sign in.
   <% else %>
-
-    My team dashboard
+    <%= render Deployments::GridComponent.new(deployments: current_user.team.deployments) %>
   <% end %>
 </div>
