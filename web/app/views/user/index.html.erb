@@ -1,0 +1,19 @@
+<div class="h-full w-full flex flex-col gap-10 bg-stone-800 sm:px-20 px-8 py-8">
+  <span class="font-medium text-lg">Account information for <%= current_user.name %></span>
+
+  <% if current_user.team.present? %>
+    <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
+      <span class="font-medium text-lg">Account options</span>
+      <div class="flex gap-4">
+        <%= button_to leave_team_user_index_path, method: :delete, class: 'p-2 bg-red-600 hover:bg-red-700 duration-200 font-semibold text-white rounded-md' do %>
+          Leave team
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
+      <span class="font-medium text-lg">Add a ssh key</span>
+      DETAILS FOR ADDING SSH Key
+    </div>
+  <% end %>
+</div>
