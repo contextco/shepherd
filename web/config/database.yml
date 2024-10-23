@@ -21,15 +21,14 @@ default: &default
 
 
 development:
-  primary:
-    <<: *default
-    database: web_control_ui_development
+  <<: *default
+  database: web_control_ui_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  #username: podcast
+  #username: web_control_ui
 
   # The password associated with the PostgreSQL role (username).
   #password:
@@ -80,6 +79,7 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary:
-    <<: *default
-    database: web_control_ui_production
+  <<: *default
+  database: web_control_ui_production
+  username: web
+  password: <%= ENV["WEB_DATABASE_PASSWORD"] %>
