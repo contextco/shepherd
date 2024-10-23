@@ -11,6 +11,12 @@ Rails.application.routes.draw do
 
   resources :dashboard, only: [ :index ]
 
+  resources :team, only: [ :index, :create ]
+
+  resources :user, only: [ :index ] do
+    delete :leave_team, on: :collection
+  end
+
   root "dashboard#index"
 
   devise_for :users,
