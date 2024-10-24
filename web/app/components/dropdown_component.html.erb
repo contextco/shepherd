@@ -1,0 +1,20 @@
+<% if disabled %>
+  <%= disabled_content %>
+<% else %>
+  <div class="dropdown relative z-40"
+       data-controller="dropdown"
+       <%# Morphing handler required since this component injects the dropdown div into a new place on the page.
+       When a morph happens the dropdown gets removed, so we need this handler to re-add it. %>
+       data-action="turbo:morph@window->dropdown#connect"
+       data-dropdown-align-value="<%= align %>"
+       data-dropdown-expand-up-value="<%= expand_up %>"
+       data-dropdown-match-trigger-width-value="<%= match_trigger_width %>">
+    <div class="dropdown-control cursor-pointer" data-action="click->dropdown#toggle resize@window->dropdown#reposition click@document->dropdown#handleGlobalClick">
+      <%= content %>
+    </div>
+    <div class="<%= custom_classes %> mt-2 dropdown-drop absolute hidden z-50"
+         data-dropdown-target="dropdown">
+      <%= dropdown %>
+    </div>
+  </div>
+<% end %>
