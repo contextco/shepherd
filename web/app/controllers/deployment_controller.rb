@@ -1,10 +1,15 @@
 
 class DeploymentController < ApplicationController
+
+  def index
+    redirect_to team_index_path if current_user && current_user.team.nil?
+  end
+
   def create
     current_team.deployments.create!(deployment_params)
 
     flash[:notice] = "Deployment #{deployment_params[:name]} created"
-    redirect_to dashboard_index_path
+    redirect_to root_path
   end
 
   private
