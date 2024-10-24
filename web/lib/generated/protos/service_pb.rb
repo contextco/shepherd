@@ -5,7 +5,7 @@
 require 'google/protobuf'
 
 
-descriptor_data = "\n\rservice.proto\"\x0e\n\x0cStartRequest\"\x0f\n\rStartResponse22\n\x06OnPrem\x12(\n\x05Start\x12\r.StartRequest\x1a\x0e.StartResponse\"\x00\x62\x06proto3"
+descriptor_data = "\n\rservice.proto\"\x0e\n\x0cStartRequest\"\x0f\n\rStartResponse22\n\x06OnPrem\x12(\n\x05Start\x12\r.StartRequest\x1a\x0e.StartResponse\"\x00\x42\x1dZ\x1bonprem/generated/service_pbb\x06proto3"
 
 pool = Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
