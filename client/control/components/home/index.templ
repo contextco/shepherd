@@ -1,11 +1,99 @@
 package home 
 
-templ Index() {
-    @layout() {
-        <div class="font-bold text-2xl">
-            OnPrem
-        </div>
-    }
+import (
+	"strings"
+	"onprem/process"
+	"time"
+	"onprem/timeago"
+)
+
+type IndexProps struct {
+	SSHRunning bool
+	Process    *process.Process
+}
+
+templ Index(props IndexProps) {
+	@layout() {
+		<div class="flex flex-col h-screen w-full gap-8">
+			<div class="header py-4">
+				<h1 class="text-2xl font-semibold">OnPrem</h1>
+			</div>
+
+			@info(props.Process)
+
+			<div class="flex flex-col gap-4">
+				<div class="text-lg">Settings</div>
+				@toggles(props.SSHRunning)
+			</div>
+		</div>
+	}
+}
+
+templ info(process *process.Process) {
+	if process == nil {
+		<div>No process running</div>
+	} else {
+		<div class="flex flex-col gap-4">
+			<div class="text-lg">Process</div>
+
+			<div class="rounded-md bg-slate-50 p-2 font-mono text-slate-800 flex flex-col gap-2">
+				<div class="text-sm">{ strings.Join(process.Args(), " ") }</div>
+				<div class="w-full flex justify-start">
+					<div class="text-xs text-slate-500">Started { timeago.InWords(process.StartedAt()) }</div>
+				</div>
+			</div>
+
+			@Logs(process)
+		</div>
+	}
+}
+
+templ Logs(process *process.Process) {
+	<div class="flex flex-col logs overflow-y-auto p-4 h-48 border rounded-md font-mono">
+		for _, line := range process.RecentLogs(50) {
+			<div class="w-full py-0.5 text-xs hover:bg-slate-50">
+				<span class="text-stone-500">{ line.Time.Format(time.DateTime) }</span> { line.Text }
+			</div>
+		}
+	</div>
+}
+
+templ toggles(running bool) {
+	<div>
+		<div class="flex flex-col items-center justify-center w-full">
+			<div class="flex flex-row gap-4 justify-between w-full">
+				@SSHToggle(running)
+			</div>
+		</div>
+	</div>
+}
+
+templ SSHToggle(running bool) {
+	<div class="flex items-center justify-between w-full p-4 border rounded-md">
+		<div>
+			<div class="flex items-center font-medium">Enable SSH Breakglass</div>
+
+			<div class="flex text-xs text-slate-500">
+				SSH allows you to connect to this machine from another machine.
+			</div>
+		</div>
+
+		<div class="flex items-center justify-end gap-2">
+			<button class="bg-slate-200  py-1 px-2 rounded-md">
+				For 1 hour
+			</button>
+				<button class="bg-slate-200 py-1 px-2 rounded-md">
+				For 6 hours
+			</button>
+				<button class="bg-slate-200 py-1 px-2 rounded-md">
+				For 24 hours
+			</button>
+
+		</div>
+	</div>
+}
+
+templ toggle() {
 }
 
 templ layout() {
@@ -14,15 +102,12 @@ templ layout() {
 			<title>Home</title>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-				<link rel="stylesheet" href="/static/application.css"/>
+			<link rel="stylesheet" href="/static/application.css"/>
 		</head>
 		<body>
-			<main class="mx-auto max-w-screen-md">
+			<main class="mx-auto max-w-3xl">
 				{ children... }
 			</main>
-			<footer>
-				<p>&copy; 2023 My Website. All rights reserved.</p>
-			</footer>
 			<script src="/static/application.js"></script>
 		</body>
 	</html>
