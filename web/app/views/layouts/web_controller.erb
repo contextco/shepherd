@@ -24,8 +24,8 @@
             <% end %>
 
             <%= link_to user_index_path, class: ["rounded-md font-medium hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
-              "bg-stone-700": current_page?(user_index_path),
-              "hover:bg-stone-800": !current_page?(user_index_path)
+              "bg-stone-700": current_page?(user_index_path) || request.path_parameters&.fetch(:controller) == "ssh_key",
+              "hover:bg-stone-800": !(current_page?(user_index_path) || request.path_parameters&.fetch(:controller) == "ssh_key")
             }] do %>
               User
             <% end %>
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <div class="grow min-h-0 relative">
+    <div class="grow relative">
       <%= render BurgerMenuContentComponent.new do |burger| %>
         <% burger.with_burger_menu_content do %>
           <div class="shadow-lg border-b border-stone-500 flex flex-col w-full divide-y divide-stone-500" data-action="click->burger-menu#closeMenu">
