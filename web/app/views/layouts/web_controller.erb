@@ -1,0 +1,92 @@
+<%= content_for :content do %>
+  <div class="h-full flex flex-col overflow-y-auto" data-controller="burger-menu">
+    <div class="header w-full flex justify-between p-8 gap-8 items-center">
+      <div class="left font-bold">
+        <%= link_to root_path, class: 'font-garamond text-2xl' do %>
+          Control Panel
+        <% end %>
+      </div>
+      <div class="">
+        <% if user_signed_in? %>
+          <div class="items-center rounded-md gap-4 p-2 bg-stone-900 hidden sm:flex">
+            <%= link_to root_path, class: ["rounded-md font-medium gap-1 items-center hidden sm:flex hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
+              "bg-stone-700": current_page?(root_path),
+              "hover:bg-stone-800": !current_page?(root_path)
+            }] do %>
+              Dashboard
+            <% end %>
+
+            <%= link_to team_index_path, class: ["rounded-md font-medium hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
+              "bg-stone-700": current_page?(team_index_path),
+              "hover:bg-stone-800": !current_page?(team_index_path)
+            }] do %>
+              Team
+            <% end %>
+
+            <%= link_to user_index_path, class: ["rounded-md font-medium hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
+              "bg-stone-700": current_page?(user_index_path),
+              "hover:bg-stone-800": !current_page?(user_index_path)
+            }] do %>
+              User
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <div class="right">
+        <% if user_signed_in? %>
+          <div data-burger-menu-target="button"
+               data-action="click->burger-menu#toggleMenu"
+               class="sm:hidden p-1 px-1.5 text-xs border border-stone-600 rounded-md bg-stone-800">
+            <div class="w-7 h-7 cursor-pointer">
+              <%= heroicon 'bars-4', class: 'w-full h-full' %>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <%= button_to destroy_user_session_path, method: :delete, class: 'hidden sm:block flex items-center gap-2' do %>
+              <%= profile_picture_tag(current_user) %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="right flex items-center gap-4 whitespace-nowrap mt-2">
+            <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                          class: 'px-2 py-1 flex items-center gap-1 hover:bg-stone-800 rounded-md duration-200' do %>
+              Sign in
+            <% end %>
+            <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                          class: 'border rounded-md px-2 py-1 flex items-center gap-1 hover:bg-stone-800 duration-200 border-stone-400' do %>
+              Create account
+              <%= heroicon 'arrow-right', class: 'size-4' %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grow min-h-0 relative">
+      <%= render BurgerMenuContentComponent.new do |burger| %>
+        <% burger.with_burger_menu_content do %>
+          <div class="shadow-lg border-b border-stone-500 flex flex-col w-full divide-y divide-stone-500" data-action="click->burger-menu#closeMenu">
+            <%= link_to root_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>
+              My Dashboard
+            <% end %>
+
+            <%= link_to team_index_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>
+              My Team
+            <% end %>
+
+            <%= link_to user_index_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>
+              My Account
+            <% end %>
+
+            <%= button_to destroy_user_session_path, method: :delete, class: 'w-full flex p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200' do %>
+              Sign Out
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+      <%= yield %>
+    </div>
+  </div>
+<% end %>
+
+<%= render template: 'layouts/application' %>
