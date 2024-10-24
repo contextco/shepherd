@@ -1,0 +1,48 @@
+<div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
+  <div class="flex w-full justify-between">
+    <div class="flex flex-col">
+      <span class="text-sm text-stone-400 font-medium text-stone-100">Deployment</span>
+      <span class="text-2xl font-medium text-stone-100 w-fit"><%= @deployment.name %></span>
+    </div>
+
+    <div class="flex flex-col justify-center">
+      <div class="flex gap-2 items-center">
+        <div class="flex gap-2 items-baseline text-xs px-2 py-1">
+          <span class="text-stone-400 select-none">Deployment ID </span>
+          <span><%= @deployment.id %></span>
+        </div>
+
+        <%= link_to settings_deployment_path, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% if @deployment.containers.any? %>
+    <table class="w-full whitespace-nowrap border-separate border-spacing-0">
+      <thead>
+        <tr>
+          <th class="text-left">Name</th>
+          <th class="text-left">Status</th>
+          <th class="text-left">Deployed at</th>
+          <th class="text-left">Deployed by</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @deployment.containers.each do |container| %>
+          <tr>
+            <td><%= container.name %></td>
+            <td><%= container.status %></td>
+            <td><%= container.created_at %></td>
+            <td><%= container.created_at %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="flex flex-col items-center justify-center h-full">
+      <span class="text-stone-400">No containers found</span>
+    </div>
+  <% end %>
+</div>

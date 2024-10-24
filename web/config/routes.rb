@@ -9,7 +9,10 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  resources :deployment, only: [ :create, :index ]
+  resources :deployment, only: [ :create, :index, :show, :destroy ] do
+    get :settings, on: :member
+  end
+  resources :deployment_container, only: [ :show ]
 
   resources :team, only: [ :index, :create ]
 
