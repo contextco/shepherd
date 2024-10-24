@@ -10,8 +10,8 @@
         <% if user_signed_in? %>
           <div class="items-center rounded-md gap-4 p-2 bg-stone-900 hidden sm:flex">
             <%= link_to root_path, class: ["rounded-md font-medium gap-1 items-center hidden sm:flex hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
-              "bg-stone-700": current_page?(root_path),
-              "hover:bg-stone-800": !current_page?(root_path)
+              "bg-stone-700": current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment",
+              "hover:bg-stone-800": !(current_page?(root_path)  || request.path_parameters&.fetch(:controller) == "deployment")
             }] do %>
               Deployments
             <% end %>
