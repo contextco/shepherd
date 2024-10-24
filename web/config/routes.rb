@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :team, only: [ :index, :create ]
 
   resources :user, only: [ :index ] do
+    resources :ssh_key, only: [ :create, :destroy, :new ]
     delete :leave_team, on: :collection
   end
 
