@@ -3,4 +3,6 @@
 class Deployment < ApplicationRecord
   belongs_to :team
   has_many :containers, dependent: :destroy
+
+  validates :name, presence: true
 end
