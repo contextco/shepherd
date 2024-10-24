@@ -11,6 +11,8 @@ Rails.application.routes.draw do
 
   resources :dashboard, only: [ :index ]
 
+  resources :deployment, only: [ :create ]
+
   resources :team, only: [ :index, :create ]
 
   resources :user, only: [ :index ] do
