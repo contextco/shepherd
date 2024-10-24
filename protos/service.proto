@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+service OnPrem {
+    rpc Start(StartRequest) returns (StartResponse) {}
+}
+
+message StartRequest {
+}
+
+message StartResponse {
+}
