@@ -7,10 +7,6 @@ import (
 	"onprem/config"
 	"onprem/control"
 	"onprem/process"
-	"onprem/ssh"
-
-	"github.com/google/uuid"
-	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -25,34 +21,22 @@ func do(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	group, groupCtx := errgroup.WithContext(ctx)
-
-	id, err := uuid.NewV7()
-	if err != nil {
-		return err
-	}
-
-	srv := ssh.NewServer(tsKey.MustValue(), id.String())
-	group.Go(func() error {
-		return srv.Start(groupCtx)
-	})
-	defer srv.Close()
-
-	ctrl := control.Server{}
-	group.Go(func() error {
-		return ctrl.Start(groupCtx)
-	})
-
 	p, err := process.RunFromArgs(ctx)
 	if err != nil && err != process.ErrNoCommand {
 		return err
-	} else if err == process.ErrNoCommand {
-		<-ctx.Done()
-		return nil
 	}
-	defer p.Cancel()
+	if p != nil {
+		defer p.Cancel()
+	}
 
-	return nil
+	log.Printf("Starting control server with process %v", p)
+	ctrl, err := control.New(tsKey.MustValue(), p)
+	if err != nil {
+		return err
+	}
+	defer ctrl.Close()
+
+	return ctrl.Start(ctx)
 }
 
 func main() {
