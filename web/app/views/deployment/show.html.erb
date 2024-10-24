@@ -1,15 +1,15 @@
 <div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
   <div class="flex w-full justify-between">
     <div class="flex flex-col">
-      <span class="text-sm text-stone-400 font-medium text-stone-100">Deployment</span>
-      <span class="text-2xl font-medium text-stone-100 w-fit"><%= @deployment.name %></span>
+      <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Deployment</span>
+      <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= @deployment.name %></span>
     </div>
 
     <div class="flex flex-col justify-center">
       <div class="flex gap-2 items-center">
-        <div class="flex gap-2 items-baseline text-xs px-2 py-1">
+        <div class="flex flex-col sm:flex-row gap-2 items-baseline text-xs">
           <span class="text-stone-400 select-none">Deployment ID </span>
-          <span><%= @deployment.id %></span>
+          <span class="overflow-x-scroll max-w-32 sm:max-w-full whitespace-nowrap scrollbar-hide"><%= @deployment.id %></span>
         </div>
 
         <%= link_to settings_deployment_path, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
