@@ -10,10 +10,10 @@
         <% if user_signed_in? %>
           <div class="items-center rounded-md gap-4 p-2 bg-stone-900 hidden sm:flex">
             <%= link_to root_path, class: ["rounded-md font-medium gap-1 items-center hidden sm:flex hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
-              "bg-stone-700": current_page?(root_path),
-              "hover:bg-stone-800": !current_page?(root_path)
+              "bg-stone-700": current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment",
+              "hover:bg-stone-800": !(current_page?(root_path)  || request.path_parameters&.fetch(:controller) == "deployment")
             }] do %>
-              Dashboard
+              Deployments
             <% end %>
 
             <%= link_to team_index_path, class: ["rounded-md font-medium hidden px-2 sm:block p-1 text-sm text-stone-200 select-none cursor-pointer duration-200", {
@@ -67,7 +67,7 @@
         <% burger.with_burger_menu_content do %>
           <div class="shadow-lg border-b border-stone-500 flex flex-col w-full divide-y divide-stone-500" data-action="click->burger-menu#closeMenu">
             <%= link_to root_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>
-              My Dashboard
+              Deployments
             <% end %>
 
             <%= link_to team_index_path, class: "w-full p-4 px-4 text-sm text-stone-200 bg-stone-800 select-none cursor-pointer hover:bg-stone-700 duration-200" do %>

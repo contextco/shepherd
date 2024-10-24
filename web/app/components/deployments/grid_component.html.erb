@@ -17,7 +17,7 @@
   <% else %>
     <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
       <% deployments&.each do |deployment| %>
-        <%= render Deployments::ElementComponent.new(name: deployment.name, health_status: true) %>
+        <%= render Deployments::ElementComponent.new(deployment: deployment, health_status: true) %>
       <% end %>
     </ul>
   <% end %>

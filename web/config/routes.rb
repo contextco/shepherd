@@ -9,9 +9,10 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  resources :dashboard, only: [ :index ]
-
-  resources :deployment, only: [ :create ]
+  resources :deployment, only: [ :create, :index, :show, :destroy ] do
+    get :settings, on: :member
+  end
+  resources :deployment_container, only: [ :show ]
 
   resources :team, only: [ :index, :create ]
 
@@ -19,7 +20,7 @@ Rails.application.routes.draw do
     delete :leave_team, on: :collection
   end
 
-  root "dashboard#index"
+  root "deployment#index"
 
   devise_for :users,
              controllers: { omniauth_callbacks: "users/omniauth_callbacks" },
