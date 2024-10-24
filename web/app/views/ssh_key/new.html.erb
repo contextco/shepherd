@@ -1,0 +1,37 @@
+<div class="h-full w-full flex flex-col gap-6 bg-stone-800 sm:px-20 px-8 py-8">
+  <div class="flex flex-col">
+    <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">New SSH Key</span>
+    <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= current_user.name %></span>
+  </div>
+
+  <%= form_for SshPublicKey.new, url: user_ssh_key_index_path do |form| %>
+    <div class="flex flex-col gap-8">
+
+      <div class="flex flex-col gap-2">
+        <%= form.label :name, 'Title' %>
+        <%= form.text_field :name,
+                            required: true,
+                            minlength: 2,
+                            'data-1p-ignore': true,
+                            'data-lpignore': true,
+                            maxlength: 100,
+                            class: 'text-sm w-full focus:border-stone-400 focus:ring-0 rounded-md border border-stone-400 bg-transparent placeholder:text-stone-500' %>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <%= form.label :key, 'Key' %>
+        <%= form.text_area :key,
+                           required: true,
+                           placeholder: 'Name',
+                           'data-1p-ignore': true,
+                           'data-lpignore': true,
+                           class: 'text-sm w-full focus:border-stone-400 focus:ring-0 rounded-md border border-stone-400 bg-transparent placeholder:text-stone-500' %>
+      </div>
+
+      <div class="flex justify-start">
+        <%= form.submit 'Add SSH Key', class: 'cursor-pointer text-sm font-normal p-2 bg-green-700 hover:bg-green-800 duration-200 font-semibold text-white rounded-md' %>
+      </div>
+    </div>
+
+  <% end %>
+</div>
