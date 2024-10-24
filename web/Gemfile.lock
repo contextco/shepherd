@@ -215,8 +215,6 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    loops_sdk (0.1.2)
-      faraday
     mail (2.8.1)
       mini_mime (>= 0.1.1)
       net-imap
@@ -421,7 +419,6 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.1.1)
-    stripe (13.0.1)
     tailwindcss-rails (3.0.0)
       railties (>= 7.0.0)
       tailwindcss-ruby
@@ -496,7 +493,6 @@ DEPENDENCIES
   hotwire-livereload (~> 1.4)
   importmap-rails
   jbuilder
-  loops_sdk (~> 0.1.2)
   mission_control-jobs
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.2)
@@ -510,7 +506,6 @@ DEPENDENCIES
   selenium-webdriver
   sprockets-rails
   stimulus-rails
-  stripe (~> 13.0)
   tailwindcss-rails (~> 3.0)
   turbo-rails
   tzinfo-data
