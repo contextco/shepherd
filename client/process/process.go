@@ -4,19 +4,29 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"io"
+	"onprem/circular"
 	"os"
 	"os/exec"
+	"time"
 )
 
 var ErrNoCommand = errors.New("no command provided")
 
+var flagSet = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
 type Process struct {
-	cmd *exec.Cmd
+	cmd       *exec.Cmd
+	startedAt time.Time
+
+	stdout *circular.Buffer
+	stderr *circular.Buffer
 }
 
 func RunFromArgs(ctx context.Context) (*Process, error) {
-	flag.Parse()
-	args := flag.Args()
+	ensureFlagsParsed()
+
+	args := flagSet.Args()
 
 	var cmdArgs []string
 	if len(args) == 0 {
@@ -34,22 +44,58 @@ func RunFromArgs(ctx context.Context) (*Process, error) {
 	return p, nil
 }
 
+func (p *Process) Args() []string {
+	return p.cmd.Args
+}
+
+func (p *Process) StartedAt() time.Time {
+	return p.startedAt
+}
+
+func GlobalArgs() []string {
+	ensureFlagsParsed()
+	return flag.Args()
+}
+
 func run(ctx context.Context, cmd string, args ...string) (*Process, error) {
-	p := &Process{
-		cmd: exec.CommandContext(ctx, cmd, args...),
-	}
+	p := &Process{cmd: exec.CommandContext(ctx, cmd, args...)}
 
-	p.cmd.Stdin = os.Stdin
-	p.cmd.Stdout = os.Stdout
-	p.cmd.Stderr = os.Stderr
+	p.connectPipes()
 
-	if err := p.cmd.Run(); err != nil {
+	if err := p.cmd.Start(); err != nil {
 		return nil, err
 	}
+
+	p.startedAt = time.Now()
 
 	return p, nil
 }
 
+func (p *Process) RecentLogs(n int) []circular.Line {
+	if p.stdout == nil {
+		return []circular.Line{}
+	}
+	return p.stdout.Lines(n)
+}
+
+func (p *Process) connectPipes() {
+	// TODO: Do something intelligent with collecting this.
+	p.cmd.Stdin = os.Stdin
+
+	p.stdout = circular.NewBuffer(1024)
+	p.cmd.Stdout = io.MultiWriter(os.Stdout, p.stdout)
+
+	p.stderr = circular.NewBuffer(1024)
+	p.cmd.Stderr = io.MultiWriter(os.Stderr, p.stderr)
+}
+
 func (p *Process) Cancel() error {
 	return p.cmd.Cancel()
+}
+
+func ensureFlagsParsed() {
+	if flag.Parsed() {
+		return
+	}
+	flagSet.Parse(os.Args[1:])
 }

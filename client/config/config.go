@@ -52,22 +52,23 @@ func nameToEnv(name string) string {
 }
 
 func parseType[T any](v string) (T, error) {
-	switch any(v).(type) {
+	var zero T
+	switch any(zero).(type) {
 	case string:
 		return any(v).(T), nil
 	case int:
 		i, err := strconv.Atoi(v)
 		if err != nil {
-			return any(0).(T), err
+			return zero, err
 		}
 		return any(i).(T), nil
 	case bool:
 		b, err := strconv.ParseBool(v)
 		if err != nil {
-			return any(false).(T), err
+			return zero, err
 		}
 		return any(b).(T), nil
+	default:
+		return zero, fmt.Errorf("unsupported type %T", zero)
 	}
-
-	return any(nil).(T), fmt.Errorf("unsupported type %T", v)
 }
