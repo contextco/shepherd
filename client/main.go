@@ -7,6 +7,11 @@ import (
 	"onprem/config"
 	"onprem/control"
 	"onprem/process"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	service_pb "onprem/generated/protos"
 )
 
 var (
@@ -28,6 +33,14 @@ func do(ctx context.Context) error {
 	if p != nil {
 		defer p.Cancel()
 	}
+
+	conn, err := grpc.DialContext(ctx, "localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	_ = service_pb.NewOnPremClient(conn)
 
 	log.Printf("Starting control server with process %v", p)
 	ctrl, err := control.New(tsKey.MustValue(), p)

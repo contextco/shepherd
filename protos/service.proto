@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "onprem/generated/service_pb";
+
 service OnPrem {
     rpc Start(StartRequest) returns (StartResponse) {}
 }
