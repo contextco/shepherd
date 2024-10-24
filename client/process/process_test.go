@@ -2,39 +2,46 @@ package process
 
 import (
 	"context"
+	"errors"
+	"flag"
 	"os"
+	"os/exec"
 	"testing"
 )
 
 func TestRunFromArgs(t *testing.T) {
 	// Save original os.Args and restore after test
-	originalArgs := os.Args
-	defer func() { os.Args = originalArgs }()
+	flagSet = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 	tests := []struct {
 		name    string
 		args    []string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name:    "Valid command",
 			args:    []string{"echo", "hello"},
-			wantErr: false,
+			wantErr: nil,
 		},
 		{
 			name:    "Invalid command",
 			args:    []string{"nonexistentcommand"},
-			wantErr: true,
+			wantErr: exec.ErrNotFound,
+		},
+		{
+			name:    "No command",
+			args:    []string{},
+			wantErr: ErrNoCommand,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Args = append([]string{"test"}, tt.args...)
+			flagSet.Parse(tt.args)
 			ctx := context.Background()
 			_, err := RunFromArgs(ctx)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RunFromArgs() error = %v, wantErr %v", err, tt.wantErr)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("RunFromArgs(os.Args = %v) error = %v, wantErr %v", os.Args, err, tt.wantErr)
 			}
 		})
 	}

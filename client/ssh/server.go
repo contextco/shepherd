@@ -10,6 +10,7 @@ import (
 
 	"github.com/gliderlabs/ssh"
 	gssh "github.com/gliderlabs/ssh"
+	"tailscale.com/ipn/ipnstate"
 	"tailscale.com/tsnet"
 )
 
@@ -18,8 +19,9 @@ type Server struct {
 	ln     net.Listener
 	ts     *tsnet.Server
 
-	mu    sync.RWMutex
-	auths []auth
+	mu      sync.RWMutex
+	auths   []auth
+	tsState *ipnstate.Status
 
 	doneC chan struct{}
 }
@@ -36,7 +38,8 @@ func NewServer(authKey, hostname string) *Server {
 			Handler: handler,
 		},
 
-		auths: []auth{},
+		auths:   []auth{},
+		tsState: nil,
 
 		doneC: make(chan struct{}, 1),
 	}
@@ -46,6 +49,15 @@ func NewServer(authKey, hostname string) *Server {
 	s.handleInterrupts()
 
 	return s
+}
+
+const runningState = "Running" // ipnstate.Status.BackendState
+
+func (s *Server) Running() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.tsState != nil && s.tsState.BackendState == runningState
 }
 
 func (s *Server) handlePublicKeyAuth(ctx ssh.Context, key ssh.PublicKey) bool {
@@ -86,11 +98,20 @@ func (s *Server) ClearAuth() {
 	s.auths = []auth{}
 }
 
+// Start starts the SSH server.
+//
+// It returns nil immediately if the server is already running.
 func (s *Server) Start(ctx context.Context) error {
-	_, err := s.ts.Up(ctx)
+	if s.Running() {
+		return nil
+	}
+
+	tsState, err := s.ts.Up(ctx)
 	if err != nil {
 		return err
 	}
+
+	s.tsState = tsState
 
 	ln, err := s.ts.Listen("tcp", ":22")
 	if err != nil {
@@ -99,7 +120,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	go func() {
 		if err := s.sshSrv.Serve(ln); err != nil {
-			log.Printf("Failed to serve SSH: %s", err)
+			log.Println(err)
 		}
 	}()
 
