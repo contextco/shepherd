@@ -39,4 +39,7 @@ binary:
 
 build: templ binary
 
-.PHONY: build
+test:
+	go test ./...
+
+.PHONY: build test
