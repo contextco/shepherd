@@ -3,15 +3,14 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
+	"github.com/google/uuid"
+
+	"onprem/backend"
 	"onprem/config"
 	"onprem/control"
 	"onprem/process"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
-	service_pb "onprem/generated/protos"
 )
 
 var (
@@ -20,42 +19,104 @@ var (
 		"",
 		"The key for the tailscale instance",
 	)
+
+	name = config.Define(
+		"name",
+		"",
+		"The name of the process",
+	)
+
+	backendAddr = config.Define(
+		"backend-addr",
+		"",
+		"The address of the backend",
+	)
+
+	heartbeatInterval = config.Define(
+		"heartbeat-interval",
+		30*time.Second,
+		"The interval at which to send heartbeats",
+	)
 )
 
-func do(ctx context.Context) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+type Agent struct {
+	LifecycleID string
+	Name        string
 
-	p, err := process.RunFromArgs(ctx)
-	if err != nil && err != process.ErrNoCommand {
+	client  *backend.Client
+	process *process.Process
+	ctrl    *control.Server
+}
+
+func (a *Agent) Start(ctx context.Context) error {
+	if err := a.process.Run(ctx); err != nil && err != process.ErrNoCommand {
 		return err
 	}
-	if p != nil {
-		defer p.Cancel()
-	}
+	defer a.process.Cancel()
 
-	conn, err := grpc.DialContext(ctx, "localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	go func() {
+		if err := a.heartbeat(ctx); err != nil {
+			log.Fatalf("Failed to heartbeat: %s", err)
+		}
+	}()
+
+	return a.ctrl.Start(ctx)
+}
+
+func (a *Agent) heartbeat(ctx context.Context) error {
+	ticker := time.NewTicker(heartbeatInterval.MustValue())
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			if err := a.client.Heartbeat(ctx); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func NewAgent() (*Agent, error) {
+	id := uuid.New().String()
+
+	p, err := process.NewFromArgs(context.Background())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer conn.Close()
 
-	_ = service_pb.NewOnPremClient(conn)
+	client, err := backend.NewClient(backendAddr.MustValue(), "", backend.Identity{
+		LifecycleID: id,
+		Name:        name.MustValue(),
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	log.Printf("Starting control server with process %v", p)
 	ctrl, err := control.New(tsKey.MustValue(), p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer ctrl.Close()
 
-	return ctrl.Start(ctx)
+	return &Agent{
+		LifecycleID: id,
+		Name:        name.MustValue(),
+
+		process: p,
+		client:  client,
+		ctrl:    ctrl,
+	}, nil
 }
 
 func main() {
 	config.Init()
 
-	if err := do(context.Background()); err != nil {
-		log.Fatalf("Failed to do this %s", err)
+	agent, err := NewAgent()
+	if err != nil {
+		log.Fatalf("Failed to create agent: %s", err)
 	}
+
+	agent.Start(context.Background())
 }
