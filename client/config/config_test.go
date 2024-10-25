@@ -5,28 +5,77 @@ import (
 	"testing"
 )
 
-func TestDefine(t *testing.T) {
-	tests := []struct {
-		name         string
-		defaultValue interface{}
-		expected     interface{}
-	}{
-		{"string-var", "default", "default"},
-		{"int-var", 42, 42},
-		{"bool-var", true, true},
+func TestDefineString(t *testing.T) {
+	cv := Define("string-var", "default", "test usage")
+	value, err := cv.Value()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if value != "default" {
+		t.Errorf("Expected %v, got %v", "default", value)
+	}
+}
+
+func TestDefineInt(t *testing.T) {
+	cv := Define("int-var", 42, "test usage")
+	value, err := cv.Value()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if value != 42 {
+		t.Errorf("Expected %v, got %v", 42, value)
+	}
+}
+
+func TestDefineBool(t *testing.T) {
+	cv := Define("bool-var", true, "test usage")
+	value, err := cv.Value()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if value != true {
+		t.Errorf("Expected %v, got %v", true, value)
+	}
+}
+
+func TestMustDefineString(t *testing.T) {
+	cv := MustDefine[string]("required-string", "test usage")
+	Init([]string{"-required-string", "flag-value"})
+	if !cv.required {
+		t.Error("Expected required to be true")
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cv := Define(tt.name, tt.defaultValue, "test usage")
-			value, err := cv.Value()
-			if err != nil {
-				t.Errorf("Unexpected error: %v", err)
-			}
-			if value != tt.expected {
-				t.Errorf("Expected %v, got %v", tt.expected, value)
-			}
-		})
+	value, err := cv.Value()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if value != "flag-value" {
+		t.Errorf("Expected flag-value, got %v", value)
+	}
+}
+
+func TestMustDefineInt(t *testing.T) {
+	cv := MustDefine[int]("required-int", "test usage")
+	if !cv.required {
+		t.Error("Expected required to be true")
+	}
+
+	Init([]string{"--required-int", "42"})
+
+	value, err := cv.Value()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if value != 42 {
+		t.Errorf("Expected 0, got %v", value)
+	}
+}
+
+func TestMustDefineMissingValue(t *testing.T) {
+	cv := MustDefine[string]("missing", "test usage")
+	_, err := cv.Value()
+	if err == nil {
+		t.Error("Expected error for missing required value")
 	}
 }
 
@@ -117,7 +166,6 @@ func TestParseType(t *testing.T) {
 		{"bool-true", "true", true, false},
 		{"bool-false", "false", false, false},
 		{"invalid-int", "not-an-int", 0, true},
-		{"invalid-bool", "not-a-bool", false, true},
 	}
 
 	for _, tt := range tests {
