@@ -2,8 +2,7 @@
 class RpcController < ::Gruf::Controllers::Base
   bind ::OnPrem::Service
 
-  def heartbeat(request)
-    puts "Received heartbeat request: #{request.inspect}"
+  def heartbeat
     ::HeartbeatResponse.new
   end
 end
