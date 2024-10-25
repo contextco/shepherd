@@ -30,3 +30,13 @@ live/sync_assets:
 # start all 4 watch processes in parallel.
 live: 
 	make -j4 live/templ live/server live/tailwind live/sync_assets
+
+templ:
+	templ generate
+
+binary:
+	go build -o tmp/bin/main
+
+build: templ binary
+
+.PHONY: build
