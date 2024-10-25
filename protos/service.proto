@@ -3,11 +3,24 @@ syntax = "proto3";
 option go_package = "onprem/generated/service_pb";
 
 service OnPrem {
-    rpc Start(StartRequest) returns (StartResponse) {}
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
 }
 
-message StartRequest {
+message HeartbeatRequest {
+    Identity identity = 1;
 }
 
-message StartResponse {
+message HeartbeatResponse {
+}
+
+message Identity {
+    // ID that persists for the lifetime of the process.
+    string lifecycle_id = 1;
+
+    // ID that persists for the duration of the deployment.
+    string deployment_id = 2;
+
+    // Human-readable name for the identity. This is provided by the vendor as a friendly name to identify a container type.
+    // Eg: "worker", "web", "db", etc.
+    string name = 3;
 }

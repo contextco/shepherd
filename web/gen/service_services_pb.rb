@@ -6,13 +6,14 @@ require 'service_pb'
 
 module OnPrem
   class Service
+
     include ::GRPC::GenericService
 
     self.marshal_class_method = :encode
     self.unmarshal_class_method = :decode
     self.service_name = 'OnPrem'
 
-    rpc :Start, ::StartRequest, ::StartResponse
+    rpc :Heartbeat, ::HeartbeatRequest, ::HeartbeatResponse
   end
 
   Stub = Service.rpc_stub_class
