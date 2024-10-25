@@ -3,24 +3,27 @@ package config
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
-var flagSet = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+var (
+	flagSet = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+)
 
-func Init() {
-	flagSet.Parse(os.Args[1:])
+func Init(args []string) {
+	flagSet.Parse(args)
 }
 
-type ConfigVar[T any] struct {
+type ConfigVar[T comparable] struct {
 	name         string
 	defaultValue T
+	required     bool
 }
 
-func Define[T any](name string, defaultValue T, usage string) *ConfigVar[T] {
+func Define[T comparable](name string, defaultValue T, usage string) *ConfigVar[T] {
 	_ = flagSet.String(name, "", usage)
 	return &ConfigVar[T]{
 		name:         name,
@@ -28,14 +31,43 @@ func Define[T any](name string, defaultValue T, usage string) *ConfigVar[T] {
 	}
 }
 
+func MustDefine[T comparable](name string, usage string) *ConfigVar[T] {
+	c := Define(name, *new(T), usage)
+	c.required = true
+	return c
+}
+
 func (c *ConfigVar[T]) Value() (T, error) {
-	if v := flagSet.Lookup(c.name); v != nil && v.Value.String() != "" {
-		return parseType[T](v.Value.String())
+	v := flagSet.Lookup(c.name)
+
+	var zero T
+	if v == nil {
+		return zero, fmt.Errorf("required flag %s not configured in this flag set", c.name)
 	}
-	v, ok := os.LookupEnv(nameToEnv(c.name))
-	if ok {
-		return parseType[T](v)
+
+	parsed, err := parseType[T](v.Value.String())
+	if err != nil {
+		return zero, err
 	}
+
+	if parsed != zero {
+		return parsed, nil
+	}
+
+	envValue := os.Getenv(nameToEnv(c.name))
+	parsed, err = parseType[T](envValue)
+	if err != nil {
+		return zero, err
+	}
+
+	if parsed != zero {
+		return parsed, nil
+	}
+
+	if c.required && parsed == zero {
+		return zero, fmt.Errorf("required config variable %s not set", c.name)
+	}
+
 	return c.defaultValue, nil
 }
 
@@ -51,24 +83,12 @@ func nameToEnv(name string) string {
 	return strings.ToUpper(strings.ReplaceAll(name, "-", "_"))
 }
 
-func parseType[T any](v string) (T, error) {
+func parseType[T comparable](v string) (T, error) {
 	var zero T
-	switch any(zero).(type) {
-	case string:
-		return any(v).(T), nil
-	case int:
-		i, err := strconv.Atoi(v)
-		if err != nil {
-			return zero, err
-		}
-		return any(i).(T), nil
-	case bool:
-		b, err := strconv.ParseBool(v)
-		if err != nil {
-			return zero, err
-		}
-		return any(b).(T), nil
-	default:
-		return zero, fmt.Errorf("unsupported type %T", zero)
+	n, err := fmt.Sscanf(v, "%v", &zero)
+	if err != nil && err != io.EOF && n == 0 {
+		return zero, err
 	}
+
+	return zero, nil
 }
