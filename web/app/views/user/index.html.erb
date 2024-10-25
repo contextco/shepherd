@@ -1,7 +1,47 @@
 <div class="h-full w-full flex flex-col gap-10 bg-stone-800 sm:px-20 px-8 py-8">
-  <span class="font-medium text-lg">Account information for <%= current_user.name %></span>
+  <div class="flex flex-col">
+    <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Account information </span>
+    <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= current_user.name %></span>
+  </div>
 
   <% if current_user.team.present? %>
+    <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
+      <div class="flex w-full justify-between items-start">
+        <span class="font-medium text-lg">SSH Keys</span>
+        <%= link_to new_user_ssh_key_path(current_user), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          <%= heroicon 'plus', variant: :outline, class: 'size-5' %>
+        <% end %>
+      </div>
+      <div class="flex flex-col gap-1">
+        <% if current_user.ssh_public_keys.any? %>
+          <% current_user.ssh_public_keys.each do |ssh_public_key| %>
+            <div class="group flex w-full gap-2 bg-stone-800 hover:bg-stone-700 p-2 rounded-md justify-between">
+              <div class="flex gap-2">
+                <div class="p-2">
+                  <%= heroicon 'key', class: 'size-6' %>
+                </div>
+                <div class="flex flex-col w-full">
+                  <span class="font-semibold text-sm text-stone-100"><%= ssh_public_key.name %></span>
+                  <span class="text-sm font-mono"><%= ssh_public_key.key %></span>
+                  <span class="text-sm text-stone-400">Added on <%= ssh_public_key.created_at.strftime('%B %d, %Y') %></span>
+                </div>
+              </div>
+
+              <div class="flex items-center opacity-0 group-hover:opacity-100 h-full">
+                <%= button_to user_ssh_key_path(id: ssh_public_key.id, user_id: ssh_public_key.user.id), method: :delete do %>
+                  <div class="p-2 cursor-pointer rounded-md hover:bg-stone-600 bg-transparent">
+                    <%= heroicon 'trash', variant: :solid, class: 'size-5 text-red-500' %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <span class="text-sm text-stone-100">No SSH keys added</span>
+        <% end %>
+      </div>
+    </div>
+
     <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
       <span class="font-medium text-lg">Account options</span>
       <div class="flex gap-4">
@@ -9,11 +49,6 @@
           Leave team
         <% end %>
       </div>
-    </div>
-
-    <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
-      <span class="font-medium text-lg">Add a ssh key</span>
-      DETAILS FOR ADDING SSH Key
     </div>
   <% end %>
 </div>
