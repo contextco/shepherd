@@ -21,6 +21,10 @@ Rails.application.routes.draw do
     delete :leave_team, on: :collection
   end
 
+  namespace :api, path: "api/v1", defaults: { format: :json } do
+    post :heartbeat, to: "ingress#heartbeat"
+  end
+
   root "deployment#index"
 
   devise_for :users,
