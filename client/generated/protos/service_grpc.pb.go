@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OnPrem_Start_FullMethodName = "/OnPrem/Start"
+	OnPrem_Heartbeat_FullMethodName = "/OnPrem/Heartbeat"
 )
 
 // OnPremClient is the client API for OnPrem service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OnPremClient interface {
-	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
+	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 }
 
 type onPremClient struct {
@@ -37,10 +37,10 @@ func NewOnPremClient(cc grpc.ClientConnInterface) OnPremClient {
 	return &onPremClient{cc}
 }
 
-func (c *onPremClient) Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error) {
+func (c *onPremClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StartResponse)
-	err := c.cc.Invoke(ctx, OnPrem_Start_FullMethodName, in, out, cOpts...)
+	out := new(HeartbeatResponse)
+	err := c.cc.Invoke(ctx, OnPrem_Heartbeat_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *onPremClient) Start(ctx context.Context, in *StartRequest, opts ...grpc
 // All implementations must embed UnimplementedOnPremServer
 // for forward compatibility.
 type OnPremServer interface {
-	Start(context.Context, *StartRequest) (*StartResponse, error)
+	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	mustEmbedUnimplementedOnPremServer()
 }
 
@@ -62,8 +62,8 @@ type OnPremServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOnPremServer struct{}
 
-func (UnimplementedOnPremServer) Start(context.Context, *StartRequest) (*StartResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+func (UnimplementedOnPremServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
 }
 func (UnimplementedOnPremServer) mustEmbedUnimplementedOnPremServer() {}
 func (UnimplementedOnPremServer) testEmbeddedByValue()                {}
@@ -86,20 +86,20 @@ func RegisterOnPremServer(s grpc.ServiceRegistrar, srv OnPremServer) {
 	s.RegisterService(&OnPrem_ServiceDesc, srv)
 }
 
-func _OnPrem_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartRequest)
+func _OnPrem_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OnPremServer).Start(ctx, in)
+		return srv.(OnPremServer).Heartbeat(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OnPrem_Start_FullMethodName,
+		FullMethod: OnPrem_Heartbeat_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnPremServer).Start(ctx, req.(*StartRequest))
+		return srv.(OnPremServer).Heartbeat(ctx, req.(*HeartbeatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var OnPrem_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OnPremServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Start",
-			Handler:    _OnPrem_Start_Handler,
+			MethodName: "Heartbeat",
+			Handler:    _OnPrem_Heartbeat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
