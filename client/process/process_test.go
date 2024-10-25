@@ -71,7 +71,8 @@ func TestRun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			p, err := run(ctx, tt.cmd, tt.args...)
+			p := New(ctx, tt.cmd, tt.args...)
+			err := p.Run(ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("run() error = %v, wantErr %v", err, tt.wantErr)
 				return
