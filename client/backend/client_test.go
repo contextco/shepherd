@@ -95,7 +95,10 @@ func (s *testServer) ensureValidToken(bearerToken string) grpc.UnaryServerInterc
 func newTestClient(t *testing.T, addr string, bearerToken string) *Client {
 	t.Helper()
 
-	client, err := NewClient(addr, bearerToken, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	client, err := NewClient(addr, bearerToken, Identity{
+		LifecycleID: "test-lifecycle-id",
+		Name:        "test-name",
+	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
