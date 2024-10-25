@@ -5,7 +5,7 @@ class ApplicationComponent < ViewComponent::Base
   include ActiveModel::AttributeAssignment
   include RailsHeroicon::Helper
 
-  delegate :current_user, :current_team, :current_project, :user_signed_in?, to: :helpers
+  delegate :current_user, :current_team, :user_signed_in?, to: :helpers
 
   def initialize(**args)
     super
