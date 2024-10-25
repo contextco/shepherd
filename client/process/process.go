@@ -23,7 +23,7 @@ type Process struct {
 	stderr *circular.Buffer
 }
 
-func RunFromArgs(ctx context.Context) (*Process, error) {
+func NewFromArgs(ctx context.Context) (*Process, error) {
 	ensureFlagsParsed()
 
 	args := flagSet.Args()
@@ -36,12 +36,28 @@ func RunFromArgs(ctx context.Context) (*Process, error) {
 		cmdArgs = args[1:]
 	}
 
-	p, err := run(ctx, args[0], cmdArgs...)
+	return &Process{
+		cmd: exec.CommandContext(ctx, args[0], cmdArgs...),
+	}, nil
+}
+
+func RunFromArgs(ctx context.Context) (*Process, error) {
+	p, err := NewFromArgs(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	if err := p.Run(ctx); err != nil {
+		return nil, err
+	}
+
 	return p, nil
+}
+
+func New(ctx context.Context, cmd string, args ...string) *Process {
+	return &Process{
+		cmd: exec.CommandContext(ctx, cmd, args...),
+	}
 }
 
 func (p *Process) Args() []string {
@@ -57,18 +73,15 @@ func GlobalArgs() []string {
 	return flag.Args()
 }
 
-func run(ctx context.Context, cmd string, args ...string) (*Process, error) {
-	p := &Process{cmd: exec.CommandContext(ctx, cmd, args...)}
-
+func (p *Process) Run(ctx context.Context) error {
 	p.connectPipes()
 
 	if err := p.cmd.Start(); err != nil {
-		return nil, err
+		return err
 	}
 
 	p.startedAt = time.Now()
-
-	return p, nil
+	return nil
 }
 
 func (p *Process) RecentLogs(n int) []circular.Line {

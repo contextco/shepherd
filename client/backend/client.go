@@ -10,12 +10,18 @@ import (
 	service_pb "onprem/generated/protos"
 )
 
-type Client struct {
-	client service_pb.OnPremClient
-	conn   *grpc.ClientConn
+type Identity struct {
+	LifecycleID string
+	Name        string
 }
 
-func NewClient(addr string, bearerToken string, opts ...grpc.DialOption) (*Client, error) {
+type Client struct {
+	client   service_pb.OnPremClient
+	conn     *grpc.ClientConn
+	identity Identity
+}
+
+func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.DialOption) (*Client, error) {
 	dialOpts := []grpc.DialOption{
 		grpc.WithPerRPCCredentials(&authHeader{bearerToken: bearerToken}),
 	}
@@ -25,7 +31,21 @@ func NewClient(addr string, bearerToken string, opts ...grpc.DialOption) (*Clien
 	if err != nil {
 		return nil, err
 	}
-	return &Client{client: service_pb.NewOnPremClient(conn), conn: conn}, nil
+	return &Client{
+		client:   service_pb.NewOnPremClient(conn),
+		conn:     conn,
+		identity: identity,
+	}, nil
+}
+
+func (c *Client) Heartbeat(ctx context.Context) error {
+	_, err := c.client.Heartbeat(ctx, &service_pb.HeartbeatRequest{
+		Identity: &service_pb.Identity{
+			LifecycleId: c.identity.LifecycleID,
+			Name:        c.identity.Name,
+		},
+	})
+	return err
 }
 
 func (c *Client) Close() error {
