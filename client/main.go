@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -111,7 +112,7 @@ func NewAgent() (*Agent, error) {
 }
 
 func main() {
-	config.Init()
+	config.Init(os.Args)
 
 	agent, err := NewAgent()
 	if err != nil {
