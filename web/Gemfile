@@ -48,6 +48,8 @@ group :development, :test do
 
   gem "factory_bot_rails"
   gem "ffaker"
+
+  gem "gruf-rspec", "~> 1.0"
 end
 
 group :development do

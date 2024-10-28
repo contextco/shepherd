@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_24_154205) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_28_112257) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_24_154205) do
     t.datetime "updated_at", null: false
     t.index ["deployment_id"], name: "index_containers_on_deployment_id"
     t.index ["team_id"], name: "index_containers_on_team_id"
+  end
+
+  create_table "deployment_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "deployment_id", null: false
+    t.string "token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deployment_id"], name: "index_deployment_tokens_on_deployment_id"
   end
 
   create_table "deployments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -82,6 +90,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_24_154205) do
 
   add_foreign_key "containers", "deployments"
   add_foreign_key "containers", "teams"
+  add_foreign_key "deployment_tokens", "deployments"
   add_foreign_key "deployments", "teams"
   add_foreign_key "ssh_public_keys", "users"
   add_foreign_key "users", "teams"
