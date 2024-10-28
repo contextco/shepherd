@@ -1,5 +1,5 @@
 
-class SshKeyController < ApplicationController
+class SSHKeyController < ApplicationController
   def new; end
 
   def create
