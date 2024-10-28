@@ -8,13 +8,13 @@ class AuthenticationInterceptor < Gruf::Interceptors::ServerInterceptor
   private
 
   def authenticate!
-    token = Deployment::Token.find_by(token: key_from_metadata)
-    fail!(:unauthenticated, "Token not found") unless token
+    token = Deployment::Token.find_by(token: token_from_request_metadata)
+    fail!(:unauthenticated, "Token not found") unless token.present?
 
     request.context[:current_deployment] = token.deployment
   end
 
-  def key_from_metadata
+  def token_from_request_metadata
     return "" unless request.metadata[:authorization].present?
 
     request.metadata[:authorization].split(" ").last
