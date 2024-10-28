@@ -1,5 +1,5 @@
 
-class HeartbeatController < Gruf::Controllers::Base
+class HeartbeatController < RpcController
   bind OnPrem::Service
 
   def heartbeat
