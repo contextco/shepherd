@@ -195,6 +195,12 @@ GEM
       json (>= 2.3)
       slop (>= 4.6)
       zeitwerk (>= 2)
+    gruf-rspec (1.0.1)
+      gruf (~> 2.5, >= 2.5.1)
+      rake (>= 12.3)
+      rspec-core (>= 3.8)
+      rspec-expectations (>= 3.8)
+      zeitwerk (>= 2)
     hashie (5.0.0)
     hotwire-livereload (1.4.1)
       actioncable (>= 6.0.0)
@@ -502,6 +508,7 @@ DEPENDENCIES
   grpc (~> 1.67)
   grpc-tools
   gruf (~> 2.20.1)
+  gruf-rspec (~> 1.0)
   hotwire-livereload (~> 1.4)
   importmap-rails
   jbuilder
