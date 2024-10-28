@@ -80,6 +80,6 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   stdout_logger = Logger.new(STDOUT)
-  file_logger   = Logger.new("development.log")
+  file_logger   = Logger.new("log/development.log")
   config.logger = ActiveSupport::BroadcastLogger.new(stdout_logger, file_logger)
 end
