@@ -3,6 +3,7 @@
 class Deployment < ApplicationRecord
   belongs_to :team
   has_many :containers, dependent: :destroy
+  has_many :health_logs, through: :containers
 
   validates :name, presence: true
 
