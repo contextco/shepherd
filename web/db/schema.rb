@@ -10,17 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_28_112257) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_28_141119) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "containers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "team_id", null: false
     t.uuid "deployment_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name", null: false
     t.index ["deployment_id"], name: "index_containers_on_deployment_id"
-    t.index ["team_id"], name: "index_containers_on_team_id"
   end
 
   create_table "deployment_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -53,6 +52,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_28_112257) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+  end
+
+  create_table "health_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "container_id", null: false
+    t.string "lifecycle_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["container_id"], name: "index_health_logs_on_container_id"
   end
 
   create_table "ssh_public_keys", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -89,9 +96,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_28_112257) do
   end
 
   add_foreign_key "containers", "deployments"
-  add_foreign_key "containers", "teams"
   add_foreign_key "deployment_tokens", "deployments"
   add_foreign_key "deployments", "teams"
+  add_foreign_key "health_logs", "containers"
   add_foreign_key "ssh_public_keys", "users"
   add_foreign_key "users", "teams"
 end
