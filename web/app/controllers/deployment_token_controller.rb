@@ -1,8 +1,10 @@
 
 class DeploymentTokenController < ApplicationController
+
   def index
     @deployment = current_team.deployments.find(params[:deployment_id])
   end
+
   def destroy
     deployment.tokens.find(params[:id]).destroy!
 
