@@ -7,10 +7,9 @@
 
     <div class="flex flex-col justify-center">
       <div class="flex gap-2 items-center">
-        <div class="flex flex-col sm:flex-row gap-2 items-baseline text-xs">
-          <span class="text-stone-400 select-none">Deployment ID </span>
-          <span class="overflow-x-scroll max-w-32 sm:max-w-full whitespace-nowrap scrollbar-hide"><%= @deployment.id %></span>
-        </div>
+        <%= link_to deployment_token_index_path(@deployment), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          <%= heroicon 'key', variant: :outline, class: 'size-5' %>
+        <% end %>
 
         <%= link_to settings_deployment_path, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>

@@ -11,7 +11,9 @@ Rails.application.routes.draw do
 
   resources :deployment, only: [ :create, :index, :show, :destroy ] do
     get :settings, on: :member
+    resources :token, only: [ :create, :destroy, :index ], controller: :deployment_token
   end
+
   resources :deployment_container, only: [ :show ]
 
   resources :team, only: [ :index, :create ]
