@@ -4,7 +4,7 @@
     <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= current_user.name %></span>
   </div>
 
-  <%= form_for SshPublicKey.new, url: user_ssh_key_index_path do |form| %>
+  <%= form_for SSHPublicKey.new, url: user_ssh_key_index_path do |form| %>
     <div class="flex flex-col gap-8">
 
       <div class="flex flex-col gap-2">
