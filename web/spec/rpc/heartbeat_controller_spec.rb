@@ -15,7 +15,7 @@ RSpec.describe HeartbeatController do
     end
 
     it 'records a heartbeat' do
-      expect { heartbeat }.to change { deployment.health_logs.count }.by(1)
+      expect { heartbeat }.to change { deployment.heartbeat_logs.count }.by(1)
     end
 
     it 'creates a container' do
@@ -23,14 +23,14 @@ RSpec.describe HeartbeatController do
     end
 
     context 'when the container already exists' do
-      before { deployment.containers.create!(name: 'web') }
+      before { deployment.containers.create!(name: 'web', lifecycle_id: 'my-lifecycle') }
 
       it 'does not create a new container' do
         expect { heartbeat }.not_to change { deployment.containers.reload.count }
       end
 
       it 'creates a health log' do
-        expect { heartbeat }.to change { deployment.health_logs.count }.by(1)
+        expect { heartbeat }.to change { deployment.event_logs.count }.by(1)
       end
     end
 

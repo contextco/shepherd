@@ -12,8 +12,8 @@ class HeartbeatController < RpcController
 
   def record_heartbeat
     current_deployment.transaction do
-      container = current_deployment.containers.find_or_create_by!(name: request.message.identity.name)
-      container.health_logs.create!(lifecycle_id: request.message.identity.lifecycle_id)
+      container = current_deployment.containers.find_or_create_by!(name: request.message.identity.name, lifecycle_id: request.message.identity.lifecycle_id)
+      container.event_logs.create!(event_type: :heartbeat)
     end
   end
 end

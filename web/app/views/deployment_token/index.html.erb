@@ -1,0 +1,44 @@
+<div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
+  <div class="flex w-full justify-between">
+    <div class="flex flex-col">
+      <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Deployment Tokens</span>
+      <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= @deployment.name %></span>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
+    <div class="flex w-full justify-between items-start">
+      <span class="font-medium text-lg">Deployment Tokens</span>
+      <%= button_to deployment_token_index_path(@deployment), method: :post, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+        <%= heroicon 'plus', variant: :outline, class: 'size-5' %>
+      <% end %>
+    </div>
+    <div class="flex flex-col gap-1">
+      <% if @deployment.tokens.any? %>
+        <% @deployment.tokens.each do |token| %>
+          <div class="group flex w-full gap-2 bg-stone-800 hover:bg-stone-700 p-2 rounded-md justify-between">
+            <div class="flex gap-2">
+              <div class="p-2">
+                <%= heroicon 'key', class: 'size-6' %>
+              </div>
+              <div class="flex flex-col w-full">
+                <span class="text-sm font-mono"><%= token.token %></span>
+                <span class="text-sm text-stone-400">Added on <%= token.created_at.strftime('%B %d, %Y') %></span>
+              </div>
+            </div>
+
+            <div class="flex items-center opacity-0 group-hover:opacity-100 h-full">
+              <%= button_to deployment_token_path(id: token.id, deployment_id: @deployment), method: :delete do %>
+                <div class="p-2 cursor-pointer rounded-md hover:bg-stone-600 bg-transparent">
+                  <%= heroicon 'trash', variant: :solid, class: 'size-5 text-red-500' %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <span class="text-sm text-stone-100">No SSH keys added</span>
+      <% end %>
+    </div>
+  </div>
+</div>
