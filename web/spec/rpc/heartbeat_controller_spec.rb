@@ -15,7 +15,7 @@ RSpec.describe HeartbeatController do
     end
 
     it 'records a heartbeat' do
-      expect { heartbeat }.to change { deployment.health_logs.count }.by(1)
+      expect { heartbeat }.to change { deployment.heartbeat_logs.count }.by(1)
     end
 
     it 'creates a container' do
@@ -30,7 +30,7 @@ RSpec.describe HeartbeatController do
       end
 
       it 'creates a health log' do
-        expect { heartbeat }.to change { deployment.health_logs.count }.by(1)
+        expect { heartbeat }.to change { deployment.event_logs.count }.by(1)
       end
     end
 
