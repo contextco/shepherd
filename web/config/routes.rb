@@ -11,13 +11,16 @@ Rails.application.routes.draw do
 
   resources :deployment, only: [ :create, :index, :show, :destroy ] do
     get :settings, on: :member
+    get :tokens, on: :member
   end
-  resources :deployment_container, only: [ :show ]
+  resources :deployment_container, only: [ :show ] do
+    resources :deployment_token, only: [ :create, :destroy ]
+  end
 
   resources :team, only: [ :index, :create ]
 
   resources :user, only: [ :index ] do
-    resources :ssh_key, only: [ :create, :destroy, :new ]
+    resources :ssh_key, only: [ :create, :destroy, :new ], controller: :ssh_key
     delete :leave_team, on: :collection
   end
 

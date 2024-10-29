@@ -9,7 +9,7 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: %i[google_oauth2]
 
   belongs_to :team, optional: true
-  has_many :ssh_public_keys, dependent: :destroy
+  has_many :ssh_public_keys, class_name: "SSHPublicKey", dependent: :destroy
 
   class << self
     def from_omniauth!(access_token)
