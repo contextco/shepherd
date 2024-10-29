@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
     <div class="flex w-full justify-between items-start">
       <span class="font-medium text-lg">Deployment Tokens</span>
-      <%= button_to deployment_container_deployment_token_index_path(@deployment), method: :post, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+      <%= button_to deployment_token_index_path(@deployment), method: :post, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
         <%= heroicon 'plus', variant: :outline, class: 'size-5' %>
       <% end %>
     </div>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="flex items-center opacity-0 group-hover:opacity-100 h-full">
-              <%= button_to deployment_container_deployment_token_path(id: token.id, deployment_container_id: @deployment), method: :delete do %>
+              <%= button_to deployment_token_path(id: token.id, deployment_id: @deployment), method: :delete do %>
                 <div class="p-2 cursor-pointer rounded-md hover:bg-stone-600 bg-transparent">
                   <%= heroicon 'trash', variant: :solid, class: 'size-5 text-red-500' %>
                 </div>

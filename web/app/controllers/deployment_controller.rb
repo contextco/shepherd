@@ -29,10 +29,6 @@ class DeploymentController < ApplicationController
     @deployment = current_team.deployments.find(params[:id])
   end
 
-  def tokens
-    @deployment = current_team.deployments.find(params[:id])
-  end
-
   private
 
   def deployment_params
