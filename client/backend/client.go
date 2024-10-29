@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	service_pb "onprem/generated/protos"
+	service_pb "onprem/generated"
 )
 
 type Identity struct {
