@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_28_141119) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_29_113402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,6 +19,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_28_141119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name", null: false
+    t.string "lifecycle_id", null: false
     t.index ["deployment_id"], name: "index_containers_on_deployment_id"
   end
 
@@ -56,7 +57,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_28_141119) do
 
   create_table "health_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "container_id", null: false
-    t.string "lifecycle_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["container_id"], name: "index_health_logs_on_container_id"
