@@ -1,0 +1,30 @@
+<div class="w-full whitespace-nowrap px-2 flex flex-col gap-2">
+  <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center gap-1">
+      <%= heroicon 'check-circle', class: 'size-6 text-green-500 stroke-2' %>
+      <span class="text-stone-100 font-semibold"><%= name %></span>
+      <span class="text-stone-400 text-sm"><%= containers.count %> instances</span>
+      <%= heroicon 'chevron-down', class: 'size-5 text-stone-400' %>
+    </div>
+
+    <span class="text-stone-400"><%= uptime_percentage %>% uptime</span>
+  </div>
+
+  <div class="flex justify-center items-center gap-0.5 h-8 w-full">
+    <% status_bars.each do |day| %>
+      <% if day[:status] == 'operational' %>
+        <div class="relative group max-w-3 min-w-1 w-full h-full rounded-sm bg-green-500">
+          <div class="absolute top-10 left-0 bg-green-500 bg-stone-800 border border-stone-400 rounded-md bg-stone-800 text-stone-100 text-xs rounded px-2 py-1 whitespace-nowrap z-40 opacity-0 group-hover:opacity-100">
+            <%= day[:date].strftime('%B %d, %Y') %>
+            <div class="text-xs text-green-400"> <%= day[:status].titleize %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="relative group max-w-3 min-w-1 w-full flex-initial h-full rounded-sm bg-red-500">
+
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

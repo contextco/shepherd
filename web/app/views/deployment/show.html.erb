@@ -18,30 +18,13 @@
     </div>
   </div>
 
-  <% if @deployment.containers.any? %>
-    <table class="w-full whitespace-nowrap border-separate border-spacing-0">
-      <thead>
-        <tr>
-          <th class="text-left">Name</th>
-          <th class="text-left">Status</th>
-          <th class="text-left">Deployed at</th>
-          <th class="text-left">Deployed by</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @deployment.containers.each do |container| %>
-          <tr>
-            <td><%= container.name %></td>
-            <td><%= container.status %></td>
-            <td><%= container.created_at %></td>
-            <td><%= container.created_at %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% else %>
+  <% if @deployment.containers.none? %>
     <div class="flex flex-col items-center justify-center h-full">
       <span class="text-stone-400">No containers found</span>
     </div>
+  <% end %>
+
+  <% @deployment.containers_by_name.each do |name, containers| %>
+    <%= render Containers::ContainerStatusComponent.new(name:, containers:) %>
   <% end %>
 </div>
