@@ -23,7 +23,7 @@ RSpec.describe HeartbeatController do
     end
 
     context 'when the container already exists' do
-      before { deployment.containers.create!(name: 'web') }
+      before { deployment.containers.create!(name: 'web', lifecycle_id: 'my-lifecycle') }
 
       it 'does not create a new container' do
         expect { heartbeat }.not_to change { deployment.containers.reload.count }
