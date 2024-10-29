@@ -14,12 +14,14 @@ class Container < ApplicationRecord
   after_find :update_status
 
   def last_heartbeat_time
-    heartbeat_logs.last&.created_at
+    @last_heartbeat_time ||= heartbeat_logs.last&.created_at
   end
 
   private
 
   def update_status
+    return unless last_heartbeat_time.present?
+
     if last_heartbeat_time < HEARTBEAT_TIMEOUT.ago
       update!(status: :unresponsive) unless unresponsive?
     else
