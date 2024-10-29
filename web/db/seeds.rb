@@ -25,7 +25,3 @@ end
 
 create_containers('web', %w[1234 5678], d)
 create_containers('worker', %w[45222 234234], d)
-
-
-
-
