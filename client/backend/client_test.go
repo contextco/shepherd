@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	service_pb "onprem/generated/protos"
+	service_pb "onprem/generated"
 )
 
 func TestNewClient(t *testing.T) {

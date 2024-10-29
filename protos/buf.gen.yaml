@@ -16,4 +16,5 @@ plugins:
     out: ../client/generated
     opt:
       - paths=source_relative
+      - generate_unbound_methods=true
 
