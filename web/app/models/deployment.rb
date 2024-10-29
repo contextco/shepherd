@@ -11,4 +11,8 @@ class Deployment < ApplicationRecord
   has_many :tokens, class_name: "Deployment::Token", dependent: :destroy
 
   after_create -> { tokens.create! }
+
+  def containers_by_name
+    containers.group_by(&:name)
+  end
 end
