@@ -52,19 +52,6 @@ class Containers::ContainerStatusComponent < ApplicationComponent
     "No Data"
   end
 
-  def bg_classes(status)
-    case status
-    when :offline
-      "bg-red-500"
-    when :degraded
-      "bg-yellow-500"
-    when :online
-      "bg-green-500"
-    else
-      "bg-gray-500"
-    end
-  end
-
   def text_classes(status)
     case status
     when :offline
