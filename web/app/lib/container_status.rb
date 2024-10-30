@@ -34,7 +34,8 @@ class ContainerStatus
         status: :online,
         date: days_ago.days.ago.to_date,
         downtime_minutes: 0,
-        uptime_minutes: MINUTES_PER_DAY
+        uptime_minutes: MINUTES_PER_DAY,
+        uptime_percentage: 0
       }
     end
   end
@@ -82,6 +83,7 @@ class ContainerStatus
 
       result[days_ago][:downtime_minutes] += calculate_gap_downtime(gap, date)
       result[days_ago][:uptime_minutes] = calculate_day_uptime(date, result[days_ago][:downtime_minutes], first_heartbeat)
+      result[days_ago][:uptime_percentage] = calculate_percentage(result[days_ago][:uptime_minutes], result[days_ago][:downtime_minutes])
     end
   end
 
@@ -96,6 +98,13 @@ class ContainerStatus
     return calculate_first_day_uptime(first_heartbeat, downtime) if date == first_heartbeat.to_date
 
     [ MINUTES_PER_DAY - downtime, 0 ].max
+  end
+
+  def calculate_percentage(uptime, downtime)
+    total = uptime + downtime
+    return 0 if total.zero?
+
+    (uptime / total.to_f * 100).round(2)
   end
 
   def calculate_first_day_uptime(first_heartbeat, downtime)
