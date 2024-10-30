@@ -17,6 +17,10 @@ class Container < ApplicationRecord
     @last_heartbeat_time ||= heartbeat_logs.last&.created_at
   end
 
+  def unhealthy?
+    unresponsive? || crashed?
+  end
+
   private
 
   def update_status
