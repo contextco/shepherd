@@ -9,19 +9,7 @@
   </div>
 
   <div class="flex flex-col w-full gap-4">
-    <div class="flex justify-center items-center gap-1.5 h-10 grow">
-      <% group_status_bars.each do |status_bar| %>
-        <div class="relative group max-w-2 min-w-1 w-full h-full <%= bg_classes(status_bar[:status]) %>">
-          <div class="absolute flex flex-col gap-0.5 top-10 left-0 border border-stone-400 rounded-md bg-stone-800 text-stone-100 text-xs rounded px-2 py-1 whitespace-nowrap z-40 opacity-0 group-hover:opacity-100">
-            <%= status_bar[:date].strftime('%B %d, %Y') %>
-            <div class="flex justify-between items-baseline gap-2">
-              <div class="text-xs <%= text_classes(status_bar[:status]) %>"> <%= status_text(status_bar[:status]) %> </div>
-              <div class="text-xs text-stone-400"> <%= status_bar[:uptime_percentage] %>% uptime </div>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
+    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: group_status_bars) %>
     <div class="flex gap-2 w-full items-center text-sm text-stone-400">
       <span><%= DAYS %> days ago</span>
       <hr class="border-stone-400 w-full">
@@ -30,4 +18,7 @@
       <span>Today</span>
     </div>
   </div>
+  <% containers_statuses.each do |status_bars| %>
+    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id] ) %>
+  <% end %>
 </div>
