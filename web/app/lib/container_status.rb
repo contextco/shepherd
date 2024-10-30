@@ -2,7 +2,10 @@
 
 class ContainerStatus
   DAYS = 90
+  MINUTES_PER_DAY = 1440
+
   HEARTBEAT_GAP_THRESHOLD = 6.minutes
+
   OFFLINE_THRESHOLD = 2.hours
   DEGRADED_THRESHOLD = 10.minutes
 
@@ -11,31 +14,43 @@ class ContainerStatus
   end
 
   def generate_status_per_day
-    # Initialise result for last 90 days (91 days total including today)
-    result = (0..DAYS).each_with_object({}) do |days_ago, hash|
+    result = initialize_days_hash
+    first_heartbeat = heartbeat_logs.order(:created_at).first&.created_at
+
+    mark_inactive_days(result, first_heartbeat || Time.zone.now + 1.day) # mark all days before the first heartbeat as no data
+    return result if heartbeat_logs.none?
+
+    process_gaps(find_gaps, result, first_heartbeat)
+    calculate_daily_status(result)
+
+    result
+  end
+
+  private
+
+  def initialize_days_hash
+    (0..DAYS).each_with_object({}) do |days_ago, hash|
       hash[days_ago] = {
         status: :online,
         date: days_ago.days.ago.to_date,
         downtime_minutes: 0,
-        uptime_minutes: 1440
+        uptime_minutes: MINUTES_PER_DAY
       }
     end
+  end
 
-    first_heartbeat = heartbeat_logs.order(:created_at).first&.created_at
-    mark_inactive_days(result, first_heartbeat || Time.zone.now + 1.day) # mark all days before the first heartbeat as no data
-
-    return result if heartbeat_logs.none?
-
-    # Process any gaps in the data
-    process_gaps(find_gaps, result, first_heartbeat)
-
-    # Calculate status for each day based on downtime
+  def calculate_daily_status(result)
     result.each do |_, day_data|
       next if day_data[:status] == :no_data
       day_data[:status] = determine_status(day_data[:downtime_minutes])
     end
+  end
 
-    result
+  def determine_status(downtime_minutes)
+    return :offline if downtime_minutes >= OFFLINE_THRESHOLD / 60
+    return :degraded if downtime_minutes >= DEGRADED_THRESHOLD / 60
+
+    :online
   end
 
   def find_gaps
@@ -56,37 +71,36 @@ class ContainerStatus
 
   def process_gaps(gaps, result, first_heartbeat)
     gaps.each do |gap|
-      # Handle gaps that span multiple days
-      (gap[:start_time].to_date..gap[:end_time].to_date).each do |date|
-        days_ago = (Time.zone.today - date).to_i
-        next if days_ago > DAYS || days_ago < 0
-
-        # Calculate downtime for this specific day
-        day_start = date.beginning_of_day
-        day_end = date.end_of_day
-        gap_start = [ gap[:start_time], day_start ].max
-        gap_end = [ gap[:end_time], day_end ].min
-
-        downtime_minutes = ((gap_end - gap_start) / 60).round
-        result[days_ago][:downtime_minutes] += downtime_minutes
-
-        if date == Time.zone.today
-          time_passed_today_minutes = (Time.current.seconds_since_midnight / 60).to_i
-          result[days_ago][:uptime_minutes] = [ time_passed_today_minutes - result[days_ago][:downtime_minutes] ].max
-          next
-        end
-
-        # if date is the first day we see a heartbeat, calculate uptime for the day
-        if date == first_heartbeat.to_date
-          total_time_for_day_since_first_heartbeat = ((first_heartbeat.end_of_day - first_heartbeat) / 60).to_i
-          # downtime can be up to 5 minutes off which can lead to small negative values
-          result[days_ago][:uptime_minutes] = [ total_time_for_day_since_first_heartbeat - result[days_ago][:downtime_minutes], 0 ].max
-          next
-        end
-
-        result[days_ago][:uptime_minutes] = 1440 - result[days_ago][:downtime_minutes]
-      end
+      process_gap(gap, result, first_heartbeat)
     end
+  end
+
+  def process_gap(gap, result, first_heartbeat)
+    (gap[:start_time].to_date..gap[:end_time].to_date).each do |date|
+      days_ago = (Time.zone.today - date).to_i
+      next if days_ago > DAYS || days_ago < 0
+
+      result[days_ago][:downtime_minutes] += calculate_gap_downtime(gap, date)
+      result[days_ago][:uptime_minutes] = calculate_day_uptime(date, result[days_ago][:downtime_minutes], first_heartbeat)
+    end
+  end
+
+  def calculate_gap_downtime(gap, date)
+    gap_start = [ gap[:start_time], date.beginning_of_day ].max
+    gap_end = [ gap[:end_time], date.end_of_day ].min
+    ((gap_end - gap_start) / 60).round
+  end
+
+  def calculate_day_uptime(date, downtime, first_heartbeat)
+    return [ minutes_passed_today - downtime, 0 ].max if date == Time.zone.today
+    return calculate_first_day_uptime(first_heartbeat, downtime) if date == first_heartbeat.to_date
+
+    [ MINUTES_PER_DAY - downtime, 0 ].max
+  end
+
+  def calculate_first_day_uptime(first_heartbeat, downtime)
+    total_minutes = ((first_heartbeat.end_of_day - first_heartbeat) / 60).to_i
+    [ total_minutes - downtime, 0 ].max
   end
 
   def mark_inactive_days(result, first_heartbeat)
@@ -101,11 +115,8 @@ class ContainerStatus
     end
   end
 
-  def determine_status(downtime_minutes)
-    return :offline if downtime_minutes >= OFFLINE_THRESHOLD / 60
-    return :degraded if downtime_minutes >= DEGRADED_THRESHOLD / 60
-
-    :online
+  def minutes_passed_today
+    (Time.current.seconds_since_midnight / 60).to_i
   end
 
   def heartbeat_logs
