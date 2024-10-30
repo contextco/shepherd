@@ -31,6 +31,7 @@ class ContainerStatus
   def initialize_days_hash
     (0..DAYS).each_with_object({}) do |days_ago, hash|
       hash[days_ago] = {
+        lifecycle_id: @container.lifecycle_id,
         status: :online,
         date: days_ago.days.ago.to_date,
         downtime_minutes: 0,
