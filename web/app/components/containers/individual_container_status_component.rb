@@ -22,6 +22,14 @@ class Containers::IndividualContainerStatusComponent < ApplicationComponent
     "No Data"
   end
 
+  def uptime_percentage
+    # TODO: create a proper struct output from container status which containers metadata like this
+    with_data_bars = status_bars.filter { |bar| bar[:status] != :no_data }
+    return 0 if with_data_bars.empty?
+
+    with_data_bars.sum { |bar| bar[:uptime_percentage] } / with_data_bars.size
+  end
+
   def bg_classes(status)
     case status
     when :offline
