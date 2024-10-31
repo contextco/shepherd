@@ -1,9 +1,9 @@
-<div class="w-full whitespace-nowrap px-6 pb-8 pt-6 flex flex-col gap-2 w-full">
-  <div class="flex items-center justify-between gap-2">
+<div class="w-full whitespace-nowrap px-6 pb-8 pt-6 flex flex-col gap-2 w-full" data-controller="hide-show">
+  <div class="flex items-center justify-between gap-2" data-action="click->hide-show#toggle">
     <div class="flex items-center gap-1">
       <span class="text-stone-100 font-semibold"><%= name %></span>
       <span class="text-stone-400 text-sm"><%= containers.count %> instances</span>
-      <%= heroicon 'chevron-down', class: 'size-5 text-stone-400' %>
+      <%= heroicon 'chevron-down', class: 'size-5 text-stone-400 cursor-pointer' %>
     </div>
     <span class="<%= text_classes(current_status) %>"><%= status_text(current_status) %></span>
   </div>
@@ -18,7 +18,10 @@
       <span>Today</span>
     </div>
   </div>
-  <% containers_statuses.zip(containers).each do |status_bars, container| %>
-    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id], container: ) %>
-  <% end %>
+
+  <div class="flex flex-col gap-2 hidden" data-hide-show-target="content">
+    <% containers_statuses.zip(containers).each do |status_bars, container| %>
+      <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id], container: ) %>
+    <% end %>
+  </div>
 </div>
