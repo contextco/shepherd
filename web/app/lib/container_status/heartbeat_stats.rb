@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ContainerStatus
+class ContainerStatus::HeartbeatStats
   DAYS = 90
   MINUTES_PER_DAY = 1440
 

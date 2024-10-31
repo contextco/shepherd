@@ -5,23 +5,23 @@
       <span class="text-stone-400 text-sm"><%= containers.count %> instances</span>
       <%= heroicon 'chevron-down', class: 'size-5 text-stone-400 cursor-pointer' %>
     </div>
-    <span class="<%= text_classes(current_status) %>"><%= status_text(current_status) %></span>
+    <span class="<%= text_classes(group_status.current_status) %>"><%= status_text(group_status.current_status) %></span>
   </div>
 
   <div class="flex flex-col w-full gap-4">
-    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: group_status_bars) %>
+    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: group_status.group_stats) %>
     <div class="flex gap-2 w-full items-center text-sm text-stone-400">
       <span><%= DAYS %> days ago</span>
       <hr class="border-stone-400 w-full">
-      <span><%= uptime_percentage %>% uptime</span>
+      <span><%= group_status.uptime_percentage %>% uptime</span>
       <hr class="border-stone-400 w-full">
       <span>Today</span>
     </div>
   </div>
 
   <div class="flex flex-col gap-2 hidden" data-hide-show-target="content">
-    <% containers_statuses.zip(containers).each do |status_bars, container| %>
-      <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id], container: ) %>
+    <% group_status.constituent_stats.zip(containers).each do |container_stats, container| %>
+      <%= render Containers::IndividualContainerStatusComponent.new(status_bars: container_stats.values.reverse, name: container_stats.values.first[:lifecycle_id], container: ) %>
     <% end %>
   </div>
 </div>

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ContainerStatus do
+RSpec.describe ContainerStatus::HeartbeatStats do
   subject { described_class.new(container) }
 
   let(:container) { create(:container) }
