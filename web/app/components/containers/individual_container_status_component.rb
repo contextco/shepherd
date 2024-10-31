@@ -3,8 +3,16 @@
 class Containers::IndividualContainerStatusComponent < ApplicationComponent
   attribute :name
   attribute :status_bars
+  attribute :container
 
   DAYS = 90
+
+  def current_status
+    return @current_status if defined?(@current_status)
+    return @current_status = :offline if container&.unhealthy?
+
+    @current_status = :online
+  end
 
   def status_text(status)
     return "Offline" if status == :offline
