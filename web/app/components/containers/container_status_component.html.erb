@@ -18,7 +18,7 @@
       <span>Today</span>
     </div>
   </div>
-  <% containers_statuses.each do |status_bars| %>
-    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id] ) %>
+  <% containers_statuses.zip(containers).each do |status_bars, container| %>
+    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: status_bars.values.reverse, name: status_bars.values.first[:lifecycle_id], container: ) %>
   <% end %>
 </div>
