@@ -1,6 +1,10 @@
 <div class="flex flex-col gap-2 mt-1">
   <% if name.present? %>
-  <span class="text-stone-100 font-semibold mt-1"><%= name %></span>
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-stone-100 font-semibold mt-1"><%= name %></span>
+      <span class="<%= text_classes(current_status) %>"><%= status_text(current_status) %></span>
+    </div>
+
   <% end %>
   <div class="flex justify-center items-center gap-1.5 h-10 grow">
     <% status_bars.each do |status_bar| %>
