@@ -8,7 +8,6 @@ module ContainerStatus
     :group_stats,
     keyword_init: true
   ) do
-
     def current_status
       # TODO: implement this correctly and refactor container to enum to be consistent
       return @current_status if defined?(@current_status)
