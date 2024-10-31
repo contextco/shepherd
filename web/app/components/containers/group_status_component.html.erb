@@ -1,0 +1,28 @@
+<div class="flex flex-col gap-1 text-sm py-2">
+  <div class="flex gap-1 items-center">
+    <span class="text-stone-400">
+      Containers Responding
+    </span>
+    <span class="text-stone-100">
+      <%= group_status.healthy_containers.count %>
+    </span>
+  </div>
+
+  <div class="flex gap-1 items-center">
+    <span class="text-stone-400">
+      Archived Containers
+    </span>
+    <span class="text-stone-100">
+      0
+    </span>
+  </div>
+
+  <div class="flex gap-1 items-center">
+    <span class="text-stone-400">
+      Total Containers
+    </span>
+    <span class="text-stone-100">
+      <%= group_status.containers.count %>
+    </span>
+  </div>
+</div>

@@ -8,16 +8,7 @@
     <span class="<%= text_classes(group_status.current_status) %>"><%= status_text(group_status.current_status) %></span>
   </div>
 
-  <div class="flex flex-col w-full gap-4">
-    <%= render Containers::IndividualContainerStatusComponent.new(status_bars: group_status.group_stats) %>
-    <div class="flex gap-2 w-full items-center text-sm text-stone-400">
-      <span><%= DAYS %> days ago</span>
-      <hr class="border-stone-400 w-full">
-      <span><%= group_status.uptime_percentage %>% uptime</span>
-      <hr class="border-stone-400 w-full">
-      <span>Today</span>
-    </div>
-  </div>
+  <%= render Containers::GroupStatusComponent.new(group_status:) %>
 
   <div class="flex flex-col gap-2 hidden" data-hide-show-target="content">
     <% group_status.constituent_stats.zip(containers).each do |container_stats, container| %>

@@ -6,6 +6,7 @@ module ContainerStatus
     :days,
     :constituent_stats,
     :group_stats,
+    :healthy_containers,
     keyword_init: true
   ) do
     def current_status
@@ -33,6 +34,7 @@ module ContainerStatus
           containers:,
           days:,
           constituent_stats:,
+          healthy_containers: containers.filter(&:healthy?),
           group_stats: group_stats(constituent_stats, days)
         )
       end
