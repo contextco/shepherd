@@ -73,7 +73,7 @@ gem "omniauth-rails_csrf_protection"
 gem "omniauth-google-oauth2", "~> 1.2"
 gem "mission_control-jobs"
 
-gem "view_component", "~> 3.19"
+gem "view_component", "~> 3.20"
 
 gem "rails_heroicon", "~> 2.3"
 
