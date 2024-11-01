@@ -459,7 +459,7 @@ GEM
     uri (0.13.1)
     useragent (0.16.10)
     version_gem (1.1.4)
-    view_component (3.19.0)
+    view_component (3.20.0)
       activesupport (>= 5.2.0, < 8.1)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
@@ -533,7 +533,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 3.0)
   turbo-rails
   tzinfo-data
-  view_component (~> 3.19)
+  view_component (~> 3.20)
   web-console
 
 BUNDLED WITH
