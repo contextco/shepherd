@@ -4,24 +4,30 @@ class Containers::ContainerStatusComponent < ApplicationComponent
   attribute :name
   attribute :containers
 
-  DAYS = 60
+  DAYS = 90
 
-  def status_for_day(day)
-    rand > 0.1 ? "operational" : "unhealthy"
+  def group_status
+    @group_status ||= ::ContainerStatus::GroupHeartbeat.from(containers:, days: DAYS)
   end
 
-  def status_bars
-    DAYS.times.map do |day|
-      status = status_for_day(day)
-      {
-        date: DAYS.days.ago.to_date + day.days,
-        status: status
-      }
-    end.reverse
+  def status_text(status)
+    return "Offline" if status == :offline
+    return "Degraded" if status == :degraded
+    return "Online" if status == :online
+
+    "No Data"
   end
 
-  def uptime_percentage
-    total_operational = status_bars.count { |day| day[:status] == "operational" }
-    ((total_operational.to_f / DAYS) * 100).round(2)
+  def text_classes(status)
+    case status
+    when :offline
+      "text-red-500"
+    when :degraded
+      "text-yellow-500"
+    when :online
+      "text-green-500"
+    else
+      "text-gray-500"
+    end
   end
 end
