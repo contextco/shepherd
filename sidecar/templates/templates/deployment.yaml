@@ -5,10 +5,14 @@ metadata:
   labels:
     {{- include "test.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "test.selectorLabels" . | nindent 6 }}
   template:
+    metadata:
+      labels:
+        {{- include "test.labels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
