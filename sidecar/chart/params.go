@@ -1,11 +1,13 @@
 package chart
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
 type Params struct {
-	Container Container
+	Container    Container
+	ReplicaCount int
 }
 
 type Container struct {
@@ -17,19 +19,25 @@ type helmValues struct {
 	ReplicaCount int `json:"replicaCount"`
 }
 
-func (p *Params) Validate() error {
-	if p.Container.Image == "" {
-		return fmt.Errorf("container image is required")
+func (p *Params) toValues() (map[string]interface{}, error) {
+	hv := helmValues{
+		ReplicaCount: p.ReplicaCount,
 	}
 
-	return nil
+	bytes, err := json.Marshal(hv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal helm values: %w", err)
+	}
+
+	var values map[string]interface{}
+	if err := json.Unmarshal(bytes, &values); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal helm values: %w", err)
+	}
+
+	return values, nil
 }
 
 func NewFromParams(params *Params) (*Chart, error) {
-	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("invalid params: %w", err)
-	}
-
 	template, err := canonicalTemplate()
 	if err != nil {
 		return nil, fmt.Errorf("error getting canonical chart: %w", err)
