@@ -4,20 +4,16 @@
       <div class="">
         <div class="font-semibold">Deployments</div>
       </div>
-
-      <div class="flex items-center">
-        <%= render Deployments::CreateDropdownComponent.new %>
-      </div>
     </div>
   </div>
   <% if deployments.blank? %>
     <div class="flex items-center justify-center h-48 border border-stone-300 mt-6">
-      <div class="text-stone-300">Your Deployments will be visible here. Create your first to get started.</div>
+      <div class="text-stone-300">Your Deployments will be visible here. Deploy an application to see its status.</div>
     </div>
   <% else %>
     <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
       <% deployments&.each do |deployment| %>
-        <%= render Deployments::ElementComponent.new(deployment: deployment, health_status: true) %>
+        <%= render Deployments::ElementComponent.new(deployment:, health_status: true) %>
       <% end %>
     </ul>
   <% end %>
