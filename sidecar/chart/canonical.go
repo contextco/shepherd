@@ -6,14 +6,22 @@ import (
 	"io/fs"
 	"path/filepath"
 
-	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
 //go:embed all:templates
 var template embed.FS
 
-func Canonical() (*chart.Chart, error) {
+func Empty(releaseName string) (*Chart, error) {
+	template, err := canonicalTemplate()
+	if err != nil {
+		return nil, fmt.Errorf("error getting canonical template: %w", err)
+	}
+
+	return New(releaseName, template, nil), nil
+}
+
+func canonicalTemplate() (*Template, error) {
 	files, err := templateFiles()
 	if err != nil {
 		return nil, fmt.Errorf("error getting template files: %w", err)
@@ -24,7 +32,7 @@ func Canonical() (*chart.Chart, error) {
 		return nil, fmt.Errorf("error loading template files: %w", err)
 	}
 
-	return chart, nil
+	return &Template{chart: chart}, nil
 }
 
 func templateFiles() ([]*loader.BufferedFile, error) {
