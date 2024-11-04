@@ -6,9 +6,10 @@ import (
 	"log"
 	"os"
 
+	sidecarchart "sidecar/chart"
+
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -18,7 +19,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	chart, err := createChart()
+	chart, err := sidecarchart.Canonical()
 	if err != nil {
 		log.Fatalf("Error creating chart: %v", err)
 	}
@@ -85,24 +86,6 @@ func installChart(ctx context.Context, chart *chart.Chart) error {
 
 	log.Printf("Successfully installed release %s", rel.Name)
 	return nil
-}
-
-func createChart() (*chart.Chart, error) {
-	files, err := TemplateFiles()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, file := range files {
-		fmt.Printf("file: %s\n", file.Name)
-	}
-
-	chart, err := loader.LoadFiles(files)
-	if err != nil {
-		return nil, err
-	}
-
-	return chart, nil
 }
 
 func actionConfig() (*action.Configuration, error) {
