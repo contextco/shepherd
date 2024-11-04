@@ -1,4 +1,4 @@
-package main
+package chart
 
 import (
 	"embed"
@@ -6,13 +6,28 @@ import (
 	"io/fs"
 	"path/filepath"
 
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
 //go:embed all:templates
 var template embed.FS
 
-func TemplateFiles() ([]*loader.BufferedFile, error) {
+func Canonical() (*chart.Chart, error) {
+	files, err := templateFiles()
+	if err != nil {
+		return nil, fmt.Errorf("error getting template files: %w", err)
+	}
+
+	chart, err := loader.LoadFiles(files)
+	if err != nil {
+		return nil, fmt.Errorf("error loading template files: %w", err)
+	}
+
+	return chart, nil
+}
+
+func templateFiles() ([]*loader.BufferedFile, error) {
 	bufferedFiles := []*loader.BufferedFile{}
 	err := fs.WalkDir(template, "templates", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
