@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -15,6 +16,19 @@ type Chart struct {
 
 	template *Template
 	params   *Params
+}
+
+func (c *Chart) Validate() error {
+	values, err := c.params.toValues()
+	if err != nil {
+		return fmt.Errorf("failed to convert params to helm values: %w", err)
+	}
+
+	if err := chartutil.ValidateAgainstSchema(c.template.chart, values); err != nil {
+		return fmt.Errorf("failed to validate chart: %w", err)
+	}
+
+	return nil
 }
 
 func (c *Chart) Install(ctx context.Context) error {
