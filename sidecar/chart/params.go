@@ -13,6 +13,10 @@ type Container struct {
 	Tag   string
 }
 
+type helmValues struct {
+	ReplicaCount int `json:"replicaCount"`
+}
+
 func (p *Params) Validate() error {
 	if p.Container.Image == "" {
 		return fmt.Errorf("container image is required")
