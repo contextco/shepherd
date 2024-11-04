@@ -1,0 +1,28 @@
+<div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
+  <div class="flex w-full justify-between">
+    <div class="flex flex-col">
+      <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Application</span>
+      <div class="flex gap-2 items-center sm:text-2xl">
+        <span class="font-medium text-stone-100 w-fit"><%= @app.name %></span>
+        <span class="font-medium text-stone-500 w-fit"><%= @version.version %></span>
+      </div>
+
+    </div>
+
+    <div class="flex flex-col justify-center">
+      <div class="flex gap-2 items-center">
+
+        <%= button_to release_version_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          Release
+        <% end %>
+
+
+        <%= link_to edit_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+
+</div>

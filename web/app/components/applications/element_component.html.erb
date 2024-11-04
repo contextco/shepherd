@@ -1,0 +1,9 @@
+<li class="grid items-stretch">
+  <%= link_to application_version_path(application, application.latest_version), class: 'bg-stone-800 w-full border border-solid border-stone-400 p-4 text-primary cursor-pointer hover:border-stone-200 hover:bg-stone-700 duration-200 outline-2' do %>
+    <h6 class="text-primary type-body-02-semi-bold mb-6 [container-type:inline-size]">
+      <span class="block truncate w-[100cqi] font-medium"><%= application.name %></span>
+    </h6>
+    <div class="flex items-center gap-2 h-7">
+    </div>
+  <% end %>
+</li>
