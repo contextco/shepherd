@@ -5,7 +5,8 @@ import (
 )
 
 func TestCanonical(t *testing.T) {
-	_, err := Canonical()
+	releaseName := "test"
+	_, err := Empty(releaseName)
 	if err != nil {
 		t.Fatalf("error getting canonical chart: %v", err)
 	}
