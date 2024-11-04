@@ -51,16 +51,15 @@ func NewSettings() *settings {
 }
 
 func uninstallChart() error {
-	s := NewSettings()
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(s.RESTClientGetter(), "default", os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+	actionConfig, err := actionConfig()
+	if err != nil {
 		return fmt.Errorf("failed to initialize helm configuration: %w", err)
 	}
 
 	client := action.NewUninstall(actionConfig)
 	client.IgnoreNotFound = true
 
-	_, err := client.Run(releaseName)
+	_, err = client.Run(releaseName)
 	if err != nil {
 		return fmt.Errorf("failed to uninstall chart: %w", err)
 	}
@@ -69,9 +68,8 @@ func uninstallChart() error {
 }
 
 func installChart(ctx context.Context, chart *chart.Chart) error {
-	s := NewSettings()
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(s.RESTClientGetter(), "default", os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+	actionConfig, err := actionConfig()
+	if err != nil {
 		return fmt.Errorf("failed to initialize helm configuration: %w", err)
 	}
 
@@ -105,4 +103,14 @@ func createChart() (*chart.Chart, error) {
 	}
 
 	return chart, nil
+}
+
+func actionConfig() (*action.Configuration, error) {
+	s := NewSettings()
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(s.RESTClientGetter(), "default", os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+		return nil, fmt.Errorf("failed to initialize helm configuration: %w", err)
+	}
+
+	return actionConfig, nil
 }
