@@ -1,0 +1,20 @@
+<%= form_with url:, class: 'flex flex-col gap-6', method: do |form| %>
+  <div class="flex items-center justify-between">
+    <span class="font-medium">Name</span>
+
+    <%= form.text_field :name,
+                        required: true,
+                        value: application_version&.application_project&.name,
+                        class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <span class="font-medium">Description</span>
+
+    <%= form.text_field :description,
+                        value: application_version&.description,
+                        class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+  </div>
+
+  <%= form.submit application_version.present? ? "Update" : "Create", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+<% end %>
