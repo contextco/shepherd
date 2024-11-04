@@ -1,6 +1,5 @@
 
 class ApplicationProjectController < ApplicationController
-
   def destroy
     app = current_user.team.application_projects.find(params[:id])
     app.destroy!

@@ -1,6 +1,5 @@
 
 class VersionController < ApplicationController
-
   before_action :fetch_application, only: %i[show edit update destroy]
 
   def show; end
