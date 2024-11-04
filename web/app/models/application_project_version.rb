@@ -3,7 +3,7 @@
 class ApplicationProjectVersion < ApplicationRecord
   belongs_to :application_project
   has_many :deployed_services, dependent: :destroy
-  has_one :helm_chart, optional: true, dependent: :destroy
+  has_one :helm_chart, dependent: :destroy
 
   has_one :team, through: :application_project
 
