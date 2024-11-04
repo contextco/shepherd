@@ -16,6 +16,12 @@ Rails.application.routes.draw do
 
   resources :deployment_container, only: [ :show ]
 
+  resources :application, only: [ :new, :create, :destroy ], controller: :application_project do
+    resources :version, only: [ :create, :destroy, :show, :update, :edit ] do
+      post :release, as: :release_version, on: :member
+    end
+  end
+
   resources :team, only: [ :index, :create ]
 
   resources :user, only: [ :index ] do
