@@ -31,7 +31,7 @@ class Project::VersionController < ApplicationController
   private
 
   def fetch_application
-    @app = current_user.team.application_projects.find(params[:application_id])
-    @version = @app.application_project_versions.find(params[:id])
+    @app = current_user.team.projects.find(params[:application_id])
+    @version = @app.project_versions.find(params[:id])
   end
 end
