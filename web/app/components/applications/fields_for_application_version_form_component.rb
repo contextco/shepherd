@@ -2,5 +2,5 @@
 
 class Applications::FieldsForApplicationVersionFormComponent < ApplicationComponent
   attribute :form
-  attribute :application_version
+  attribute :project_version
 end

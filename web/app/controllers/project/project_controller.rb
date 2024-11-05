@@ -18,27 +18,27 @@ class Project::ProjectController < ApplicationController
     @app.update!(name: params[:name])
 
     flash[:notice] = "Application #{@app.name} updated"
-    redirect_to application_version_path(@app, @app.latest_version)
+    redirect_to project_version_path(@app, @app.latest_version)
   end
 
   def create
     team = current_user.team
     app = team.projects.create!(
-      name: project_application_params[:name],
+      name: project_params[:name],
       )
     version = app.project_versions.create!(
-      description: project_application_params[:description],
+      description: project_params[:description],
       version: "0.0.1",
       state: :draft
     )
 
     flash[:notice] = "Application #{app.name} created"
-    redirect_to application_version_path(app, version)
+    redirect_to project_version_path(app, version)
   end
 
   private
 
-  def project_application_params
+  def project_params
     params.permit(:name, :description)
   end
 
