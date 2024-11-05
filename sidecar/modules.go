@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"sidecar/gcs"
+	"sidecar/server"
 )
 
 type Modules struct {
-	Store *gcs.Client
+	Store  *gcs.Client
+	Server *server.Server
 }
 
 func ModulesFromEnv(ctx context.Context) (*Modules, error) {
@@ -16,5 +18,8 @@ func ModulesFromEnv(ctx context.Context) (*Modules, error) {
 		return nil, fmt.Errorf("failed to create store: %w", err)
 	}
 
-	return &Modules{Store: store}, nil
+	return &Modules{
+		Store:  store,
+		Server: server.New(),
+	}, nil
 }
