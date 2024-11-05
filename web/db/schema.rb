@@ -10,27 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_04_113010) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_05_134103) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "application_project_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "application_project_id", null: false
-    t.integer "state", default: 0, null: false
-    t.string "version", null: false
-    t.string "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["application_project_id"], name: "index_application_project_versions_on_application_project_id"
-  end
-
-  create_table "application_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.uuid "team_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["team_id"], name: "index_application_projects_on_team_id"
-  end
 
   create_table "containers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "deployment_id", null: false
@@ -40,18 +22,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_04_113010) do
     t.string "lifecycle_id", null: false
     t.integer "status", default: 0
     t.index ["deployment_id"], name: "index_containers_on_deployment_id"
-  end
-
-  create_table "deployed_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "application_project_version_id", null: false
-    t.string "name", null: false
-    t.string "image"
-    t.jsonb "environment_variables", default: {}
-    t.jsonb "secrets", default: []
-    t.jsonb "resources", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["application_project_version_id"], name: "index_deployed_services_on_application_project_version_id"
   end
 
   create_table "deployment_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -103,6 +73,36 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_04_113010) do
     t.index ["owner_type", "owner_id"], name: "index_helm_charts_on_owner"
   end
 
+  create_table "project_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "image"
+    t.jsonb "environment_variables", default: {}
+    t.jsonb "secrets", default: []
+    t.jsonb "resources", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "project_version_id"
+    t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
+  end
+
+  create_table "project_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer "state", default: 0, null: false
+    t.string "version", null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "project_id"
+    t.index ["project_id"], name: "index_project_versions_on_project_id"
+  end
+
+  create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.uuid "team_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["team_id"], name: "index_projects_on_team_id"
+  end
+
   create_table "ssh_public_keys", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "key", null: false
@@ -136,13 +136,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_04_113010) do
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 
-  add_foreign_key "application_project_versions", "application_projects"
-  add_foreign_key "application_projects", "teams"
   add_foreign_key "containers", "deployments"
-  add_foreign_key "deployed_services", "application_project_versions"
   add_foreign_key "deployment_tokens", "deployments"
   add_foreign_key "deployments", "teams"
   add_foreign_key "event_logs", "containers"
+  add_foreign_key "project_services", "project_versions"
+  add_foreign_key "project_versions", "projects"
+  add_foreign_key "projects", "teams"
   add_foreign_key "ssh_public_keys", "users"
   add_foreign_key "users", "teams"
 end

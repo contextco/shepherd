@@ -1,5 +1,5 @@
 
-class VersionController < ApplicationController
+class Project::VersionController < ApplicationController
   before_action :fetch_application, only: %i[show edit update destroy]
 
   def show; end
@@ -31,7 +31,7 @@ class VersionController < ApplicationController
   private
 
   def fetch_application
-    @app = current_user.team.application_projects.find(params[:application_id])
-    @version = @app.application_project_versions.find(params[:id])
+    @app = current_user.team.projects.find(params[:application_id])
+    @version = @app.project_versions.find(params[:id])
   end
 end

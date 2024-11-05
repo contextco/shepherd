@@ -1,5 +1,6 @@
 
-class ApplicationProjectController < ApplicationController
+# in routes this is the application resource
+class Project::ProjectController < ApplicationController
   before_action :fetch_application, only: %i[edit update destroy]
 
   def destroy
@@ -22,10 +23,10 @@ class ApplicationProjectController < ApplicationController
 
   def create
     team = current_user.team
-    app = team.application_projects.create!(
+    app = team.projects.create!(
       name: project_application_params[:name],
       )
-    version = app.application_project_versions.create!(
+    version = app.project_versions.create!(
       description: project_application_params[:description],
       version: "0.0.1",
       state: :draft
@@ -42,6 +43,6 @@ class ApplicationProjectController < ApplicationController
   end
 
   def fetch_application
-    @app = current_user.team.application_projects.find(params[:id])
+    @app = current_user.team.projects.find(params[:id])
   end
 end
