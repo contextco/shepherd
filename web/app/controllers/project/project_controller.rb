@@ -1,5 +1,5 @@
 
-class ApplicationProjectController < ApplicationController
+class Project::ProjectController < ApplicationController
   before_action :fetch_application, only: %i[edit update destroy]
 
   def destroy
