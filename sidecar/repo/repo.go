@@ -10,7 +10,6 @@ import (
 	"sidecar/chart"
 
 	"helm.sh/helm/v3/pkg/provenance"
-	helmrepo "helm.sh/helm/v3/pkg/repo"
 )
 
 const indexFileName = "index.yaml"
@@ -39,7 +38,7 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 		return fmt.Errorf("failed to check if index file exists: %w", err)
 	}
 
-	indexFile := c.createIndex(chart, archive)
+	indexFile := newIndexFile(chart, archive)
 	if repoExists {
 		indexFile, err = c.updateIndex(ctx, repo, chart, archive)
 		if err != nil {
@@ -47,39 +46,21 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 		}
 	}
 
-	tempFile, err := os.CreateTemp("", "sidecar-repo-index")
+	indexFileBytes, err := indexFile.Bytes()
 	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
-	defer os.Remove(tempFile.Name())
-
-	if err := indexFile.WriteFile(tempFile.Name(), 0644); err != nil {
-		return fmt.Errorf("failed to write index file: %w", err)
+		return fmt.Errorf("failed to get index file bytes: %w", err)
 	}
 
-	buf, err := os.ReadFile(tempFile.Name())
-	if err != nil {
-		return fmt.Errorf("failed to read temp file: %w", err)
-	}
-
-	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(buf))
+	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(indexFileBytes))
 }
 
-func (c *Client) createIndex(chart *chart.Chart, archive *ChartArchive) *helmrepo.IndexFile {
-	indexFile := helmrepo.NewIndexFile()
-	indexFile.MustAdd(chart.Metadata(), chart.Name(), c.baseURL.JoinPath(archive.objectName).String(), archive.hash)
-	indexFile.SortEntries()
-	return indexFile
-}
-
-func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) (*helmrepo.IndexFile, error) {
-	tempFile, err := c.store.ReadToTempFile(ctx, filepath.Join(repo, indexFileName))
+func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) (*indexFile, error) {
+	buf, err := c.store.ReadAll(ctx, filepath.Join(repo, indexFileName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read index file: %w", err)
 	}
-	defer os.Remove(tempFile.Name())
 
-	indexFile, err := helmrepo.LoadIndexFile(tempFile.Name())
+	indexFile, err := newIndexFileFromBytes(buf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load index file: %w", err)
 	}
