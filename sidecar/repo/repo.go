@@ -4,44 +4,44 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sidecar/chart"
 
+	"helm.sh/helm/v3/pkg/provenance"
 	helmrepo "helm.sh/helm/v3/pkg/repo"
 )
 
 const indexFileName = "index.yaml"
 
-type Repo struct {
-	name string
-}
-
 type Client struct {
-	store Store
+	baseURL *url.URL
+	store   Store
 }
 
 func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error {
-	if err := c.upload(ctx, chart, repo); err != nil {
+	objectName, err := c.upload(ctx, chart, repo)
+	if err != nil {
 		return fmt.Errorf("failed to upload chart: %w", err)
 	}
 
-	if err := c.ensureIndex(ctx, repo, chart); err != nil {
+	if err := c.ensureIndex(ctx, repo, chart, objectName); err != nil {
 		return fmt.Errorf("failed to update index: %w", err)
 	}
 
 	return nil
 }
 
-func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Chart) error {
+func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) error {
 	repoExists, err := c.store.Exists(ctx, filepath.Join(repo, indexFileName))
 	if err != nil {
 		return fmt.Errorf("failed to check if index file exists: %w", err)
 	}
 
-	indexFile := c.createIndex(chart)
+	indexFile := c.createIndex(chart, archive)
 	if repoExists {
-		indexFile, err = c.updateIndex(ctx, repo, chart)
+		indexFile, err = c.updateIndex(ctx, repo, chart, archive)
 		if err != nil {
 			return fmt.Errorf("failed to update index: %w", err)
 		}
@@ -65,14 +65,14 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(buf))
 }
 
-func (c *Client) createIndex(chart *chart.Chart) *helmrepo.IndexFile {
+func (c *Client) createIndex(chart *chart.Chart, archive *ChartArchive) *helmrepo.IndexFile {
 	indexFile := helmrepo.NewIndexFile()
-	indexFile.MustAdd(chart.Metadata(), chart.Name(), chart.Version(), "")
+	indexFile.MustAdd(chart.Metadata(), chart.Name(), c.baseURL.JoinPath(archive.objectName).String(), archive.hash)
 	indexFile.SortEntries()
 	return indexFile
 }
 
-func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart) (*helmrepo.IndexFile, error) {
+func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) (*helmrepo.IndexFile, error) {
 	tempFile, err := c.store.ReadToTempFile(ctx, filepath.Join(repo, indexFileName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read index file: %w", err)
@@ -84,34 +84,51 @@ func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Char
 		return nil, fmt.Errorf("failed to load index file: %w", err)
 	}
 
-	indexFile.MustAdd(chart.Metadata(), chart.Name(), chart.Version(), "")
+	indexFile.MustAdd(chart.Metadata(), chart.Name(), archive.objectName, archive.hash)
 	indexFile.SortEntries()
 
 	return indexFile, nil
 }
 
-func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) error {
+func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*ChartArchive, error) {
 	tempDir, err := os.MkdirTemp("", "sidecar-repo")
 	if err != nil {
-		return fmt.Errorf("failed to create temp dir: %w", err)
+		return nil, fmt.Errorf("failed to create temp dir: %w", err)
 	}
 	defer os.RemoveAll(tempDir)
 
 	archivePath, err := chart.Archive(tempDir)
 	if err != nil {
-		return fmt.Errorf("failed to archive chart: %w", err)
+		return nil, fmt.Errorf("failed to archive chart: %w", err)
 	}
 
 	objectName := fmt.Sprintf("%s/%s", repo, filepath.Base(archivePath))
 
 	reader, err := os.Open(archivePath)
 	if err != nil {
-		return fmt.Errorf("failed to open archive: %w", err)
+		return nil, fmt.Errorf("failed to open archive: %w", err)
 	}
 
-	return c.store.Upload(ctx, objectName, reader)
+	hash, err := provenance.DigestFile(archivePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to digest archive: %w", err)
+	}
+
+	if err := c.store.Upload(ctx, objectName, reader); err != nil {
+		return nil, fmt.Errorf("failed to upload archive: %w", err)
+	}
+
+	return &ChartArchive{
+		hash:       hash,
+		objectName: objectName,
+	}, nil
 }
 
-func NewClient(ctx context.Context, store Store) (*Client, error) {
-	return &Client{store: store}, nil
+func NewClient(ctx context.Context, store Store, baseURL *url.URL) (*Client, error) {
+	return &Client{baseURL: baseURL, store: store}, nil
+}
+
+type ChartArchive struct {
+	hash       string
+	objectName string
 }
