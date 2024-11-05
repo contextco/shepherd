@@ -82,7 +82,7 @@ func TestClientAdd(t *testing.T) {
 	}
 
 	// Verify chart file was uploaded
-	chartPath := "test-repo/test-service-0.1.0.tgz" // TODO: Fix this when we propagate the version and name.
+	chartPath := "test-repo/test-chart-1.0.0.tgz"
 	chartExists, err := store.Exists(ctx, chartPath)
 	if err != nil {
 		t.Fatalf("Failed to check chart existence: %v", err)
@@ -104,7 +104,8 @@ entries:
 		},
 	}
 
-	client, err := NewClient(context.Background(), store)
+	ctx := context.Background()
+	client, err := NewClient(ctx, store)
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
@@ -114,7 +115,6 @@ entries:
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
 
-	ctx := context.Background()
 	if err := client.Add(ctx, chart, "test-repo"); err != nil {
 		t.Fatalf("Failed to add chart: %v", err)
 	}
