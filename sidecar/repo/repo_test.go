@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"maps"
+	"net/url"
 	"os"
 	"sidecar/chart"
 	"slices"
@@ -58,7 +59,7 @@ func TestClientAdd(t *testing.T) {
 	store := &fakeStore{}
 
 	ctx := context.Background()
-	client, err := NewClient(ctx, store)
+	client, err := NewClient(ctx, store, &url.URL{})
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
@@ -105,7 +106,7 @@ entries:
 	}
 
 	ctx := context.Background()
-	client, err := NewClient(ctx, store)
+	client, err := NewClient(ctx, store, &url.URL{})
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
