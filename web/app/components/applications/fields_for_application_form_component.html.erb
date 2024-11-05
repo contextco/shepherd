@@ -1,0 +1,8 @@
+<div class="flex items-center justify-between">
+  <span class="font-medium">Name</span>
+
+  <%= form.text_field :name,
+                      required: true,
+                      value: application&.name,
+                      class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+</div>

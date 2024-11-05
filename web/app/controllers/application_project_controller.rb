@@ -1,14 +1,24 @@
 
 class ApplicationProjectController < ApplicationController
-  def destroy
-    app = current_user.team.application_projects.find(params[:id])
-    app.destroy!
+  before_action :fetch_application, only: %i[edit update destroy]
 
-    flash[:notice] = "Deployment #{app.name} deleted"
+  def destroy
+    @app.destroy!
+
+    flash[:notice] = "Deployment #{@app.name} deleted"
     redirect_to root_path
   end
 
   def new; end
+
+  def edit; end
+
+  def update
+    @app.update!(name: params[:name])
+
+    flash[:notice] = "Application #{@app.name} updated"
+    redirect_to application_version_path(@app, @app.latest_version)
+  end
 
   def create
     team = current_user.team
@@ -29,5 +39,9 @@ class ApplicationProjectController < ApplicationController
 
   def project_application_params
     params.permit(:name, :description)
+  end
+
+  def fetch_application
+    @app = current_user.team.application_projects.find(params[:id])
   end
 end

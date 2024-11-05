@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Applications::ApplicationFormComponent < ApplicationComponent
+class Applications::CreateApplicationFormComponent < ApplicationComponent
   attribute :url
   attribute :method
   attribute :application_version

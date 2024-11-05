@@ -1,28 +1,47 @@
-<div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
-  <div class="flex w-full justify-between">
-    <div class="flex flex-col">
-      <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Application</span>
-      <div class="flex gap-2 items-center sm:text-2xl">
-        <span class="font-medium text-stone-100 w-fit"><%= @app.name %></span>
-        <span class="font-medium text-stone-500 w-fit"><%= @version.version %></span>
+<div class="h-full w-full flex flex-col gap-10 bg-stone-800 sm:px-20 px-8 py-8">
+  <div class="flex flex-col gap-8">
+    <div class="flex w-full justify-between">
+      <div class="flex flex-col">
+        <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Application</span>
+        <div class="flex gap-2 items-center sm:text-2xl">
+          <span class="font-medium text-stone-100 w-fit"><%= @app.name %></span>
+        </div>
+
       </div>
 
+      <div class="flex flex-col justify-center">
+        <div class="flex gap-2 items-center">
+
+          <%= link_to edit_application_path(@app), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+            <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
+          <% end %>
+        </div>
+      </div>
     </div>
+    <hr class="border-stone-400 border-t-2 w-full">
+  </div>
 
-    <div class="flex flex-col justify-center">
-      <div class="flex gap-2 items-center">
+  <div class="flex flex-col gap-4">
+    <div class="flex w-full justify-between items-center">
+      <div class="flex items-center gap-2 font-medium">
+        <span class="text-stone-200">Version</span>
+        <%# TODO: make this a dropdown? %>
+        <span class="font-medium text-stone-500 w-fit font-mono"><%= @version.version %></span>
+      </div>
 
+      <div class="flex items-center gap-2">
         <%= button_to release_version_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           Release
         <% end %>
-
-
         <%= link_to edit_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
         <% end %>
       </div>
     </div>
+
   </div>
+
+  <%= render Services::GridComponent.new(application_version: @version) %>
 
 
 </div>
