@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "generated/sidecar_pb";
+
+service Sidecar {
+    rpc PublishChart(PublishChartRequest) returns (PublishChartResponse) {}
+}
+
+message PublishChartRequest {
+    ChartParams chart = 1;
+
+    string repository_directory = 2;
+}
+
+message PublishChartResponse {
+}
+
+message ChartParams {
+    string name = 1;
+    string version = 2;
+
+    Container container = 3;
+}
+
+message Container {
+    string name = 1;
+    string tag = 2;
+}
