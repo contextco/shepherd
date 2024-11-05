@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "onprem/generated/service_pb";
+option go_package = "generated/service_pb";
 
 service OnPrem {
     rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
