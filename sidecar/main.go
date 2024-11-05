@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/url"
 
 	sidecarchart "sidecar/chart"
 	"sidecar/repo"
@@ -26,7 +27,7 @@ func main() {
 		log.Fatalf("Error creating chart: %v", err)
 	}
 
-	repo, err := repo.NewClient(ctx, modules.Store)
+	repo, err := repo.NewClient(ctx, modules.Store, &url.URL{}) // TODO: get base URL from env
 	if err != nil {
 		log.Fatalf("Error creating repo client: %v", err)
 	}
