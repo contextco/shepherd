@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 
 	"cloud.google.com/go/storage"
 )
@@ -30,20 +29,14 @@ func (s *Client) Exists(ctx context.Context, object string) (bool, error) {
 	return err == nil, nil
 }
 
-func (s *Client) ReadToTempFile(ctx context.Context, object string) (*os.File, error) {
+func (s *Client) ReadAll(ctx context.Context, object string) ([]byte, error) {
 	reader, err := s.Bucket(s.bucket).Object(object).NewReader(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read object: %w", err)
 	}
 	defer reader.Close()
 
-	tempFile, err := os.CreateTemp("", "sidecar-repo")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create temp file: %w", err)
-	}
-
-	_, err = io.Copy(tempFile, reader)
-	return tempFile, err
+	return io.ReadAll(reader)
 }
 
 func NewClient(ctx context.Context, bucket string) (*Client, error) {

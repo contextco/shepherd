@@ -33,26 +33,13 @@ func (f *fakeStore) Exists(_ context.Context, path string) (bool, error) {
 	return exists, nil
 }
 
-func (f *fakeStore) ReadToTempFile(_ context.Context, path string) (*os.File, error) {
+func (f *fakeStore) ReadAll(_ context.Context, path string) ([]byte, error) {
 	data, exists := f.files[path]
 	if !exists {
 		return nil, os.ErrNotExist
 	}
 
-	tmpFile, err := os.CreateTemp("", "repo-test")
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := tmpFile.Write(data); err != nil {
-		return nil, err
-	}
-
-	if err := tmpFile.Close(); err != nil {
-		return nil, err
-	}
-
-	return tmpFile, nil
+	return data, nil
 }
 
 func TestClientAdd(t *testing.T) {
