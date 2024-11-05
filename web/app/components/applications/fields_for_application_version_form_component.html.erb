@@ -1,0 +1,7 @@
+<div class="flex items-center justify-between">
+  <span class="font-medium">Description</span>
+
+  <%= form.text_field :description,
+                      value: application_version&.description,
+                      class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+</div>

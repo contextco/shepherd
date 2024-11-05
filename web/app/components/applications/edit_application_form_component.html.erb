@@ -1,0 +1,5 @@
+<%= form_with url: application_path, class: 'flex flex-col gap-6', method: :patch do |form| %>
+  <%= render Applications::FieldsForApplicationFormComponent.new(form:, application: ) %>
+
+  <%= form.submit "Update", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+<% end %>
