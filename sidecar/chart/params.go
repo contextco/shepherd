@@ -13,6 +13,15 @@ type Params struct {
 	ReplicaCount int
 }
 
+func (p *Params) Merge(other *Params) *Params {
+	return &Params{
+		ChartName:    firstNonEmpty(other.ChartName, p.ChartName),
+		ChartVersion: firstNonEmpty(other.ChartVersion, p.ChartVersion),
+		Container:    firstNonEmpty(other.Container, p.Container),
+		ReplicaCount: firstNonEmpty(other.ReplicaCount, p.ReplicaCount),
+	}
+}
+
 type Container struct {
 	Image string
 	Tag   string
@@ -52,4 +61,14 @@ func NewFromParams(params *Params) (*Chart, error) {
 	}
 
 	return chart, nil
+}
+
+func firstNonEmpty[T comparable](values ...T) T {
+	var zero T
+	for _, v := range values {
+		if v != zero {
+			return v
+		}
+	}
+	return zero
 }
