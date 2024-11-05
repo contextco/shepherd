@@ -12,7 +12,7 @@
       <div class="flex flex-col justify-center">
         <div class="flex gap-2 items-center">
 
-          <%= link_to edit_application_path(@app), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+          <%= link_to edit_project_path(@app), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
             <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
           <% end %>
         </div>
@@ -30,10 +30,10 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <%= button_to release_version_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+        <%= button_to release_version_project_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           Release
         <% end %>
-        <%= link_to edit_application_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+        <%= link_to edit_project_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
         <% end %>
       </div>
