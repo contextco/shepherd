@@ -1,9 +1,13 @@
 version: v2
+inputs:
+  - proto_file: service.proto
+  - proto_file: sidecar.proto
 plugins:
   - remote: buf.build/grpc/ruby:v1.67.0
     out: ../web/gen
   - remote: buf.build/protocolbuffers/ruby:v28.3
     out: ../web/gen
+
   - remote: buf.build/grpc/go:v1.5.1
     out: ../client/generated
     opt:
@@ -12,9 +16,14 @@ plugins:
     out: ../client/generated
     opt:
       - paths=source_relative
+
   - remote: buf.build/grpc-ecosystem/gateway:v2.22.0
     out: ../client/generated
     opt:
       - paths=source_relative
       - generate_unbound_methods=true
 
+  - remote: buf.build/grpc/go:v1.5.1
+    out: ../sidecar
+  - remote: buf.build/protocolbuffers/go:v1.34.2
+    out: ../sidecar
