@@ -19,7 +19,7 @@ class Project::VersionController < ApplicationController
     @version.update!(description: params[:description])
 
     flash[:notice] = "Application version updated"
-    redirect_to application_version_path(@app, @version)
+    redirect_to project_version_path(@app, @version)
   end
 
   def edit; end
@@ -31,7 +31,7 @@ class Project::VersionController < ApplicationController
   private
 
   def fetch_application
-    @app = current_user.team.projects.find(params[:application_id])
+    @app = current_user.team.projects.find(params[:project_id])
     @version = @app.project_versions.find(params[:id])
   end
 end
