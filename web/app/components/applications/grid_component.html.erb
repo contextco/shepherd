@@ -6,7 +6,7 @@
       </div>
 
       <div class="flex items-center">
-        <%= link_to new_application_path, method: :get do %>
+        <%= link_to new_project_path, method: :get do %>
           <div class="rounded-md hover:bg-stone-600 bg-stone-700 p-2 cursor-pointer">
             <%= heroicon 'plus', class: 'size-4 stroke-2 text-stone-100' %>
           </div>
@@ -14,14 +14,14 @@
       </div>
     </div>
   </div>
-  <% if applications.blank? %>
+  <% if projects.blank? %>
     <div class="flex items-center justify-center h-48 border border-stone-300 mt-6">
       <div class="text-stone-300">Your Applications will be visible here. Create your first application</div>
     </div>
   <% else %>
     <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
-      <% applications&.each do |application| %>
-        <%= render Applications::ElementComponent.new(application:) %>
+      <% projects&.each do |project| %>
+        <%= render Applications::ElementComponent.new(project:) %>
       <% end %>
     </ul>
   <% end %>

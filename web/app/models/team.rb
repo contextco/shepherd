@@ -5,5 +5,5 @@ class Team < ApplicationRecord
   has_many :deployments, dependent: :destroy
   has_many :containers, dependent: :destroy
 
-  has_many :application_projects, dependent: :destroy
+  has_many :projects, dependent: :destroy
 end
