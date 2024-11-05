@@ -92,6 +92,15 @@ func (c *Chart) Uninstall() error {
 	return nil
 }
 
+func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
+	chart, err := c.template.ApplyParams(c.params.Merge(params))
+	if err != nil {
+		return nil, fmt.Errorf("failed to apply params: %w", err)
+	}
+
+	return chart, nil
+}
+
 func New(releaseName string, template *Template, params *Params) *Chart {
 	return &Chart{releaseName: releaseName, template: template, params: params}
 }
