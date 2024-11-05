@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 
-	service_pb "onprem/generated"
+	service_pb "onprem/generated/service_pb"
 )
 
 var (
