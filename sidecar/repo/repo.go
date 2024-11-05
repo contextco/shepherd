@@ -46,22 +46,12 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 		}
 	}
 
-	tempFile, err := os.CreateTemp("", "sidecar-repo-index")
+	indexFileBytes, err := indexFile.Bytes()
 	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
-	defer os.Remove(tempFile.Name())
-
-	if err := indexFile.WriteFile(tempFile.Name(), 0644); err != nil {
-		return fmt.Errorf("failed to write index file: %w", err)
+		return fmt.Errorf("failed to get index file bytes: %w", err)
 	}
 
-	buf, err := os.ReadFile(tempFile.Name())
-	if err != nil {
-		return fmt.Errorf("failed to read temp file: %w", err)
-	}
-
-	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(buf))
+	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(indexFileBytes))
 }
 
 func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) (*indexFile, error) {
