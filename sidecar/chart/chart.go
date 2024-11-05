@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -16,6 +17,28 @@ type Chart struct {
 
 	template *Template
 	params   *Params
+}
+
+func (c *Chart) Name() string {
+	return c.params.ChartName
+}
+
+func (c *Chart) Version() string {
+	return c.params.ChartVersion
+}
+
+func (c *Chart) Metadata() *chart.Metadata {
+	return c.template.chart.Metadata
+}
+
+func (c *Chart) Archive(dir string) (string, error) {
+	values, err := c.params.toValues()
+	if err != nil {
+		return "", fmt.Errorf("failed to convert params to helm values: %w", err)
+	}
+
+	c.template.chart.Values = values
+	return chartutil.Save(c.template.chart, dir)
 }
 
 func (c *Chart) Validate() error {

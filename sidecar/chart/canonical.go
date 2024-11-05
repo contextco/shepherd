@@ -18,7 +18,7 @@ func Empty(releaseName string) (*Chart, error) {
 		return nil, fmt.Errorf("error getting canonical template: %w", err)
 	}
 
-	return New(releaseName, template, nil), nil
+	return New(releaseName, template, &Params{}), nil
 }
 
 func canonicalTemplate() (*Template, error) {
