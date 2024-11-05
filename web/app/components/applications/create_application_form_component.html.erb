@@ -1,0 +1,7 @@
+<%= form_with url:, class: 'flex flex-col gap-6', method: do |form| %>
+  <%= render Applications::FieldsForApplicationFormComponent.new(form:, application: application_version&.application_project ) %>
+
+  <%= render Applications::FieldsForApplicationVersionFormComponent.new(form:, application_version:) %>
+
+  <%= form.submit "Create", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+<% end %>
