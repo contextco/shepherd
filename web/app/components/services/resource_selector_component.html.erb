@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-1">
+  <%= form.label field_name, field_label, class: 'font-medium text-sm text-stone-200' %>
+  <div class="flex gap-2">
+    <%= form.number_field field_name,
+                        required: true,
+                        value: default_value,
+                        min: 1,
+                        step: 1,
+                        max: 1024,
+                        class: 'w-24 p-2 rounded-md bg-stone-700 text-stone-100 border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
+    %>
+    <%= form.select "#{field_name}_unit",
+                    field_name.to_s.include?('cpu') ? options_for_select(%w[Cores mCores]) : options_for_select(%w[GB MB KB]),
+                    { include_blank: false },
+                    class: 'p-2 rounded-md bg-stone-700 text-stone-100 border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
+    %>
+  </div>
+</div>
