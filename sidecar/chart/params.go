@@ -6,6 +6,9 @@ import (
 )
 
 type Params struct {
+	ChartName    string
+	ChartVersion string
+
 	Container    Container
 	ReplicaCount int
 }
