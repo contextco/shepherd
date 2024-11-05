@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Services::GridComponent < ApplicationComponent
-  attribute :application_version
+  attribute :project_version
 
   def services
-    application_version&.deployed_services || []
+    project_version&.project_services || []
   end
 end
