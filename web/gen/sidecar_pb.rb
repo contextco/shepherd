@@ -5,12 +5,14 @@
 require 'google/protobuf'
 
 
-descriptor_data = "\n\rsidecar.proto\"l\n\x13PublishChartRequest\x12\"\n\x05\x63hart\x18\x01 \x01(\x0b\x32\x0c.ChartParamsR\x05\x63hart\x12\x31\n\x14repository_directory\x18\x02 \x01(\tR\x13repositoryDirectory\"\x16\n\x14PublishChartResponse\"e\n\x0b\x43hartParams\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12(\n\tcontainer\x18\x03 \x01(\x0b\x32\n.ContainerR\tcontainer\"1\n\tContainer\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x10\n\x03tag\x18\x02 \x01(\tR\x03tag2H\n\x07Sidecar\x12=\n\x0cPublishChart\x12\x14.PublishChartRequest\x1a\x15.PublishChartResponse\"\x00\x42\x16Z\x14generated/sidecar_pbb\x06proto3"
+descriptor_data = "\n\rsidecar.proto\"l\n\x13PublishChartRequest\x12\"\n\x05\x63hart\x18\x01 \x01(\x0b\x32\x0c.ChartParamsR\x05\x63hart\x12\x31\n\x14repository_directory\x18\x02 \x01(\tR\x13repositoryDirectory\"\x16\n\x14PublishChartResponse\":\n\x14ValidateChartRequest\x12\"\n\x05\x63hart\x18\x01 \x01(\x0b\x32\x0c.ChartParamsR\x05\x63hart\"E\n\x15ValidateChartResponse\x12\x14\n\x05valid\x18\x01 \x01(\x08R\x05valid\x12\x16\n\x06\x65rrors\x18\x02 \x03(\tR\x06\x65rrors\"e\n\x0b\x43hartParams\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12(\n\tcontainer\x18\x03 \x01(\x0b\x32\n.ContainerR\tcontainer\"1\n\tContainer\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x10\n\x03tag\x18\x02 \x01(\tR\x03tag2\x8a\x01\n\x07Sidecar\x12=\n\x0cPublishChart\x12\x14.PublishChartRequest\x1a\x15.PublishChartResponse\"\x00\x12@\n\rValidateChart\x12\x15.ValidateChartRequest\x1a\x16.ValidateChartResponse\"\x00\x42\x16Z\x14generated/sidecar_pbb\x06proto3"
 
 pool = Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
 
 PublishChartRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("PublishChartRequest").msgclass
 PublishChartResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("PublishChartResponse").msgclass
+ValidateChartRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ValidateChartRequest").msgclass
+ValidateChartResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ValidateChartResponse").msgclass
 ChartParams = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ChartParams").msgclass
 Container = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Container").msgclass

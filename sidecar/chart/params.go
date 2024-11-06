@@ -3,6 +3,7 @@ package chart
 import (
 	"encoding/json"
 	"fmt"
+	"sidecar/generated/sidecar_pb"
 )
 
 type Params struct {
@@ -61,6 +62,17 @@ func NewFromParams(params *Params) (*Chart, error) {
 	}
 
 	return chart, nil
+}
+
+func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
+	return NewFromParams(&Params{
+		ChartName:    proto.Name,
+		ChartVersion: proto.Version,
+		Container: Container{
+			Image: proto.GetContainer().GetName(),
+			Tag:   proto.GetContainer().GetTag(),
+		},
+	})
 }
 
 func firstNonEmpty[T comparable](values ...T) T {

@@ -14,6 +14,7 @@ module Sidecar
     self.service_name = 'Sidecar'
 
     rpc :PublishChart, ::PublishChartRequest, ::PublishChartResponse
+    rpc :ValidateChart, ::ValidateChartRequest, ::ValidateChartResponse
   end
 
   Stub = Service.rpc_stub_class
