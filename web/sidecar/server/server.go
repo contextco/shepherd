@@ -46,7 +46,7 @@ func (s *Server) Run(ctx context.Context) error {
 	sidecar_pb.RegisterSidecarServer(grpcServer, s)
 
 	// Create a listener on TCP port 50051
-	lis, err := net.Listen("tcp", s.port)
+	lis, err := net.Listen("tcp", net.JoinHostPort("localhost", s.port))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
