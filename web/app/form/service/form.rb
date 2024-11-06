@@ -37,7 +37,7 @@ class Service::Form
 
     def name_valid
       # for now allow empty names which we will ignore when creating the service object
-      return if name.empty?
+      return if name.blank?
       return if name.match?(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
 
       errors.add(:name, "must start with a letter or underscore and contain only letters, numbers, and underscores")
@@ -51,7 +51,7 @@ class Service::Form
     validate :name_valid
 
     def name_valid
-      return if name.empty?
+      return if name.blank?
       return if name.match?(/\A[a-z0-9][a-z0-9.-]*[a-z0-9]\z/)
 
       errors.add(:name, "must start and end with a letter or number and contain only letters, numbers, periods, and hyphens")
@@ -64,9 +64,17 @@ class Service::Form
   validate :name_format
 
   def create_service(project_version)
-    return unless valid?
-
     project_version.project_services.create!(
+      name:,
+      image:,
+      resources: resources_object,
+      environment_variables: environment_variables_object,
+      secrets: secrets_object
+    )
+  end
+
+  def update_service(service)
+    service.update!(
       name:,
       image:,
       resources: resources_object,
@@ -79,10 +87,18 @@ class Service::Form
 
   def resources_object
     {
-      cpu_request: "#{resources.cpu_request}#{resources.cpu_request_unit}",
-      cpu_limit: "#{resources.cpu_limit}#{resources.cpu_limit_unit}",
-      memory_request: "#{resources.memory_request}#{resources.memory_request_unit}",
-      memory_limit: "#{resources.memory_limit}#{resources.memory_limit_unit}"
+      cpu_request_combined: "#{resources.cpu_request}#{resources.cpu_request_unit}",
+      cpu_limit_combined: "#{resources.cpu_limit}#{resources.cpu_limit_unit}",
+      memory_request_combined: "#{resources.memory_request}#{resources.memory_request_unit}",
+      memory_limit_combined: "#{resources.memory_limit}#{resources.memory_limit_unit}",
+      cpu_request: resources.cpu_request,
+      cpu_limit: resources.cpu_limit,
+      memory_request: resources.memory_request,
+      memory_limit: resources.memory_limit,
+      cpu_request_unit: resources.cpu_request_unit,
+      cpu_limit_unit: resources.cpu_limit_unit,
+      memory_request_unit: resources.memory_request_unit,
+      memory_limit_unit: resources.memory_limit_unit
     }
   end
 
@@ -90,7 +106,7 @@ class Service::Form
     # filter out empty environment variables names
     # TODO: we should handle this client side more gracefully..
     environment_variables.select { |env| env.name.present? }.map do |env|
-      { name: env.name, value: env.value }
+      { name: env.name, value: env.value, templated: env.templated }
     end
   end
 
