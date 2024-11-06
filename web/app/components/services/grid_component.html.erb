@@ -6,7 +6,7 @@
       </div>
 
       <div class="flex items-center">
-        <%= link_to new_project_version_service_path(project_version, project_version), method: :get do %>
+        <%= link_to new_project_version_service_path(project_version.project_id, project_version), method: :get do %>
           <div class="rounded-md hover:bg-stone-600 bg-stone-700 p-2 cursor-pointer">
             <%= heroicon 'plus', class: 'size-4 stroke-2 text-stone-100' %>
           </div>
