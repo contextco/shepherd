@@ -46,7 +46,14 @@ RUN bundle exec bootsnap precompile app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
+FROM golang:1.23.2-alpine3.20 AS sidecar
 
+
+WORKDIR /sidecar
+
+COPY ./sidecar /sidecar
+
+RUN go build -o sidecar
 
 # Final stage for app image
 FROM base
@@ -54,6 +61,8 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+
+COPY --from=sidecar /sidecar/sidecar /sidecar/sidecar
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
@@ -66,4 +75,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+CMD ["./bin/serve-with-sidecar"]
