@@ -29,10 +29,10 @@ message ChartParams {
     string name = 1;
     string version = 2;
 
-    Container container = 3;
+    Image image = 3;
 }
 
-message Container {
+message Image {
     string name = 1;
     string tag = 2;
 }

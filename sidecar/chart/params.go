@@ -10,7 +10,7 @@ type Params struct {
 	ChartName    string
 	ChartVersion string
 
-	Container    Container
+	Image        Image
 	ReplicaCount int
 }
 
@@ -18,14 +18,14 @@ func (p *Params) Merge(other *Params) *Params {
 	return &Params{
 		ChartName:    firstNonEmpty(other.ChartName, p.ChartName),
 		ChartVersion: firstNonEmpty(other.ChartVersion, p.ChartVersion),
-		Container:    firstNonEmpty(other.Container, p.Container),
+		Image:        firstNonEmpty(other.Image, p.Image),
 		ReplicaCount: firstNonEmpty(other.ReplicaCount, p.ReplicaCount),
 	}
 }
 
-type Container struct {
-	Image string
-	Tag   string
+type Image struct {
+	Name string
+	Tag  string
 }
 
 type helmValues struct {
@@ -68,9 +68,9 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 	return NewFromParams(&Params{
 		ChartName:    proto.Name,
 		ChartVersion: proto.Version,
-		Container: Container{
-			Image: proto.GetContainer().GetName(),
-			Tag:   proto.GetContainer().GetTag(),
+		Image: Image{
+			Name: proto.GetImage().GetName(),
+			Tag:  proto.GetImage().GetTag(),
 		},
 	})
 }
