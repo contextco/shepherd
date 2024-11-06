@@ -9,7 +9,7 @@
     },
     "image": {
       "type": "object",
-      "required": ["repository"],
+      "required": ["repository", "tag"],
       "properties": {
         "repository": {
           "type": "string",

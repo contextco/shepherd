@@ -14,9 +14,9 @@ func TestMerge(t *testing.T) {
 			base: &Params{
 				ChartName:    "base-chart",
 				ChartVersion: "1.0.0",
-				Container: Container{
-					Image: "base-image",
-					Tag:   "base-tag",
+				Image: Image{
+					Name: "base-image",
+					Tag:  "base-tag",
 				},
 				ReplicaCount: 1,
 			},
@@ -24,9 +24,9 @@ func TestMerge(t *testing.T) {
 			want: &Params{
 				ChartName:    "base-chart",
 				ChartVersion: "1.0.0",
-				Container: Container{
-					Image: "base-image",
-					Tag:   "base-tag",
+				Image: Image{
+					Name: "base-image",
+					Tag:  "base-tag",
 				},
 				ReplicaCount: 1,
 			},
@@ -36,27 +36,27 @@ func TestMerge(t *testing.T) {
 			base: &Params{
 				ChartName:    "base-chart",
 				ChartVersion: "1.0.0",
-				Container: Container{
-					Image: "base-image",
-					Tag:   "base-tag",
+				Image: Image{
+					Name: "base-image",
+					Tag:  "base-tag",
 				},
 				ReplicaCount: 1,
 			},
 			override: &Params{
 				ChartName:    "override-chart",
 				ChartVersion: "2.0.0",
-				Container: Container{
-					Image: "override-image",
-					Tag:   "override-tag",
+				Image: Image{
+					Name: "override-image",
+					Tag:  "override-tag",
 				},
 				ReplicaCount: 2,
 			},
 			want: &Params{
 				ChartName:    "override-chart",
 				ChartVersion: "2.0.0",
-				Container: Container{
-					Image: "override-image",
-					Tag:   "override-tag",
+				Image: Image{
+					Name: "override-image",
+					Tag:  "override-tag",
 				},
 				ReplicaCount: 2,
 			},
@@ -66,9 +66,9 @@ func TestMerge(t *testing.T) {
 			base: &Params{
 				ChartName:    "base-chart",
 				ChartVersion: "1.0.0",
-				Container: Container{
-					Image: "base-image",
-					Tag:   "base-tag",
+				Image: Image{
+					Name: "base-image",
+					Tag:  "base-tag",
 				},
 				ReplicaCount: 1,
 			},
@@ -79,9 +79,9 @@ func TestMerge(t *testing.T) {
 			want: &Params{
 				ChartName:    "base-chart",
 				ChartVersion: "2.0.0",
-				Container: Container{
-					Image: "base-image",
-					Tag:   "base-tag",
+				Image: Image{
+					Name: "base-image",
+					Tag:  "base-tag",
 				},
 				ReplicaCount: 2,
 			},
@@ -97,8 +97,8 @@ func TestMerge(t *testing.T) {
 			if got.ChartVersion != tt.want.ChartVersion {
 				t.Errorf("ChartVersion = %v, want %v", got.ChartVersion, tt.want.ChartVersion)
 			}
-			if got.Container != tt.want.Container {
-				t.Errorf("Container = %v, want %v", got.Container, tt.want.Container)
+			if got.Image != tt.want.Image {
+				t.Errorf("Image = %v, want %v", got.Image, tt.want.Image)
 			}
 			if got.ReplicaCount != tt.want.ReplicaCount {
 				t.Errorf("ReplicaCount = %v, want %v", got.ReplicaCount, tt.want.ReplicaCount)
