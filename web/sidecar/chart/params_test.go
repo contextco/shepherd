@@ -1,6 +1,11 @@
 package chart
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+)
 
 func TestMerge(t *testing.T) {
 	tests := []struct {
@@ -102,6 +107,70 @@ func TestMerge(t *testing.T) {
 			}
 			if got.ReplicaCount != tt.want.ReplicaCount {
 				t.Errorf("ReplicaCount = %v, want %v", got.ReplicaCount, tt.want.ReplicaCount)
+			}
+		})
+	}
+}
+
+func TestParams_toValues(t *testing.T) {
+	tests := []struct {
+		name    string
+		params  *Params
+		want    map[string]interface{}
+		wantErr bool
+	}{
+		{
+			name: "valid params",
+			params: &Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+				ReplicaCount: 3,
+				Environment: Environment{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+			},
+			want: map[string]interface{}{
+				"replicaCount": 3,
+				"environment": map[string]interface{}{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "empty environment",
+			params: &Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+				ReplicaCount: 3,
+				Environment:  Environment{},
+			},
+			want: map[string]interface{}{
+				"replicaCount": 3,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.params.toValues()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("toValues() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if diff := cmp.Diff(got, tt.want, cmpopts.SortMaps(func(a, b string) bool { return a < b })); diff != "" {
+				t.Errorf("toValues() = %v, want %v, diff = %s", got, tt.want, diff)
 			}
 		})
 	}

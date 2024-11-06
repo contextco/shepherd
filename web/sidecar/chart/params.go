@@ -1,7 +1,6 @@
 package chart
 
 import (
-	"encoding/json"
 	"fmt"
 	"sidecar/generated/sidecar_pb"
 )
@@ -12,6 +11,20 @@ type Params struct {
 
 	Image        Image
 	ReplicaCount int
+
+	Environment Environment
+}
+
+type Environment map[string]string
+
+func (e Environment) LoadFromProto(proto *sidecar_pb.EnvironmentConfig) {
+	for _, v := range proto.GetEnvironmentVariables() {
+		e[v.GetName()] = v.GetValue()
+	}
+}
+
+func (e Environment) toValues() map[string]interface{} {
+	return withInterfaceValues(e)
 }
 
 func (p *Params) Merge(other *Params) *Params {
@@ -29,25 +42,20 @@ type Image struct {
 }
 
 type helmValues struct {
-	ReplicaCount int `json:"replicaCount"`
+	ReplicaCount int         `json:"replicaCount"`
+	Environment  Environment `json:"environment,omitempty"`
 }
 
 func (p *Params) toValues() (map[string]interface{}, error) {
 	hv := helmValues{
 		ReplicaCount: p.ReplicaCount,
+		Environment:  p.Environment,
 	}
 
-	bytes, err := json.Marshal(hv)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal helm values: %w", err)
-	}
-
-	var values map[string]interface{}
-	if err := json.Unmarshal(bytes, &values); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal helm values: %w", err)
-	}
-
-	return values, nil
+	return compactMap(map[string]interface{}{
+		"replicaCount": hv.ReplicaCount,
+		"environment":  hv.Environment.toValues(),
+	}), nil
 }
 
 func NewFromParams(params *Params) (*Chart, error) {
@@ -65,6 +73,9 @@ func NewFromParams(params *Params) (*Chart, error) {
 }
 
 func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
+	env := Environment{}
+	env.LoadFromProto(proto.GetEnvironmentConfig())
+
 	return NewFromParams(&Params{
 		ChartName:    proto.Name,
 		ChartVersion: proto.Version,
@@ -72,6 +83,7 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 			Name: proto.GetImage().GetName(),
 			Tag:  proto.GetImage().GetTag(),
 		},
+		Environment: env,
 	})
 }
 
@@ -83,4 +95,29 @@ func firstNonEmpty[T comparable](values ...T) T {
 		}
 	}
 	return zero
+}
+
+func compactMap(m map[string]interface{}) map[string]interface{} {
+	for k, v := range m {
+		if v == nil {
+			delete(m, k)
+		}
+
+		if vm, ok := v.(map[string]interface{}); ok {
+			if len(vm) == 0 {
+				delete(m, k)
+			} else {
+				vm = compactMap(vm)
+			}
+		}
+	}
+	return m
+}
+
+func withInterfaceValues[T any](v map[string]T) map[string]interface{} {
+	m := make(map[string]interface{}, len(v))
+	for k, v := range v {
+		m[k] = v
+	}
+	return m
 }
