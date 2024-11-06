@@ -17,15 +17,33 @@ class Service::Form
     attribute :memory_request_unit, default: "Gi"
     attribute :memory_limit_unit, default: "Gi"
 
-    validates :cpu_request, presence: true, numericality: { greater_than: 0, less_than: 1025 }
-    validates :cpu_limit, presence: true, numericality: { greater_than: 0, less_than: 1025 }
-    validates :memory_request, presence: true, numericality: { greater_than: 0, less_than: 1025 }
-    validates :memory_limit, presence: true, numericality: { greater_than: 0, less_than: 1025 }
+    validates :cpu_request, presence: true, numericality: { greater_than: 0, less_than: 10000 }
+    validates :cpu_limit, presence: true, numericality: { greater_than: 0, less_than: 10000 }
+    validates :memory_request, presence: true, numericality: { greater_than: 0, less_than: 10000 }
+    validates :memory_limit, presence: true, numericality: { greater_than: 0, less_than: 10000 }
 
     validates :cpu_request_unit, presence: true, inclusion: { in: %w[Cores mCores] }
     validates :cpu_limit_unit, presence: true, inclusion: { in: %w[Cores mCores] }
     validates :memory_request_unit, presence: true, inclusion: { in: %w[Gi Mi Ki] }
     validates :memory_limit_unit, presence: true, inclusion: { in: %w[Gi Mi Ki] }
+    validate :cpu_limit_less_than_cpu_request
+    validate :memory_limit_less_than_memory_request
+
+    def cpu_limit_less_than_cpu_request
+      cpu_request_total = cpu_request.to_i * (cpu_request_unit == "Cores" ? 1000 : 1)
+      cpu_limit_total = cpu_limit.to_i * (cpu_limit_unit == "Cores" ? 1000 : 1)
+      return if cpu_limit_total >= cpu_request_total
+
+      errors.add(:cpu_limit, "must be greater than or equal to CPU request")
+    end
+
+    def memory_limit_less_than_memory_request
+      memory_request_total = memory_request.to_i * (memory_request_unit == "Gi" ? 1024**2 : memory_request_unit == "Mi" ? 1024**1 : 1)
+      memory_limit_total = memory_limit.to_i * (memory_limit_unit == "Gi" ? 1024**2 : memory_limit_unit == "Mi" ? 1024**1 : 1)
+      return if memory_limit_total >= memory_request_total
+
+      errors.add(:memory_limit, "must be greater than or equal to memory request")
+    end
   end
 
   attribute :environment_variables, multiple: true do
@@ -47,7 +65,7 @@ class Service::Form
   attribute :secrets, multiple: true do
     attribute :name
 
-    validates :name, length: { maximum: 253 }
+    validates :name, length: { maximum: 253 } # restrict to 253 characters to match kubernetes secret name limit
     validate :name_valid
 
     def name_valid
