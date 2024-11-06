@@ -26,16 +26,7 @@ func New(port string, repoClient *repo.Client) *Server {
 }
 
 func (s *Server) PublishChart(ctx context.Context, req *sidecar_pb.PublishChartRequest) (*sidecar_pb.PublishChartResponse, error) {
-	params := &chart.Params{
-		ChartName:    req.Chart.Name,
-		ChartVersion: req.Chart.Version,
-		Container: chart.Container{
-			Image: req.Chart.Container.Name,
-			Tag:   req.Chart.Container.Tag,
-		},
-	}
-
-	chart, err := chart.NewFromParams(params)
+	chart, err := chart.NewFromProto(req.Chart)
 	if err != nil {
 		return nil, err
 	}

@@ -13,9 +13,9 @@ func TestChartValidate(t *testing.T) {
 		{
 			name: "valid params",
 			params: &Params{
-				Container: Container{
-					Image: "nginx",
-					Tag:   "latest",
+				Image: Image{
+					Name: "nginx",
+					Tag:  "latest",
 				},
 				ReplicaCount: 1,
 			},
