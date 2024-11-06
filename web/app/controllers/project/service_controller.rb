@@ -16,7 +16,7 @@ class Project::ServiceController < ApplicationController
 
   def create
     form = Service::Form.new(params[:project_service])
-    return flash[:error] = form.errors.full_messages.join(", ") unless form.valid?
+    flash[:error] = form.errors.full_messages.join(", ") unless form.valid?
   end
 
   def edit; end
