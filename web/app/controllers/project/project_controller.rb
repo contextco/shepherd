@@ -15,6 +15,10 @@ class Project::ProjectController < ApplicationController
   def edit; end
 
   def update
+    unless project_params[:name].match?(/\A[a-z0-9-]+\z/) && project_params[:name].length <= 100
+      flash[:error] = "Name must be lower case and contain only letters, numbers, hyphens and be less than 100 characters"
+      return render action: :new, status: :unprocessable_entity
+    end
     @app.update!(name: params[:name])
 
     flash[:notice] = "Application #{@app.name} updated"
@@ -22,6 +26,12 @@ class Project::ProjectController < ApplicationController
   end
 
   def create
+    # turn into a form when we have more fields
+    unless project_params[:name].match?(/\A[a-z0-9-]+\z/) && project_params[:name].length <= 100
+      flash[:error] = "Name must be lower case and contain only letters, numbers, hyphens and be less than 100 characters"
+      return render action: :new, status: :unprocessable_entity
+    end
+
     team = current_user.team
     app = team.projects.create!(
       name: project_params[:name],
