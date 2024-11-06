@@ -4,6 +4,7 @@ option go_package = "generated/sidecar_pb";
 
 service Sidecar {
     rpc PublishChart(PublishChartRequest) returns (PublishChartResponse) {}
+    rpc ValidateChart(ValidateChartRequest) returns (ValidateChartResponse) {}
 }
 
 message PublishChartRequest {
@@ -13,6 +14,15 @@ message PublishChartRequest {
 }
 
 message PublishChartResponse {
+}
+
+message ValidateChartRequest {
+    ChartParams chart = 1;
+}
+
+message ValidateChartResponse {
+    bool valid = 1;
+    repeated string errors = 2;
 }
 
 message ChartParams {
