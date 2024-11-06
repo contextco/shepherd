@@ -12,7 +12,7 @@ on:
 
 defaults:
   run:
-    working-directory: sidecar
+    working-directory: web/sidecar
 
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version-file: sidecar/go.mod
-        cache-dependency-path: sidecar/go.sum
+        go-version-file: web/sidecar/go.mod
+        cache-dependency-path: web/sidecar/go.sum
 
     - name: Set up Kind
       uses: helm/kind-action@v1
