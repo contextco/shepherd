@@ -21,7 +21,7 @@
   <% else %>
     <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
       <% services.each do |service| %>
-        <%= render Services::ElementComponent.new(service:) %>
+        <%= render Services::ElementComponent.new(service:, version: project_version) %>
       <% end %>
     </ul>
   <% end %>
