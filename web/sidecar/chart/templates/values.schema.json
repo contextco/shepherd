@@ -168,5 +168,6 @@
         "type": "object"
       }
     }
-  }
+  },
+  "additionalProperties": false
 }

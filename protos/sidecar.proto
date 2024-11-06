@@ -30,6 +30,21 @@ message ChartParams {
     string version = 2;
 
     Image image = 3;
+
+    EnvironmentConfig environment_config = 4;
+}
+
+message EnvironmentConfig {
+    // Contains environment key and value pairs that are hardcoded into the chart.
+    repeated EnvironmentVariable environment_variables = 1;
+
+    // Contains environment variable names that must be provided by the client.
+    // repeated string client_required_environment_variables = 2;
+}
+
+message EnvironmentVariable {
+    string name = 1;
+    string value = 2;
 }
 
 message Image {
