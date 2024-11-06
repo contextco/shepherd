@@ -1,6 +1,7 @@
 
 class Project::ServiceController < ApplicationController
   before_action :fetch_application, only: %i[show edit update destroy]
+  before_action :prepare_form, only: %i[create]
 
   def show; end
 
@@ -13,7 +14,10 @@ class Project::ServiceController < ApplicationController
 
   def new; end
 
-  def create; end
+  def create
+    form = Service::Form.new(params[:project_service])
+    return flash[:error] = form.errors.full_messages.join(", ") unless form.valid?
+  end
 
   def edit; end
 
@@ -25,6 +29,14 @@ class Project::ServiceController < ApplicationController
   end
 
   private
+
+  def prepare_form
+    @form = Service::Form.new(params[:project_service])
+    @form.validate!
+  rescue ActiveModel::ValidationError
+    flash[:error] = @form.errors.full_messages.first
+    render action: :new, status: :unprocessable_entity
+  end
 
   def fetch_application
     @app = current_user.team.projects.find(params[:project_id])
