@@ -3,5 +3,5 @@ go 1.23.2
 use (
 	./client
 	./gateway
-	./sidecar
+	./web/sidecar
 )
