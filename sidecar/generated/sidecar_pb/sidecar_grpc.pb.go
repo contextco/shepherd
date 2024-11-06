@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Sidecar_PublishChart_FullMethodName = "/Sidecar/PublishChart"
+	Sidecar_PublishChart_FullMethodName  = "/Sidecar/PublishChart"
+	Sidecar_ValidateChart_FullMethodName = "/Sidecar/ValidateChart"
 )
 
 // SidecarClient is the client API for Sidecar service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SidecarClient interface {
 	PublishChart(ctx context.Context, in *PublishChartRequest, opts ...grpc.CallOption) (*PublishChartResponse, error)
+	ValidateChart(ctx context.Context, in *ValidateChartRequest, opts ...grpc.CallOption) (*ValidateChartResponse, error)
 }
 
 type sidecarClient struct {
@@ -47,11 +49,22 @@ func (c *sidecarClient) PublishChart(ctx context.Context, in *PublishChartReques
 	return out, nil
 }
 
+func (c *sidecarClient) ValidateChart(ctx context.Context, in *ValidateChartRequest, opts ...grpc.CallOption) (*ValidateChartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ValidateChartResponse)
+	err := c.cc.Invoke(ctx, Sidecar_ValidateChart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SidecarServer is the server API for Sidecar service.
 // All implementations must embed UnimplementedSidecarServer
 // for forward compatibility.
 type SidecarServer interface {
 	PublishChart(context.Context, *PublishChartRequest) (*PublishChartResponse, error)
+	ValidateChart(context.Context, *ValidateChartRequest) (*ValidateChartResponse, error)
 	mustEmbedUnimplementedSidecarServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedSidecarServer struct{}
 
 func (UnimplementedSidecarServer) PublishChart(context.Context, *PublishChartRequest) (*PublishChartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishChart not implemented")
+}
+func (UnimplementedSidecarServer) ValidateChart(context.Context, *ValidateChartRequest) (*ValidateChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateChart not implemented")
 }
 func (UnimplementedSidecarServer) mustEmbedUnimplementedSidecarServer() {}
 func (UnimplementedSidecarServer) testEmbeddedByValue()                 {}
@@ -104,6 +120,24 @@ func _Sidecar_PublishChart_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sidecar_ValidateChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SidecarServer).ValidateChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Sidecar_ValidateChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidecarServer).ValidateChart(ctx, req.(*ValidateChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Sidecar_ServiceDesc is the grpc.ServiceDesc for Sidecar service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Sidecar_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublishChart",
 			Handler:    _Sidecar_PublishChart_Handler,
+		},
+		{
+			MethodName: "ValidateChart",
+			Handler:    _Sidecar_ValidateChart_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
