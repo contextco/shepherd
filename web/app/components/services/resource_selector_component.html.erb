@@ -10,7 +10,7 @@
                         class: 'w-24 p-2 rounded-md bg-stone-700 text-stone-100 border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
     %>
     <%= form.select "#{field_name}_unit",
-                    field_name.to_s.include?('cpu') ? options_for_select(%w[Cores mCores]) : options_for_select(%w[GB MB KB]),
+                    field_name.to_s.include?('cpu') ? options_for_select(%w[Cores mCores]) : options_for_select([%w[GB Gi], %w[MB Mi], %w[KB Ki]]),
                     { include_blank: false },
                     class: 'p-2 rounded-md bg-stone-700 text-stone-100 border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
     %>
