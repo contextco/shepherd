@@ -44,6 +44,20 @@ class Service::Form
     end
   end
 
+  attribute :secrets, multiple: true do
+    attribute :name
+
+    validates :name, length: { maximum: 253 }
+    validate :name_valid
+
+    def name_valid
+      return if name.empty?
+      return if name.match?(/\A[a-z0-9][a-z0-9.-]*[a-z0-9]\z/)
+
+      errors.add(:name, "must start and end with a letter or number and contain only letters, numbers, periods, and hyphens")
+    end
+  end
+
   validates :name, presence: true
   validates :image, presence: true
   validate :image_format
@@ -56,7 +70,8 @@ class Service::Form
       name:,
       image:,
       resources: resources_object,
-      environment_variables: environment_variables_object
+      environment_variables: environment_variables_object,
+      secrets: secrets_object
     )
   end
 
@@ -77,6 +92,10 @@ class Service::Form
     environment_variables.select { |env| env.name.present? }.map do |env|
       { name: env.name, value: env.value }
     end
+  end
+
+  def secrets_object
+    secrets.select { |secret| secret.name.present? }.map(&:name)
   end
 
   def name_format

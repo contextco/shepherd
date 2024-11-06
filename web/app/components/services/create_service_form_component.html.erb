@@ -4,6 +4,8 @@
       <%= form.label :name, class: 'font-medium' %>
       <%= form.text_field :name,
                           required: true,
+                          'data-1p-ignore': true,
+                          'data-lpignore': true,
                           class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
     </div>
 
@@ -51,6 +53,29 @@
         <template data-dynamic-elements-target="template">
           <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
         </template>
+      <% end %>
+    </div>
+
+    <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
+      <div class="flex flex-col gap-1 max-w-96">
+        <span class="font-medium text-stone-100 flex-none">Secrets</span>
+        <span class="text-stone-400 text-sm">
+          Client provided secrets. Use for sensitive values like API keys, passwords, etc.
+        </span>
+      </div>
+
+      <%= form.fields_for :secrets, index: '' do |secret_form| %>
+        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
+          <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
+            <%= render Services::SecretComponent.new(form: secret_form) %>
+          </div>
+          <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
+            Add Secret
+          </div>
+          <template data-dynamic-elements-target="template">
+            <%= render Services::SecretComponent.new(form: secret_form) %>
+          </template>
+        </div>
       <% end %>
     </div>
 
