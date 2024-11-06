@@ -15,10 +15,10 @@
                           class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
     </div>
 
-    <div class="flex items-center justify-between">
+    <div class="flex items-start justify-between">
       <span class="font-medium text-stone-100">Resources</span>
       <%= form.fields_for :resources do |resources_form| %>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-fit">
+        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
             <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_request, field_label: 'Min CPU', default_value: 1) %>
             <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_limit, field_label: 'Max CPU', default_value: 2) %>
@@ -30,6 +30,29 @@
     </div>
 
     <%# TODO: add env variables and secrets. Env variables will need a checkbox to denote if hard coded or the user should override %>
+
+    <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
+      <div class="flex flex-col gap-1 max-w-96">
+        <span class="font-medium text-stone-100 flex-none">Environment Variables</span>
+        <span class="text-stone-400 text-sm">
+          Do not put sensitive values here. Sensitive values should be stored in secrets.
+          'Client set' denotes placeholders where the client will provide the value.
+        </span>
+      </div>
+      <%= form.fields_for :environment_variables, index: '' do |env_var_form| %>
+        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
+          <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
+            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+          </div>
+          <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
+            Add Environment Variable
+          </div>
+        </div>
+        <template data-dynamic-elements-target="template">
+          <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+        </template>
+      <% end %>
+    </div>
 
     <%= form.submit "Create", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
   </div>

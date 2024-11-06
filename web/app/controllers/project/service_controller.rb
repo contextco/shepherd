@@ -1,6 +1,6 @@
 
 class Project::ServiceController < ApplicationController
-  before_action :fetch_application, only: %i[show edit update destroy]
+  before_action :fetch_application, only: %i[show edit update destroy new]
   before_action :prepare_form, only: %i[create]
 
   def show; end
@@ -15,8 +15,7 @@ class Project::ServiceController < ApplicationController
   def new; end
 
   def create
-    form = Service::Form.new(params[:project_service])
-    flash[:error] = form.errors.full_messages.join(", ") unless form.valid?
+    @form.awd
   end
 
   def edit; end
@@ -41,6 +40,6 @@ class Project::ServiceController < ApplicationController
   def fetch_application
     @app = current_user.team.projects.find(params[:project_id])
     @version = @app.project_versions.find(params[:version_id])
-    @service = @version.project_services.find(params[:id])
+    @service = @version.project_services.find(params[:id]) if params[:id].present?
   end
 end
