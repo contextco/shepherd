@@ -1,7 +1,7 @@
 
 class Project::ServiceController < ApplicationController
   before_action :fetch_application, only: %i[show edit update destroy new create]
-  before_action :prepare_form, only: %i[create]
+  before_action :prepare_form, only: %i[create update]
 
   def show; end
 
@@ -21,10 +21,10 @@ class Project::ServiceController < ApplicationController
     redirect_to project_version_path(@app, @version)
   end
 
-  def edit; end
+  def edit;end
 
   def update
-    # TODO
+    @form.update_service(@service)
 
     flash[:notice] = "Service #{@service.name} updated"
     redirect_to project_version_path(@app, @version)
