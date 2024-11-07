@@ -26,8 +26,11 @@ class DockerImageUrlParser
     @tag = match[:tag] || "latest"
   end
 
-  def to_s
-    [ @registry, @image, @tag ].compact.join("/")
+  def to_s(with_tag: true)
+    without_tag = [ @registry, @image ].compact.join("/")
+    return without_tag unless with_tag
+
+    "#{without_tag}:#{@tag}"
   end
 
   class InvalidDockerImageURLError < StandardError; end
