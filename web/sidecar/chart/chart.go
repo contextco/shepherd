@@ -2,6 +2,7 @@ package chart
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,8 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
+
+var ValidationError = errors.New("chart validation error")
 
 type Chart struct {
 	releaseName string
@@ -64,7 +67,7 @@ func (c *Chart) Validate() error {
 	}
 
 	if err := chartutil.ValidateAgainstSchema(c.template.chart, values); err != nil {
-		return fmt.Errorf("failed to validate chart: %w", err)
+		return fmt.Errorf("%w: %s", ValidationError, err.Error())
 	}
 
 	return nil
