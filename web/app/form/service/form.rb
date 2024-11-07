@@ -81,27 +81,29 @@ class Service::Form
   validate :image_format
   validate :name_format
 
+  def build_service
+    ProjectService.new(**service_params)
+  end
+
   def create_service(project_version)
-    project_version.project_services.create!(
-      name:,
-      image:,
-      resources: resources_object,
-      environment_variables: environment_variables_object,
-      secrets: secrets_object
-    )
+    project_version.project_services.create!(**service_params)
   end
 
   def update_service(service)
-    service.update!(
+    service.update!(**service_params)
+  end
+
+  private
+
+  def service_params
+    {
       name:,
       image:,
       resources: resources_object,
       environment_variables: environment_variables_object,
       secrets: secrets_object
-    )
+    }
   end
-
-  private
 
   def resources_object
     {

@@ -1,4 +1,4 @@
-<%= form_for service, url:, method: do |form| %>
+<%= form_for service_object, url:, method: method_type do |form| %>
   <div class="flex flex-col gap-6">
     <div class="flex items-center justify-between">
       <%= form.label :name, class: 'font-medium' %>
@@ -22,10 +22,10 @@
       <%= form.fields_for :resources do |resources_form| %>
         <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_request, field_label: 'Min CPU', default_value: service.resources&.dig('cpu_request') || 1, default_unit: service.resources&.dig('cpu_request_unit') || 'Cores') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_limit, field_label: 'Max CPU', default_value: service.resources&.dig('cpu_limit') || 2, default_unit: service.resources&.dig('cpu_limit_unit') || 'Cores') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_request, field_label: 'Min memory', default_value: service.resources&.dig('memory_request') || 1, default_unit: service.resources&.dig('memory_request_unit') || 'Gi') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_limit, field_label: 'Max memory', default_value: service.resources&.dig('memory_limit') || 2, default_unit: service.resources&.dig('memory_limit_unit') || 'Gi') %>
+            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_request, field_label: 'Min CPU', default_value: service_object.resources&.dig('cpu_request') || 1, default_unit: service_object.resources&.dig('cpu_request_unit') || 'Cores') %>
+            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_limit, field_label: 'Max CPU', default_value: service_object.resources&.dig('cpu_limit') || 2, default_unit: service_object.resources&.dig('cpu_limit_unit') || 'Cores') %>
+            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_request, field_label: 'Min memory', default_value: service_object.resources&.dig('memory_request') || 1, default_unit: service_object.resources&.dig('memory_request_unit') || 'Gi') %>
+            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_limit, field_label: 'Max memory', default_value: service_object.resources&.dig('memory_limit') || 2, default_unit: service_object.resources&.dig('memory_limit_unit') || 'Gi') %>
           </div>
         </div>
       <% end %>
@@ -38,16 +38,15 @@
         <span class="font-medium text-stone-100 flex-none">Environment Variables</span>
         <span class="text-stone-400 text-sm">
           Do not put sensitive values here. Sensitive values should be stored in secrets.
-          'Client set' denotes placeholders where the client will provide the value.
         </span>
       </div>
       <%= form.fields_for :environment_variables, index: '' do |env_var_form| %>
         <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
-            <% service&.environment_variables&.each do |environment_variable| %>
+            <% service_object&.environment_variables&.each do |environment_variable| %>
               <%= render Services::EnvironmentVariableComponent.new(form: env_var_form, environment_variable:) %>
             <% end %>
-            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) if service&.environment_variables.blank? %>
+            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) if service_object&.environment_variables.blank? %>
           </div>
           <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
             Add Environment Variable
@@ -70,10 +69,10 @@
       <%= form.fields_for :secrets, index: '' do |secret_form| %>
         <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
-            <% service&.secrets&.each do |secret| %>
+            <% service_object&.secrets&.each do |secret| %>
               <%= render Services::SecretComponent.new(form: secret_form, secret:) %>
             <% end %>
-            <%= render Services::SecretComponent.new(form: secret_form) if service&.secrets.blank? %>
+            <%= render Services::SecretComponent.new(form: secret_form) if service_object&.secrets.blank? %>
           </div>
           <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
             Add Secret

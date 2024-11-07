@@ -94,3 +94,5 @@ gem "gruf", "~> 2.20.1"
 gem "grpc-tools"
 
 gem "groupdate", "~> 6.5.1"
+
+gem "rails-controller-testing"
