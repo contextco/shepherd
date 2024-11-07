@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -19,6 +20,11 @@ type Chart struct {
 	params   *Params
 }
 
+type ChartArchive struct {
+	Name string
+	Data []byte
+}
+
 func (c *Chart) Name() string {
 	return c.params.ChartName
 }
@@ -31,14 +37,24 @@ func (c *Chart) Metadata() *chart.Metadata {
 	return c.template.chart.Metadata
 }
 
-func (c *Chart) Archive(dir string) (string, error) {
-	values, err := c.params.toValues()
+func (c *Chart) Archive() (*ChartArchive, error) {
+	dir, err := os.MkdirTemp("", "chart-archive")
 	if err != nil {
-		return "", fmt.Errorf("failed to convert params to helm values: %w", err)
+		return nil, fmt.Errorf("failed to create temp dir: %w", err)
+	}
+	defer os.RemoveAll(dir)
+
+	archivePath, err := chartutil.Save(c.template.chart, dir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save chart: %w", err)
 	}
 
-	c.template.chart.Values = values
-	return chartutil.Save(c.template.chart, dir)
+	archive, err := os.ReadFile(archivePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read chart archive: %w", err)
+	}
+
+	return &ChartArchive{Name: filepath.Base(archivePath), Data: archive}, nil
 }
 
 func (c *Chart) Validate() error {

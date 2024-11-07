@@ -3,13 +3,17 @@ package repo
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
-	"maps"
 	"net/url"
 	"os"
+	"path/filepath"
 	"sidecar/chart"
-	"slices"
+	"sidecar/clock"
 	"testing"
+	"time"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 type fakeStore struct {
@@ -42,7 +46,35 @@ func (f *fakeStore) ReadAll(_ context.Context, path string) ([]byte, error) {
 	return data, nil
 }
 
-func TestClientAdd(t *testing.T) {
+func (f *fakeStore) VerifyAgainstFixture(t *testing.T, path string) error {
+	data, exists := f.files[path]
+	if !exists {
+		return fmt.Errorf("file %s does not exist", path)
+	}
+
+	fixturePath := filepath.Join("testdata", t.Name(), path)
+	if _, err := os.Stat(fixturePath); os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(fixturePath), 0755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(fixturePath, data, 0644); err != nil {
+			return err
+		}
+	}
+
+	fixture, err := os.ReadFile(fixturePath)
+	if err != nil {
+		return err
+	}
+	if diff := cmp.Diff(data, fixture); diff != "" {
+		return fmt.Errorf("fixture for %s does not match: %s", path, diff)
+	}
+	return nil
+}
+
+func TestAdd_indexFileIsCreated(t *testing.T) {
+	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+
 	store := &fakeStore{}
 
 	ctx := context.Background()
@@ -69,15 +101,25 @@ func TestClientAdd(t *testing.T) {
 		t.Error("Index file was not created")
 	}
 
-	// Verify chart file was uploaded
-	chartPath := "test-repo/test-chart-1.0.0.tgz"
-	chartExists, err := store.Exists(ctx, chartPath)
-	if err != nil {
-		t.Fatalf("Failed to check chart existence: %v", err)
+	// Need to strip the digests from the index file for comparison.
+	store.files["test-repo/index.yaml"] = stripIndexDigests(t, store.files["test-repo/index.yaml"])
+
+	if err := store.VerifyAgainstFixture(t, "test-repo/index.yaml"); err != nil {
+		t.Fatalf("Failed to verify fixtures: %v", err)
 	}
-	if !chartExists {
-		t.Errorf("Chart file was not uploaded, got %+v", slices.Sorted(maps.Keys(store.files)))
+}
+
+func stripIndexDigests(t *testing.T, indexData []byte) []byte {
+	t.Helper()
+
+	lines := bytes.Split(indexData, []byte("\n"))
+	var filteredLines [][]byte
+	for _, line := range lines {
+		if !bytes.Contains(line, []byte("digest")) {
+			filteredLines = append(filteredLines, line)
+		}
 	}
+	return bytes.Join(filteredLines, []byte("\n"))
 }
 
 func TestClientAddUpdatesExistingIndex(t *testing.T) {

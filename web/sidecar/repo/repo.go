@@ -78,24 +78,18 @@ func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*
 	}
 	defer os.RemoveAll(tempDir)
 
-	archivePath, err := chart.Archive(tempDir)
+	archive, err := chart.Archive()
 	if err != nil {
 		return nil, fmt.Errorf("failed to archive chart: %w", err)
 	}
 
-	objectName := fmt.Sprintf("%s/%s", repo, filepath.Base(archivePath))
-
-	reader, err := os.Open(archivePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open archive: %w", err)
-	}
-
-	hash, err := provenance.DigestFile(archivePath)
+	hash, err := provenance.Digest(bytes.NewReader(archive.Data))
 	if err != nil {
 		return nil, fmt.Errorf("failed to digest archive: %w", err)
 	}
 
-	if err := c.store.Upload(ctx, objectName, reader); err != nil {
+	objectName := fmt.Sprintf("%s/%s", repo, archive.Name)
+	if err := c.store.Upload(ctx, objectName, bytes.NewReader(archive.Data)); err != nil {
 		return nil, fmt.Errorf("failed to upload archive: %w", err)
 	}
 
