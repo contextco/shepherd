@@ -171,27 +171,52 @@ func TestAdd_indexFileIsCreated(t *testing.T) {
 func TestAdd_valuesFile(t *testing.T) {
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 
-	store := &fakeStore{}
-
-	ctx := context.Background()
-	chart, err := chart.NewFromParams(&chart.Params{ChartName: "test-chart", ChartVersion: "1.0.0"})
-	if err != nil {
-		t.Fatalf("Failed to create empty chart: %v", err)
+	cases := []struct {
+		name   string
+		params *chart.Params
+	}{
+		{
+			name: "values file is created",
+			params: &chart.Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				ReplicaCount: 1,
+				Environment: map[string]string{
+					"FOO": "bar",
+				},
+				Image: chart.Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+			},
+		},
 	}
 
-	addChartToRepo(t, ctx, store, chart, "test-repo")
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
 
-	// Verify values file was created
-	valuesExists, err := store.ExistsInArchive("test-repo/test-chart-1.0.0.tgz", "test-chart/values.yaml")
-	if err != nil {
-		t.Fatalf("Failed to check values existence: %v", err)
-	}
-	if !valuesExists {
-		t.Error("Values file was not created")
-	}
+			store := &fakeStore{}
+			chart, err := chart.NewFromParams(tc.params)
+			if err != nil {
+				t.Fatalf("Failed to create empty chart: %v", err)
+			}
 
-	if err := store.VerifyWithinArchiveAgainstFixture(t, "test-repo/test-chart-1.0.0.tgz", "test-chart/values.yaml"); err != nil {
-		t.Fatalf("Failed to verify fixtures: %v", err)
+			addChartToRepo(t, ctx, store, chart, "test-repo")
+
+			// Verify values file was created
+			valuesExists, err := store.ExistsInArchive("test-repo/test-chart-1.0.0.tgz", "test-chart/values.yaml")
+			if err != nil {
+				t.Fatalf("Failed to check values existence: %v", err)
+			}
+			if !valuesExists {
+				t.Error("Values file was not created")
+			}
+
+			if err := store.VerifyWithinArchiveAgainstFixture(t, "test-repo/test-chart-1.0.0.tgz", "test-chart/values.yaml"); err != nil {
+				t.Fatalf("Failed to verify fixtures: %v", err)
+			}
+		})
 	}
 }
 

@@ -43,6 +43,13 @@ type Image struct {
 	Tag  string
 }
 
+func (i Image) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"repository": i.Name,
+		"tag":        i.Tag,
+	}
+}
+
 func (p *Params) toYaml() (string, error) {
 	values, err := p.toValues()
 	if err != nil {
@@ -55,6 +62,7 @@ func (p *Params) toYaml() (string, error) {
 func (p *Params) toValues() (map[string]interface{}, error) {
 	return compactMap(map[string]interface{}{
 		"replicaCount": p.ReplicaCount,
+		"image":        p.Image.toValues(),
 		"environment":  p.Environment.toValues(),
 	}), nil
 }
