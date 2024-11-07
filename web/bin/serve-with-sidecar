@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Start the first process
 ./bin/rails server &
