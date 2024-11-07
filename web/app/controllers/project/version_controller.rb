@@ -26,10 +26,10 @@ class Project::VersionController < ApplicationController
   def edit; end
 
   def publish
+    @version.building!
     @version.published!
 
     # this is where we should call the helm builder sidecar to build the helm chart
-    # ideally we should not go straight into published state but rather building state
 
     flash[:notice] = "Application version published"
     redirect_to project_version_path
@@ -38,6 +38,7 @@ class Project::VersionController < ApplicationController
   def unpublish
     # we should include validations here to ensure there are no attached deployments and perhaps a warning
     @version.draft!
+    # we will need to update the repo to either remove the helm chart or deprecate it
 
     flash[:notice] = "Application version unpublished"
     redirect_to project_version_path
