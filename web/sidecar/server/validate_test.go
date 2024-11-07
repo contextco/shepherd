@@ -23,6 +23,16 @@ func TestValidateChart(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:    "empty chart",
+			chart:   &sidecar_pb.ChartParams{},
+			wantErr: false,
+		},
+		{
+			name:    "nil chart",
+			chart:   nil,
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
