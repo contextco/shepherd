@@ -169,5 +169,13 @@
       }
     }
   },
+
+  "environment": {
+    "type": "object",
+    "description": "Key-value pairs of environment variables",
+    "additionalProperties": {
+      "type": "string"
+    }
+  },
   "additionalProperties": false
 }
