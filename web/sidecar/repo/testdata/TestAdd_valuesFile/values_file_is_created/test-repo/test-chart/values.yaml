@@ -1,0 +1,6 @@
+environment:
+  FOO: bar
+image:
+  repository: test-image
+  tag: latest
+replicaCount: 1
