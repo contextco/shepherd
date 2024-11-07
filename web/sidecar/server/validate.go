@@ -2,12 +2,17 @@ package server
 
 import (
 	"context"
+	"errors"
 	"sidecar/chart"
 	sidecar_pb "sidecar/generated/sidecar_pb"
 )
 
 func (s *Server) ValidateChart(ctx context.Context, req *sidecar_pb.ValidateChartRequest) (*sidecar_pb.ValidateChartResponse, error) {
-	chart, err := chart.NewFromProto(req.Chart)
+	if req.GetChart() == nil {
+		return nil, errors.New("chart is required")
+	}
+
+	chart, err := chart.NewFromProto(req.GetChart())
 	if err != nil {
 		return nil, err
 	}
