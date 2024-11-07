@@ -27,6 +27,6 @@ func ModulesFromEnv(ctx context.Context) (*Modules, error) {
 
 	return &Modules{
 		Store:  store,
-		Server: server.New(":8080", repoClient),
+		Server: server.New("8080", repoClient),
 	}, nil
 }
