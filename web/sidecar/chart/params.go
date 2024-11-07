@@ -43,11 +43,6 @@ type Image struct {
 	Tag  string
 }
 
-type helmValues struct {
-	ReplicaCount int         `json:"replicaCount"`
-	Environment  Environment `json:"environment,omitempty"`
-}
-
 func (p *Params) toYaml() (string, error) {
 	values, err := p.toValues()
 	if err != nil {
@@ -58,14 +53,9 @@ func (p *Params) toYaml() (string, error) {
 }
 
 func (p *Params) toValues() (map[string]interface{}, error) {
-	hv := helmValues{
-		ReplicaCount: p.ReplicaCount,
-		Environment:  p.Environment,
-	}
-
 	return compactMap(map[string]interface{}{
-		"replicaCount": hv.ReplicaCount,
-		"environment":  hv.Environment.toValues(),
+		"replicaCount": p.ReplicaCount,
+		"environment":  p.Environment.toValues(),
 	}), nil
 }
 
