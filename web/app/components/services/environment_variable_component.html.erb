@@ -1,10 +1,6 @@
 <div class="dynamic-element flex gap-4 items-center">
-  <div class="flex flex-col gap-1 w-fit flex-none">
-    <%= form.label :templated, 'Client set', class: 'font-medium text-stone-100 text-sm' %>
-    <%= form.check_box :templated,
-                       checked: environment_variable&.dig('templated') == "1",
-                       class: 'rounded-md bg-stone-700 text-stone-100 border border-stone-600 focus:ring-0 outline-none cursor-pointer' %>
-  </div>
+  <%# hidden value for now as we will not support this yet %>
+  <%= form.hidden_field :templated, value: '0' %>
   <%= form.text_field :name,
                       placeholder: 'ENV_NAME',
                       value: environment_variable&.dig('name'),
