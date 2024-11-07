@@ -1,0 +1,9 @@
+<% if version.published? %>
+  <%= button_to unpublish_project_version_path(version.project_id, version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+    Unpublish
+  <% end %>
+<% else %>
+  <%= button_to publish_project_version_path(version.project_id, version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+    Publish
+  <% end %>
+<% end %>

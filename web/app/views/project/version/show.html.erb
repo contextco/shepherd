@@ -30,9 +30,8 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <%= button_to release_version_project_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
-          Release
-        <% end %>
+        <%= render Applications::PublishButtonComponent.new(version: @version) %>
+
         <%= link_to edit_project_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
           <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
         <% end %>
@@ -40,8 +39,5 @@
     </div>
 
   </div>
-
   <%= render Services::GridComponent.new(project_version: @version) %>
-
-
 </div>
