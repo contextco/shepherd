@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sidecar/chart"
+	"sidecar/clock"
 
 	helmrepo "helm.sh/helm/v3/pkg/repo"
 )
@@ -14,7 +15,9 @@ type indexFile struct {
 
 func newIndexFile(chart *chart.Chart, archive *ChartArchive) *indexFile {
 	idxFile := helmrepo.NewIndexFile()
+	idxFile.Generated = clock.Canonical.Now()
 	idxFile.MustAdd(chart.Metadata(), chart.Name(), archive.objectName, archive.hash)
+	idxFile.Entries[chart.Metadata().Name][len(idxFile.Entries[chart.Metadata().Name])-1].Created = clock.Canonical.Now()
 	idxFile.SortEntries()
 	return &indexFile{IndexFile: idxFile}
 }

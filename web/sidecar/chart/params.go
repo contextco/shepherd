@@ -3,6 +3,8 @@ package chart
 import (
 	"fmt"
 	"sidecar/generated/sidecar_pb"
+
+	"helm.sh/helm/v3/pkg/chartutil"
 )
 
 type Params struct {
@@ -44,6 +46,15 @@ type Image struct {
 type helmValues struct {
 	ReplicaCount int         `json:"replicaCount"`
 	Environment  Environment `json:"environment,omitempty"`
+}
+
+func (p *Params) toYaml() (string, error) {
+	values, err := p.toValues()
+	if err != nil {
+		return "", fmt.Errorf("failed to convert params to helm values: %w", err)
+	}
+
+	return chartutil.Values(values).YAML()
 }
 
 func (p *Params) toValues() (map[string]interface{}, error) {

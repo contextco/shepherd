@@ -175,3 +175,64 @@ func TestParams_toValues(t *testing.T) {
 		})
 	}
 }
+
+func TestParams_toYaml(t *testing.T) {
+	tests := []struct {
+		name    string
+		params  *Params
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "valid params",
+			params: &Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+				ReplicaCount: 3,
+				Environment: Environment{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+			},
+			want: `environment:
+  ENV_VAR1: value1
+  ENV_VAR2: value2
+replicaCount: 3
+`,
+			wantErr: false,
+		},
+		{
+			name: "empty environment",
+			params: &Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+				ReplicaCount: 3,
+				Environment:  Environment{},
+			},
+			want: `replicaCount: 3
+`,
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.params.toYaml()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("toYaml() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("toYaml() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
