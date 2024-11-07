@@ -27,6 +27,19 @@ func main() {
 		log.Fatalf("Error creating chart: %v", err)
 	}
 
+	chart, err = chart.ApplyParams(&sidecarchart.Params{
+		ChartName:    "sidecar",
+		ChartVersion: "0.2.0",
+
+		ReplicaCount: 1,
+		Environment: sidecarchart.Environment{
+			"FOO": "BAR",
+		},
+	})
+	if err != nil {
+		log.Fatalf("Error applying params: %v", err)
+	}
+
 	repo, err := repo.NewClient(ctx, modules.Store, &url.URL{}) // TODO: get base URL from env
 	if err != nil {
 		log.Fatalf("Error creating repo client: %v", err)

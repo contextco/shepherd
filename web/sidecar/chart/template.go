@@ -1,6 +1,11 @@
 package chart
 
-import "helm.sh/helm/v3/pkg/chart"
+import (
+	"fmt"
+
+	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chartutil"
+)
 
 type Template struct {
 	chart *chart.Chart
@@ -13,6 +18,17 @@ func (t *Template) Validate() error {
 func (t *Template) ApplyParams(params *Params) (*Chart, error) {
 	t.chart.Metadata.Name = params.ChartName
 	t.chart.Metadata.Version = params.ChartVersion
+
+	for _, file := range t.chart.Raw {
+		if file.Name == chartutil.ValuesfileName {
+			values, err := params.toYaml()
+			if err != nil {
+				return nil, fmt.Errorf("failed to convert params to helm values: %w", err)
+			}
+
+			file.Data = []byte(values)
+		}
+	}
 
 	return &Chart{template: t, params: params}, nil
 }
