@@ -1,7 +1,6 @@
 
 class Project::ServiceController < ApplicationController
   before_action :fetch_application, only: %i[show edit update destroy new create]
-  before_action :prepare_form, only: %i[create]
 
   def show; end
 
@@ -15,7 +14,12 @@ class Project::ServiceController < ApplicationController
   def new; end
 
   def create
-    @service = @form.create_service(@version)
+    unless form.valid?
+      flash[:error] = form.errors.full_messages.first
+      return render action: :new, status: :unprocessable_entity
+    end
+
+    @service = form.create_service(@version)
 
     flash[:notice] = "Service #{@service.name} created"
     redirect_to project_version_path(@app, @version)
@@ -24,7 +28,12 @@ class Project::ServiceController < ApplicationController
   def edit; end
 
   def update
-    # TODO
+    unless form.valid?
+      flash[:error] = form.errors.full_messages.first
+      return render action: :edit, status: :unprocessable_entity
+    end
+
+    form.update_service(@service)
 
     flash[:notice] = "Service #{@service.name} updated"
     redirect_to project_version_path(@app, @version)
@@ -32,12 +41,8 @@ class Project::ServiceController < ApplicationController
 
   private
 
-  def prepare_form
-    @form = Service::Form.new(params[:project_service])
-    @form.validate!
-  rescue ActiveModel::ValidationError
-    flash[:error] = @form.errors.full_messages.first
-    render action: :new, status: :unprocessable_entity
+  def form
+    @form ||= Service::Form.new(params[:project_service])
   end
 
   def fetch_application
