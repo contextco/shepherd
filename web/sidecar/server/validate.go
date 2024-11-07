@@ -12,12 +12,17 @@ func (s *Server) ValidateChart(ctx context.Context, req *sidecar_pb.ValidateChar
 		return nil, errors.New("chart is required")
 	}
 
-	chart, err := chart.NewFromProto(req.GetChart())
+	c, err := chart.NewFromProto(req.GetChart())
 	if err != nil {
 		return nil, err
 	}
 
-	if err := chart.Validate(); err != nil {
+	if err := c.Validate(); err != nil && errors.Is(err, chart.ValidationError) {
+		return &sidecar_pb.ValidateChartResponse{
+			Valid:  false,
+			Errors: []string{err.Error()},
+		}, nil
+	} else if err != nil {
 		return nil, err
 	}
 
