@@ -86,8 +86,8 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 	env.LoadFromProto(proto.GetEnvironmentConfig())
 
 	return NewFromParams(&Params{
-		ChartName:    proto.Name,
-		ChartVersion: proto.Version,
+		ChartName:    proto.GetName(),
+		ChartVersion: proto.GetVersion(),
 		Image: Image{
 			Name: proto.GetImage().GetName(),
 			Tag:  proto.GetImage().GetTag(),
@@ -129,4 +129,12 @@ func withInterfaceValues[T any](v map[string]T) map[string]interface{} {
 		m[k] = v
 	}
 	return m
+}
+
+func valueOrZero[T any](v *T) *T {
+	if v == nil {
+		var zero T
+		return &zero
+	}
+	return v
 }
