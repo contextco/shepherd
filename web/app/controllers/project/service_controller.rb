@@ -23,7 +23,7 @@ class Project::ServiceController < ApplicationController
     @service = form.create_service(@version)
 
     flash[:notice] = "Service #{@service.name} created"
-    redirect_to project_version_path(@app, @version)
+    redirect_to project_version_service_path(@app, @version, @service)
   end
 
   def edit; end
@@ -38,7 +38,7 @@ class Project::ServiceController < ApplicationController
     form.update_service(@service)
 
     flash[:notice] = "Service #{@service.name} updated"
-    redirect_to project_version_path(@app, @version)
+    redirect_to project_version_service_path(@app, @version, @service)
   end
 
   private
