@@ -135,6 +135,10 @@ func TestParams_toValues(t *testing.T) {
 				},
 			},
 			want: map[string]interface{}{
+				"image": map[string]interface{}{
+					"repository": "test-image",
+					"tag":        "latest",
+				},
 				"replicaCount": 3,
 				"environment": map[string]interface{}{
 					"ENV_VAR1": "value1",
@@ -156,6 +160,10 @@ func TestParams_toValues(t *testing.T) {
 				Environment:  Environment{},
 			},
 			want: map[string]interface{}{
+				"image": map[string]interface{}{
+					"repository": "test-image",
+					"tag":        "latest",
+				},
 				"replicaCount": 3,
 			},
 			wantErr: false,
@@ -201,6 +209,9 @@ func TestParams_toYaml(t *testing.T) {
 			want: `environment:
   ENV_VAR1: value1
   ENV_VAR2: value2
+image:
+  repository: test-image
+  tag: latest
 replicaCount: 3
 `,
 			wantErr: false,
@@ -217,7 +228,10 @@ replicaCount: 3
 				ReplicaCount: 3,
 				Environment:  Environment{},
 			},
-			want: `replicaCount: 3
+			want: `image:
+  repository: test-image
+  tag: latest
+replicaCount: 3
 `,
 			wantErr: false,
 		},
