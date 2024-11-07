@@ -38,8 +38,11 @@ message EnvironmentConfig {
     // Contains environment key and value pairs that are hardcoded into the chart.
     repeated EnvironmentVariable environment_variables = 1;
 
-    // Contains environment variable names that must be provided by the client.
-    // repeated string client_required_environment_variables = 2;
+    repeated Secret secrets = 3;
+}
+
+message Secret {
+    string name = 1;
 }
 
 message EnvironmentVariable {

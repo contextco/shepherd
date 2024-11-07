@@ -20,6 +20,10 @@ func TestValidateChart(t *testing.T) {
 			chart: &sidecar_pb.ChartParams{
 				Name:    "test",
 				Version: "0.1.0",
+				Image: &sidecar_pb.Image{
+					Name: "",
+					Tag:  "latest",
+				},
 			},
 			wantErr: false,
 		},
