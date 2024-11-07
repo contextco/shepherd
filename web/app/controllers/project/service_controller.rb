@@ -8,7 +8,7 @@ class Project::ServiceController < ApplicationController
     @service.destroy!
 
     flash[:notice] = "Application version #{@service.name} deleted"
-    redirect_to root_path
+    redirect_to project_version_path(@app, @version)
   end
 
   def new; end
