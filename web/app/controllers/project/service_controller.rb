@@ -15,8 +15,9 @@ class Project::ServiceController < ApplicationController
 
   def create
     unless form.valid?
-      flash[:error] = form.errors.full_messages.first
-      return render action: :new, status: :unprocessable_entity
+      flash.now[:error] = form.errors.full_messages.first
+      @service = form.build_service
+      return render :new, status: :unprocessable_entity
     end
 
     @service = form.create_service(@version)
@@ -30,7 +31,8 @@ class Project::ServiceController < ApplicationController
   def update
     unless form.valid?
       flash[:error] = form.errors.full_messages.first
-      return render action: :edit, status: :unprocessable_entity
+      @service = form.build_service
+      return render :edit, status: :unprocessable_entity
     end
 
     form.update_service(@service)
