@@ -3,7 +3,10 @@ package chart
 import (
 	"context"
 	"sidecar/testcluster"
+	"strings"
 	"testing"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 func TestChartValidate(t *testing.T) {
@@ -48,8 +51,9 @@ func TestChartValidate(t *testing.T) {
 }
 
 func TestChartInstall(t *testing.T) {
+
 	ctx := context.Background()
-	_ = testcluster.New(t, ctx, "test")
+	cluster := testcluster.New(t, ctx, "test")
 
 	cases := []struct {
 		name    string
@@ -97,8 +101,18 @@ func TestChartInstall(t *testing.T) {
 
 			err = chart.Install(ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Chart.Install() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("Chart.Install() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
+				return strings.Contains(pod.Name, "test-0-0-1") && pod.Status.Phase == corev1.PodRunning
+			}); err != nil {
+				t.Fatalf("failed to wait for pods: %v", err)
 			}
 		})
 	}
+}
+
+type ExpectedClusterState struct {
+	Pods []string
 }
