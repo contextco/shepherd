@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Helm::RepoController, type: :controller do
-
   describe 'GET #index_yaml' do
     it 'returns a success response' do
       get :index_yaml
