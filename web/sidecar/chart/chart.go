@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -17,8 +18,6 @@ import (
 var ValidationError = errors.New("chart validation error")
 
 type Chart struct {
-	releaseName string
-
 	template *Template
 	params   *Params
 }
@@ -26,6 +25,10 @@ type Chart struct {
 type ChartArchive struct {
 	Name string
 	Data []byte
+}
+
+func (c *Chart) releaseName() string {
+	return fmt.Sprintf("%s-%s", c.params.ChartName, strings.ReplaceAll(c.params.ChartVersion, ".", "-"))
 }
 
 func (c *Chart) Name() string {
@@ -81,7 +84,7 @@ func (c *Chart) Install(ctx context.Context) error {
 
 	client := action.NewInstall(actionConfig)
 	client.Namespace = "default"
-	client.ReleaseName = c.releaseName
+	client.ReleaseName = c.releaseName()
 	client.Replace = true
 
 	rel, err := client.RunWithContext(ctx, c.template.chart, nil)
@@ -102,12 +105,12 @@ func (c *Chart) Uninstall() error {
 	client := action.NewUninstall(actionConfig)
 	client.IgnoreNotFound = true
 
-	_, err = client.Run(c.releaseName)
+	_, err = client.Run(c.releaseName())
 	if err != nil {
 		return fmt.Errorf("failed to uninstall chart: %w", err)
 	}
 
-	log.Printf("Successfully uninstalled release %s", c.releaseName)
+	log.Printf("Successfully uninstalled release %s", c.releaseName())
 	return nil
 }
 
@@ -120,8 +123,8 @@ func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
 	return chart, nil
 }
 
-func New(releaseName string, template *Template, params *Params) *Chart {
-	return &Chart{releaseName: releaseName, template: template, params: params}
+func New(template *Template, params *Params) *Chart {
+	return &Chart{template: template, params: params}
 }
 
 func actionConfig() (*action.Configuration, error) {

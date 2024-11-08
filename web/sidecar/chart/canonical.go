@@ -12,13 +12,13 @@ import (
 //go:embed all:templates
 var template embed.FS
 
-func Empty(releaseName string) (*Chart, error) {
+func Empty() (*Chart, error) {
 	template, err := canonicalTemplate()
 	if err != nil {
 		return nil, fmt.Errorf("error getting canonical template: %w", err)
 	}
 
-	return New(releaseName, template, &Params{}), nil
+	return New(template, &Params{}), nil
 }
 
 func canonicalTemplate() (*Template, error) {
