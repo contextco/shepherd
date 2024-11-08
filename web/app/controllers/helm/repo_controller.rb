@@ -1,7 +1,7 @@
 
 class Helm::RepoController < ApplicationController
   def download
-    filename = params[:filename]
+    filename = sanitize_filename(params[:filename])
 
     bucket = GCSClient.onprem_bucket
     file = bucket.file("sidecar/#{filename}")
@@ -46,6 +46,12 @@ class Helm::RepoController < ApplicationController
   end
 
   private
+
+  def sanitize_filename(filename)
+    # Remove any path traversal attempts and restrict to expected format
+    return nil unless filename.match?(/^[\w\-\.]+\.tgz$/)
+    filename
+  end
 
   def bucket
     @bucket ||= GCSClient.onprem_bucket
