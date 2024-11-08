@@ -43,6 +43,7 @@ message EnvironmentConfig {
 
 message Secret {
     string name = 1;
+    string environment_key = 2;
 }
 
 message EnvironmentVariable {
