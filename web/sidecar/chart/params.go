@@ -142,6 +142,14 @@ func compactMap(m map[string]interface{}) map[string]interface{} {
 			delete(m, k)
 		}
 
+		if vm, ok := v.([]map[string]interface{}); ok {
+			if len(vm) == 0 {
+				delete(m, k)
+			} else {
+				m[k] = vm
+			}
+		}
+
 		if vm, ok := v.(map[string]interface{}); ok {
 			if len(vm) == 0 {
 				delete(m, k)
