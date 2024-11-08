@@ -16,6 +16,17 @@ Rails.application.routes.draw do
 
   resources :deployment_container, only: [ :show ]
 
+  scope :repo do
+    # Use proper module/controller namespace syntax
+    get "/charts/:filename", to: "helm/repo#download", constraints: { filename: /.*\.tgz/ }
+    get "/index.yaml", to: "helm/repo#index_yaml", controller: "helm/repo"
+
+    scope "/api" do
+      # For namespaced resources, use module option
+      resources :repo, only: [ :create, :destroy ], module: "helm", controller: "repo"
+    end
+  end
+
   resources :application, only: [ :new, :create, :destroy, :edit, :update ], controller: "project/project", as: :project do
     resources :version, only: [ :create, :destroy, :show, :update, :edit ], controller: "project/version" do
       post :publish, on: :member
