@@ -14,4 +14,5 @@
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "SSH"
   inflect.acronym "RPC"
+  inflect.acronym "GCS"
 end

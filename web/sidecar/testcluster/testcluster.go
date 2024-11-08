@@ -8,6 +8,12 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // Cluster represents a kind kubernetes test cluster
@@ -46,6 +52,61 @@ func New(t *testing.T, ctx context.Context, name string) *Cluster {
 	})
 
 	return cluster
+}
+
+func (c *Cluster) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
+	clientConfig, err := clientcmd.BuildConfigFromFlags("", c.KubeConfig.Name())
+	if err != nil {
+		return err
+	}
+
+	client, err := kubernetes.NewForConfig(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	factory := informers.NewSharedInformerFactoryWithOptions(client, 0)
+	podInformer := factory.Core().V1().Pods().Informer()
+
+	waitC := make(chan struct{}, 1)
+	handleNewPodState := func(obj any) {
+		pod, ok := obj.(*corev1.Pod)
+		if !ok {
+			return
+		}
+		if matchFunc(pod) {
+			waitC <- struct{}{}
+		}
+	}
+	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: handleNewPodState,
+		UpdateFunc: func(old, new any) {
+			handleNewPodState(new)
+		},
+	})
+
+	factory.Start(ctx.Done())
+	<-waitC
+	return nil
+}
+
+func (c *Cluster) Pods(ctx context.Context, selector string) ([]corev1.Pod, error) {
+	clientConfig, err := clientcmd.BuildConfigFromFlags("", c.KubeConfig.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := kubernetes.NewForConfig(clientConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	pods, err := client.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return pods.Items, nil
 }
 
 // Create creates a new kind cluster
