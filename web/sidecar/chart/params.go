@@ -52,6 +52,17 @@ func (s Secrets) LoadFromProto(protos []*sidecar_pb.Secret) {
 	}
 }
 
+func (s Secrets) toValues() []map[string]interface{} {
+	m := make([]map[string]interface{}, len(s))
+	for i, v := range s {
+		m[i] = map[string]interface{}{
+			"name":           v.Name,
+			"environmentKey": v.EnvironmentKey,
+		}
+	}
+	return m
+}
+
 type Image struct {
 	Name string
 	Tag  string
@@ -78,6 +89,7 @@ func (p *Params) toValues() (map[string]interface{}, error) {
 		"replicaCount": p.ReplicaCount,
 		"image":        p.Image.toValues(),
 		"environment":  p.Environment.toValues(),
+		"secrets":      p.Secrets.toValues(),
 	}), nil
 }
 
@@ -128,6 +140,14 @@ func compactMap(m map[string]interface{}) map[string]interface{} {
 	for k, v := range m {
 		if v == nil {
 			delete(m, k)
+		}
+
+		if vm, ok := v.([]map[string]interface{}); ok {
+			if len(vm) == 0 {
+				delete(m, k)
+			} else {
+				m[k] = vm
+			}
 		}
 
 		if vm, ok := v.(map[string]interface{}); ok {

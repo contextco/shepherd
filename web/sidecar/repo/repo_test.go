@@ -264,7 +264,10 @@ entries:
 		t.Fatalf("Failed to create client: %v", err)
 	}
 
-	chart, err := chart.Empty("test-chart")
+	chart, err := chart.NewFromParams(&chart.Params{
+		ChartName:    "test-chart",
+		ChartVersion: "0.1.0",
+	})
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
