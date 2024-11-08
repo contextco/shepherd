@@ -15,6 +15,7 @@ type Params struct {
 	ReplicaCount int
 
 	Environment Environment
+	Secrets     Secrets
 }
 
 type Environment map[string]string
@@ -36,6 +37,30 @@ func (p *Params) Merge(other *Params) *Params {
 		Image:        firstNonEmpty(other.Image, p.Image),
 		ReplicaCount: firstNonEmpty(other.ReplicaCount, p.ReplicaCount),
 	}
+}
+
+type Secret struct {
+	Name           string
+	EnvironmentKey string
+}
+
+type Secrets []Secret
+
+func (s Secrets) LoadFromProto(protos []*sidecar_pb.Secret) {
+	for _, v := range protos {
+		s = append(s, Secret{Name: v.GetName(), EnvironmentKey: v.GetEnvironmentKey()})
+	}
+}
+
+func (s Secrets) toValues() []map[string]interface{} {
+	m := make([]map[string]interface{}, len(s))
+	for i, v := range s {
+		m[i] = map[string]interface{}{
+			"name":           v.Name,
+			"environmentKey": v.EnvironmentKey,
+		}
+	}
+	return m
 }
 
 type Image struct {
@@ -64,6 +89,7 @@ func (p *Params) toValues() (map[string]interface{}, error) {
 		"replicaCount": p.ReplicaCount,
 		"image":        p.Image.toValues(),
 		"environment":  p.Environment.toValues(),
+		"secrets":      p.Secrets.toValues(),
 	}), nil
 }
 
@@ -85,6 +111,9 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 	env := Environment{}
 	env.LoadFromProto(proto.GetEnvironmentConfig())
 
+	secrets := Secrets{}
+	secrets.LoadFromProto(proto.GetEnvironmentConfig().GetSecrets())
+
 	return NewFromParams(&Params{
 		ChartName:    proto.GetName(),
 		ChartVersion: proto.GetVersion(),
@@ -93,6 +122,7 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 			Tag:  proto.GetImage().GetTag(),
 		},
 		Environment: env,
+		Secrets:     secrets,
 	})
 }
 
@@ -110,6 +140,14 @@ func compactMap(m map[string]interface{}) map[string]interface{} {
 	for k, v := range m {
 		if v == nil {
 			delete(m, k)
+		}
+
+		if vm, ok := v.([]map[string]interface{}); ok {
+			if len(vm) == 0 {
+				delete(m, k)
+			} else {
+				m[k] = vm
+			}
 		}
 
 		if vm, ok := v.(map[string]interface{}); ok {
