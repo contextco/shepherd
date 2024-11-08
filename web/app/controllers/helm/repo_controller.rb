@@ -1,3 +1,4 @@
+require "google/cloud/storage"
 
 class Helm::RepoController < ApplicationController
   def download
