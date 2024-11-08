@@ -177,5 +177,23 @@
       "type": "string"
     }
   },
+  "secrets": {
+    "type": "array",
+    "description": "List of secret keys",
+    "items": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the secret"
+        },
+        "environmentKey": {
+          "type": "string",
+          "description": "Environment variable key"
+        }
+      },
+      "required": ["name", "environmentKey"]
+    }
+  },
   "additionalProperties": false
 }
