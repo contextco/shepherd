@@ -1,0 +1,29 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "b7e1baf4f834658de3b0fefdda2c5d62f3a2dedce311c13b917bc4fabb6fefcd",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/helm/repo_controller.rb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(GCSClient.onprem_bucket.file(\"sidecar/#{sanitize_filename(params[:filename])}\").download.string, :type => \"application/x-tar\", :disposition => \"attachment\", :filename => sanitize_filename(params[:filename]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Helm::RepoController",
+        "method": "download"
+      },
+      "user_input": "params[:filename]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": ""
+    }
+  ],
+  "updated": "2024-11-08 14:43:49 +0000",
+  "brakeman_version": "6.2.2"
+}
