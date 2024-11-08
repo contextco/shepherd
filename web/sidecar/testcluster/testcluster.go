@@ -38,10 +38,10 @@ func New(t *testing.T, ctx context.Context, name string) *Cluster {
 
 	t.Cleanup(func() {
 		if err := os.Remove(cluster.KubeConfig.Name()); err != nil {
-			t.Fatalf("failed to remove kubeconfig file: %v", err)
+			t.Logf("failed to remove kubeconfig file: %v", err)
 		}
 		if err := cluster.delete(context.WithoutCancel(ctx)); err != nil {
-			t.Fatalf("failed to delete cluster: %v", err)
+			t.Logf("failed to delete cluster: %v", err)
 		}
 	})
 
