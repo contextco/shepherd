@@ -10,6 +10,8 @@ RSpec.describe Helm::RepoController, type: :controller do
 
   let(:username) { "test_user" }
   let(:password) { "test_password" }
+  let(:helm_repo) { create(:helm_repo, name: 'sidecar') }
+  let!(:helm_user) { create(:helm_user, name: username, password:, helm_repo:) }
 
   before do
     allow(GCSClient).to receive(:onprem_bucket).and_return(mock_bucket)

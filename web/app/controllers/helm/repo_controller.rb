@@ -51,20 +51,19 @@ class Helm::RepoController < ApplicationController
   private
 
   def authenticate_request
+    @repo = HelmRepo.find_by(name: params[:repo_name])
+
     if request.authorization.nil?
       return render plain: "Authentication required. Use 'helm repo add' with --username and --password flags",
                     status: :unauthorized
     end
 
     authenticate_with_http_basic do |username, password|
-      return if valid_credentials?(username, password)
+      # if the repo does not exist we still say invalid credentials to avoid leaking repo names
+      return if @repo&.valid_credentials?(username, password)
 
       return render plain: "Invalid credentials", status: :unauthorized
     end
-  end
-
-  def valid_credentials?(username, password)
-    true
   end
 
   def sanitize_filename(filename)
