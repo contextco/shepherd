@@ -1,6 +1,7 @@
 
 class DeploymentController < ApplicationController
   def index
+    flash[:error] = "You need to create a team first"
     redirect_to team_index_path if current_user && current_user.team.nil?
   end
 
