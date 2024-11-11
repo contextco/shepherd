@@ -33,14 +33,22 @@ class Project::ProjectController < ApplicationController
     end
 
     team = current_user.team
-    app = team.projects.create!(
-      name: project_params[:name],
+    app = nil
+    version = nil
+    team.transaction do
+      app = team.projects.create!(
+        name: project_params[:name],
+        )
+      version = app.project_versions.create!(
+        description: project_params[:description],
+        version: "0.0.1",
+        state: :draft
       )
-    version = app.project_versions.create!(
-      description: project_params[:description],
-      version: "0.0.1",
-      state: :draft
-    )
+      app.helm_users.create!(
+        name: app.name,
+        password: SecureRandom.hex(8)
+      )
+    end
 
     flash[:notice] = "Application #{app.name} created"
     redirect_to project_version_path(app, version)
