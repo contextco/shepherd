@@ -1,0 +1,17 @@
+<%= content_for :content do %>
+  <% unless user_signed_in? %>
+    <div class="flex items-center justify-end gap-4 whitespace-nowrap p-6">
+      <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                    class: 'px-2 py-1 flex items-center gap-1 hover:bg-stone-100 rounded-md duration-200' do %>
+        Sign in
+      <% end %>
+      <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                    class: 'border rounded-md px-2 py-1 flex items-center gap-1 hover:bg-stone-100 duration-200 border-stone-400' do %>
+        Create account
+        <%= heroicon 'arrow-right', class: 'size-4' %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render template: 'layouts/application' %>
