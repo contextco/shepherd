@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sidecar/values"
 	"strings"
 
 	"helm.sh/helm/v3/pkg/action"
@@ -25,6 +26,10 @@ type Chart struct {
 type ChartArchive struct {
 	Name string
 	Data []byte
+}
+
+func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
+	return c.params.ClientFacingValuesFile()
 }
 
 func (c *Chart) releaseName() string {
@@ -69,7 +74,7 @@ func (c *Chart) Validate() error {
 		return fmt.Errorf("failed to convert params to helm values: %w", err)
 	}
 
-	if err := chartutil.ValidateAgainstSchema(c.template.chart, values); err != nil {
+	if err := chartutil.ValidateAgainstSchema(c.template.chart, values.Values); err != nil {
 		return fmt.Errorf("%w: %s", ValidationError, err.Error())
 	}
 

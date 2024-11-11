@@ -220,6 +220,68 @@ func TestAdd_valuesFile(t *testing.T) {
 	}
 }
 
+func TestAdd_clientFacingValuesFile(t *testing.T) {
+	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+
+	cases := []struct {
+		name   string
+		params *chart.Params
+	}{
+		{
+			name: "values file is created",
+			params: &chart.Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				ReplicaCount: 1,
+				Environment: map[string]string{
+					"FOO": "bar",
+				},
+				Secrets: chart.Secrets{
+					{
+						Name:           "foo",
+						EnvironmentKey: "FOO",
+					},
+					{
+						Name:           "bar",
+						EnvironmentKey: "BAR",
+					},
+				},
+				Image: chart.Image{
+					Name: "test-image",
+					Tag:  "latest",
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+
+			store := &fakeStore{}
+			chart, err := chart.NewFromParams(tc.params)
+			if err != nil {
+				t.Fatalf("Failed to create empty chart: %v", err)
+			}
+
+			addChartToRepo(t, ctx, store, chart, "test-repo")
+
+			// Verify values file was created
+			valuesExists, err := store.Exists(ctx, "test-repo/values.yaml")
+			if err != nil {
+				t.Fatalf("Failed to check values existence: %v", err)
+			}
+			if !valuesExists {
+				t.Error("Values file was not created")
+			}
+
+			if err := store.VerifyAgainstFixture(t, "test-repo/values.yaml"); err != nil {
+				t.Fatalf("Failed to verify fixtures: %v", err)
+			}
+		})
+	}
+}
+
 func addChartToRepo(t *testing.T, ctx context.Context, store *fakeStore, chart *chart.Chart, repo string) {
 	t.Helper()
 
