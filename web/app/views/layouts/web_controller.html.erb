@@ -1,0 +1,57 @@
+<%= content_for :content do %>
+  <div class="h-full flex overflow-y-auto">
+    <div class="header flex flex-col justify-between p-4 gap-8 items-center border-r">
+      <div class="left font-bold flex flex-col items-center gap-8">
+        <%= link_to root_path, class: 'text-xl' do %>
+        S
+        <% end %>
+        <div class="">
+          <% if user_signed_in? %>
+            <div class="items-center rounded-md gap-4 hidden sm:flex flex-col flex">
+              <%= link_to root_path, class: ["rounded-md p-2 text-stone-800 select-none cursor-pointer duration-200", {
+                "bg-stone-200": current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment",
+                "hover:bg-stone-200 bg-transparent": !(current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment")
+              }] do %>
+                <%= heroicon 'computer-desktop', class: 'size-6' %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="right">
+        <% if user_signed_in? %>
+          <div data-burger-menu-target="button"
+               data-action="click->burger-menu#toggleMenu"
+               class="sm:hidden p-1 px-1.5 text-xs border border-stone-600 rounded-md bg-stone-800">
+            <div class="w-7 h-7 cursor-pointer">
+              <%= heroicon 'bars-4', class: 'w-full h-full' %>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <%= button_to destroy_user_session_path, method: :delete, class: 'hidden sm:block flex items-center gap-2' do %>
+              <%= profile_picture_tag(current_user) %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="content grow">
+      <% unless user_signed_in? %>
+        <div class="flex items-center justify-end gap-4 whitespace-nowrap p-6">
+          <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                        class: 'px-2 py-1 flex items-center gap-1 hover:bg-stone-100 rounded-md duration-200' do %>
+            Sign in
+          <% end %>
+          <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                        class: 'border rounded-md px-2 py-1 flex items-center gap-1 hover:bg-stone-100 duration-200 border-stone-400' do %>
+            Create account
+            <%= heroicon 'arrow-right', class: 'size-4' %>
+          <% end %>
+        </div>
+      <% end %>
+      <%= content_for?(:shepherd_content) ? yield(:shepherd_content) : yield %>
+    </div>
+  </div>
+<% end %>
+
+<%= render template: 'layouts/application' %>
