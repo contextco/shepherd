@@ -15,7 +15,7 @@ class FlashMessagesComponent < ViewComponent::Base
     when :error
       "bg-red-600"
     else
-      "bg-stone-100"
+      "bg-stone-400"
     end
   end
 end
