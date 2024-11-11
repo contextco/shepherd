@@ -27,9 +27,14 @@ class Project::VersionController < ApplicationController
 
   def publish
     @version.building!
+    @version.project_services.each do |service|
+      unless service.publish_chart
+        @version.draft!
+        flash[:error] = "Failed to publish service #{service.name}"
+        return redirect_to project_version_path
+      end
+    end
     @version.published!
-
-    # this is where we should call the helm builder sidecar to build the helm chart
 
     flash[:notice] = "Application version published"
     redirect_to project_version_path
@@ -39,6 +44,8 @@ class Project::VersionController < ApplicationController
     # we should include validations here to ensure there are no attached deployments and perhaps a warning
     @version.draft!
     # we will need to update the repo to either remove the helm chart or deprecate it
+
+    # Also need to make attached services not editable
 
     flash[:notice] = "Application version unpublished"
     redirect_to project_version_path
