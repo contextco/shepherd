@@ -9,4 +9,18 @@ class HelmRepo < ApplicationRecord
   def valid_credentials?(name, password)
     helm_users.exists?(name:, password:)
   end
+
+  def index_yaml
+    bucket.file("#{name}/index.yaml")
+  end
+
+  def file_yaml(filename)
+    bucket.file("#{name}/#{filename}")
+  end
+
+  private
+
+  def bucket
+    @bucket ||= GCSClient.onprem_bucket
+  end
 end
