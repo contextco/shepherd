@@ -4,14 +4,26 @@ module ServiceRPC
   extend ActiveSupport::Concern
 
   def validate_chart
-    client = SidecarClient.client
     req = ValidateChartRequest.new(chart: rpc_chart)
-    resp = client.validate_chart(req)
+    resp = rpc_client.validate_chart(req)
 
     errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
     Rails.logger.info(errors) unless resp.valid
 
     resp.valid
+  end
+
+  def publish_chart
+    # this only lives here ftm. Eventually the project_version will handle all publishing
+    repository_directory = helm_repo.name
+    req = PublishChartRequest.new(chart: rpc_chart, repository_directory:)
+    rpc_client.publish_chart(req)
+
+    true
+  rescue GRPC::Unknown => e
+    Rails.logger.error("SideCar Validation Error: #{e.message}")
+
+    false
   end
 
   private
@@ -38,5 +50,9 @@ module ServiceRPC
     end
 
     EnvironmentConfig.new(environment_variables: env_vars)
+  end
+
+  def rpc_client
+    @rpc_client ||= SidecarClient.client
   end
 end
