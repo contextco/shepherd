@@ -3,12 +3,16 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
+	"log/slog"
 	"net"
+	"os"
 	"sidecar/chart"
 	"sidecar/repo"
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/grpc"
 )
 
@@ -39,8 +43,10 @@ func (s *Server) PublishChart(ctx context.Context, req *sidecar_pb.PublishChartR
 }
 
 func (s *Server) Run(ctx context.Context) error {
+	log.Printf("Starting server on port %s", s.port)
+
 	// Create a new gRPC server
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(loggingOptions()...)
 
 	// Register the Sidecar server
 	sidecar_pb.RegisterSidecarServer(grpcServer, s)
@@ -59,10 +65,29 @@ func (s *Server) Run(ctx context.Context) error {
 	}()
 
 	// Wait for the context to be done
+	log.Printf("Server started, waiting for requests.")
 	<-ctx.Done()
 
 	// Gracefully stop the gRPC server
 	grpcServer.GracefulStop()
 
 	return nil
+}
+
+func interceptorLogger(l *slog.Logger) logging.Logger {
+	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		l.Log(ctx, slog.Level(lvl), msg, fields...)
+	})
+}
+
+func loggingOptions() []grpc.ServerOption {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
+	opts := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+	}
+
+	return []grpc.ServerOption{
+		grpc.ChainUnaryInterceptor(logging.UnaryServerInterceptor(interceptorLogger(logger), opts...)),
+	}
 }
