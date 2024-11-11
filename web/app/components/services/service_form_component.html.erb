@@ -6,7 +6,7 @@
                           required: true,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+                          class: 'w-1/2 p-2 rounded-md' %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -14,13 +14,13 @@
 
       <%= form.text_field :image,
                           required: true,
-                          class: 'w-1/2 p-2 rounded-md bg-stone-700 text-stone-100' %>
+                          class: 'w-1/2 p-2 rounded-md' %>
     </div>
 
-    <div class="flex items-start justify-between">
-      <span class="font-medium text-stone-100">Resources</span>
+    <div class="flex flex-col gap-4">
+      <span class="font-medium">Resources</span>
       <%= form.fields_for :resources do |resources_form| %>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
+        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full items-center">
           <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
             <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_request, field_label: 'Min CPU', default_value: service_object.resources&.dig('cpu_request') || 1, default_unit: service_object.resources&.dig('cpu_request_unit') || 'Cores') %>
             <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_limit, field_label: 'Max CPU', default_value: service_object.resources&.dig('cpu_limit') || 2, default_unit: service_object.resources&.dig('cpu_limit_unit') || 'Cores') %>
@@ -35,8 +35,8 @@
 
     <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
       <div class="flex flex-col gap-1 max-w-96">
-        <span class="font-medium text-stone-100 flex-none">Environment Variables</span>
-        <span class="text-stone-400 text-sm">
+        <span class="font-medium text-stone-800 flex-none">Environment Variables</span>
+        <span class="text-stone-600 text-sm">
           Do not put sensitive values here. Sensitive values should be stored in secrets.
         </span>
       </div>
@@ -48,8 +48,8 @@
             <% end %>
             <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) if service_object&.environment_variables.blank? %>
           </div>
-          <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
-            Add Environment Variable
+          <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
+            + Add
           </div>
         </div>
         <template data-dynamic-elements-target="template">
@@ -60,8 +60,8 @@
 
     <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
       <div class="flex flex-col gap-1 max-w-96">
-        <span class="font-medium text-stone-100 flex-none">Secrets</span>
-        <span class="text-stone-400 text-sm">
+        <span class="font-medium text-stone-800 flex-none">Secrets</span>
+        <span class="text-stone-600 text-sm">
           Client provided secrets. Use for sensitive values like API keys, passwords, etc.
         </span>
       </div>
@@ -74,8 +74,8 @@
             <% end %>
             <%= render Services::SecretComponent.new(form: secret_form) if service_object&.secrets.blank? %>
           </div>
-          <div class="text-sm p-2 text-stone-100 bg-stone-700 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
-            Add Secret
+          <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
+            + Add
           </div>
           <template data-dynamic-elements-target="template">
             <%= render Services::SecretComponent.new(form: secret_form) %>
