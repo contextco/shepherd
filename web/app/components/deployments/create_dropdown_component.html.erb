@@ -3,7 +3,7 @@
     <%= heroicon 'plus', class: 'size-4 stroke-2 text-stone-100' %>
   </div>
   <% c.with_dropdown do %>
-    <div class="bg-stone-500 flex-nowrap text-nowrap w-52 p-3 text-slate-800 gap-2 bg-stone-800 shadow-md rounded-md border border-stone-400">
+    <div class="bg-stone-500 flex-nowrap text-nowrap w-52 p-3 text-slate-800 gap-2 shadow-md rounded-md border border-stone-400">
       <%= form_for Deployment.new, url: deployment_index_path, method: :post do |form| %>
         <div class="flex flex-col gap-2">
           <div class="flex flex-col gap-1">
