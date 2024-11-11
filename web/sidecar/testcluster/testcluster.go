@@ -40,6 +40,8 @@ func New(t *testing.T, ctx context.Context, name string) *Cluster {
 		t.Fatalf("failed to write temp kubeconfig: %v", err)
 	}
 
+	os.Setenv("KUBECONFIG", kubeConfigFile.Name())
+
 	cluster.KubeConfig = kubeConfigFile
 
 	t.Cleanup(func() {
@@ -49,6 +51,7 @@ func New(t *testing.T, ctx context.Context, name string) *Cluster {
 		if err := cluster.delete(context.WithoutCancel(ctx)); err != nil {
 			t.Logf("failed to delete cluster: %v", err)
 		}
+		os.Unsetenv("KUBECONFIG")
 	})
 
 	return cluster
