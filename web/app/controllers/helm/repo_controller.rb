@@ -1,11 +1,13 @@
 require "google/cloud/storage"
 
 class Helm::RepoController < ApplicationController
+  before_action :authenticate_request
+
   def download
     filename = sanitize_filename(params[:filename])
 
     bucket = GCSClient.onprem_bucket
-    file = bucket.file("sidecar/#{filename}")
+    file = bucket.file("#{params[:repo_name]}/#{filename}")
 
     if file.present?
       send_file file.download.string,
@@ -21,7 +23,7 @@ class Helm::RepoController < ApplicationController
     response.headers["Cache-Control"] = "no-cache"
 
     begin
-      file = bucket.file("sidecar/index.yaml")
+      file = bucket.file("#{params[:repo_name]}/index.yaml")
       raise "File not found" if file.nil?
 
       yaml = file.download.string
@@ -47,6 +49,23 @@ class Helm::RepoController < ApplicationController
   end
 
   private
+
+  def authenticate_request
+    if request.authorization.nil?
+      return render plain: "Authentication required. Use 'helm repo add' with --username and --password flags",
+                    status: :unauthorized
+    end
+
+    authenticate_with_http_basic do |username, password|
+      return if valid_credentials?(username, password)
+
+      return render plain: "Invalid credentials", status: :unauthorized
+    end
+  end
+
+  def valid_credentials?(username, password)
+    true
+  end
 
   def sanitize_filename(filename)
     # Remove any path traversal attempts and restrict to expected format
