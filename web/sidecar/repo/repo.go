@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sidecar/chart"
+	"strings"
 
 	"helm.sh/helm/v3/pkg/provenance"
 )
@@ -23,23 +24,23 @@ type Client struct {
 }
 
 func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error {
-	objectName, err := c.upload(ctx, chart, repo)
+	chartArchive, err := c.upload(ctx, chart, repo)
 	if err != nil {
 		return fmt.Errorf("failed to upload chart: %w", err)
 	}
 
-	if err := c.ensureIndex(ctx, repo, chart, objectName); err != nil {
+	if err := c.ensureIndex(ctx, repo, chart, chartArchive); err != nil {
 		return fmt.Errorf("failed to update index: %w", err)
 	}
 
-	if err := c.ensureClientFacingValuesFile(ctx, repo, chart); err != nil {
+	if err := c.ensureClientFacingValuesFile(ctx, repo, chartArchive.objectName, chart); err != nil {
 		return fmt.Errorf("failed to ensure client facing values file: %w", err)
 	}
 
 	return nil
 }
 
-func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, chart *chart.Chart) error {
+func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, objectName string, chart *chart.Chart) error {
 	valuesFile, err := chart.ClientFacingValuesFile()
 	if err != nil {
 		return fmt.Errorf("failed to get client facing values file: %w", err)
@@ -50,7 +51,9 @@ func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, 
 		return fmt.Errorf("failed to get values file bytes: %w", err)
 	}
 
-	if err := c.store.Upload(ctx, filepath.Join(repo, valuesFileName), bytes.NewReader(valuesFileBytes)); err != nil {
+	filename := fmt.Sprintf("%s-%s", strings.TrimSuffix(filepath.Base(objectName), filepath.Ext(objectName)), valuesFileName)
+
+	if err := c.store.Upload(ctx, filepath.Join(repo, filename), bytes.NewReader(valuesFileBytes)); err != nil {
 		return fmt.Errorf("failed to upload values file: %w", err)
 	}
 
