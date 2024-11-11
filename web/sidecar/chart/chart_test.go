@@ -54,6 +54,10 @@ func TestChartValidate(t *testing.T) {
 func TestChartInstall(t *testing.T) {
 	ctx := context.Background()
 	cluster := testcluster.New(t, ctx, "test")
+	image := Image{
+		Name: "nginx",
+		Tag:  "stable-alpine",
+	}
 
 	cases := []struct {
 		name    string
@@ -63,10 +67,7 @@ func TestChartInstall(t *testing.T) {
 		{
 			name: "valid params",
 			params: &Params{
-				Image: Image{
-					Name: "nginx",
-					Tag:  "latest",
-				},
+				Image: image,
 				Secrets: Secrets{
 					{
 						Name:           "test-secret",
@@ -85,6 +86,7 @@ func TestChartInstall(t *testing.T) {
 			name: "without environment variables",
 			params: &Params{
 				ReplicaCount: 1,
+				Image:        image,
 				Secrets: []Secret{
 					{
 						Name:           "test-secret",
@@ -98,6 +100,7 @@ func TestChartInstall(t *testing.T) {
 			name: "without secrets",
 			params: &Params{
 				ReplicaCount: 1,
+				Image:        image,
 				Environment: Environment{
 					"TEST_ENV":    "test-env",
 					"ANOTHER_ENV": "another-env",
@@ -108,6 +111,7 @@ func TestChartInstall(t *testing.T) {
 		{
 			name: "invalid replica count",
 			params: &Params{
+				Image:        image,
 				ReplicaCount: -1,
 			},
 			wantErr: true,
