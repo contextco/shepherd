@@ -12,7 +12,10 @@ import (
 	"helm.sh/helm/v3/pkg/provenance"
 )
 
-const indexFileName = "index.yaml"
+const (
+	indexFileName  = "index.yaml"
+	valuesFileName = "values.yaml"
+)
 
 type Client struct {
 	baseURL *url.URL
@@ -27,6 +30,28 @@ func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error
 
 	if err := c.ensureIndex(ctx, repo, chart, objectName); err != nil {
 		return fmt.Errorf("failed to update index: %w", err)
+	}
+
+	if err := c.ensureClientFacingValuesFile(ctx, repo, chart); err != nil {
+		return fmt.Errorf("failed to ensure client facing values file: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, chart *chart.Chart) error {
+	valuesFile, err := chart.ClientFacingValuesFile()
+	if err != nil {
+		return fmt.Errorf("failed to get client facing values file: %w", err)
+	}
+
+	valuesFileBytes, err := valuesFile.Bytes()
+	if err != nil {
+		return fmt.Errorf("failed to get values file bytes: %w", err)
+	}
+
+	if err := c.store.Upload(ctx, filepath.Join(repo, valuesFileName), bytes.NewReader(valuesFileBytes)); err != nil {
+		return fmt.Errorf("failed to upload values file: %w", err)
 	}
 
 	return nil
