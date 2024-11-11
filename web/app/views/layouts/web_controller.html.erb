@@ -8,12 +8,7 @@
         <div class="">
           <% if user_signed_in? %>
             <div class="items-center rounded-md gap-4 hidden sm:flex flex-col flex">
-              <%= link_to root_path, class: ["rounded-md p-2 text-stone-800 select-none cursor-pointer duration-200", {
-                "bg-stone-200": current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment",
-                "hover:bg-stone-200 bg-transparent": !(current_page?(root_path) || request.path_parameters&.fetch(:controller) == "deployment")
-              }] do %>
-                <%= heroicon 'computer-desktop', class: 'size-6' %>
-              <% end %>
+              <%= render Sidebar::IconComponent.new(path: root_path, icon: 'computer-desktop', label: "Deployments") %>
             </div>
           <% end %>
         </div>
