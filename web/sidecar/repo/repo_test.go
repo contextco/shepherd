@@ -267,7 +267,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 			addChartToRepo(t, ctx, store, chart, "test-repo")
 
 			// Verify values file was created
-			valuesExists, err := store.Exists(ctx, "test-repo/values.yaml")
+			valuesExists, err := store.Exists(ctx, "test-repo/test-chart-1.0.0-values.yaml")
 			if err != nil {
 				t.Fatalf("Failed to check values existence: %v", err)
 			}
@@ -275,7 +275,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 				t.Error("Values file was not created")
 			}
 
-			if err := store.VerifyAgainstFixture(t, "test-repo/values.yaml"); err != nil {
+			if err := store.VerifyAgainstFixture(t, "test-repo/test-chart-1.0.0-values.yaml"); err != nil {
 				t.Fatalf("Failed to verify fixtures: %v", err)
 			}
 		})
