@@ -36,7 +36,14 @@
         <% end %>
       </div>
     </div>
-
   </div>
+
+  <% if @version.published? %>
+    <div class="flex flex-col gap-1 bg-stone-800 text-white font-mono text-sm p-3 overflow-y-scroll">
+      <span class="whitespace-nowrap"><%= @app.helm_repo.add_repo_command %></span>
+      <span class="whitespace-nowrap"><%= @app.helm_repo.install_chart_command(service: @version.project_services.first) %></span>
+    </div>
+  <% end %>
+
   <%= render Services::GridComponent.new(project_version: @version) %>
 </div>
