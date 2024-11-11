@@ -7,7 +7,7 @@ RSpec.describe HelmRepo do
   let(:project_version) { create(:project_version, project:) }
   let(:helm_repo) { create(:helm_repo, name: 'test-repo') }
   let!(:helm_user) { create(:helm_user, helm_repo:, name: 'test-user', password: 'test-password') }
-  let!(:project_service) { create(:project_service, name: 'test-service', project_version:) }
+  let!(:service) { create(:project_service, name: 'test-service', project_version:) }
 
   describe '#add_repo_command' do
     it 'returns the correct command' do
@@ -17,13 +17,13 @@ RSpec.describe HelmRepo do
 
   describe '#pull_chart_command' do
     it 'returns the correct command' do
-      expect(helm_repo.pull_chart_command(service_name: 'test-service')).to eq("helm pull test-repo/test-service --untar")
+      expect(helm_repo.pull_chart_command(service:)).to eq("helm pull test-repo/test-service --untar")
     end
   end
 
   describe '#install_chart_command' do
     it 'returns the correct command' do
-      expect(helm_repo.install_chart_command(service_name: 'test-service')).to eq("helm install test-service test-repo/test-service")
+      expect(helm_repo.install_chart_command(service:)).to eq("helm install test-service test-repo/test-service")
     end
   end
 end
