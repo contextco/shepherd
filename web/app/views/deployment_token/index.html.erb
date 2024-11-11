@@ -1,15 +1,15 @@
-<div class="h-full w-full flex flex-col gap-14 bg-stone-800 sm:px-20 px-8 py-8">
+<div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
   <div class="flex w-full justify-between">
     <div class="flex flex-col">
-      <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Deployment Tokens</span>
-      <span class="sm:text-2xl font-medium text-stone-100 w-fit"><%= @deployment.name %></span>
+      <span class="text-xs sm:text-sm text-stone-400 font-medium">Deployment Tokens</span>
+      <span class="sm:text-2xl font-medium w-fit"><%= @deployment.name %></span>
     </div>
   </div>
 
   <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
     <div class="flex w-full justify-between items-start">
       <span class="font-medium text-lg">Deployment Tokens</span>
-      <%= button_to deployment_token_index_path(@deployment), method: :post, class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+      <%= button_to deployment_token_index_path(@deployment), method: :post, class: 'p-2' do %>
         <%= heroicon 'plus', variant: :outline, class: 'size-5' %>
       <% end %>
     </div>
@@ -37,7 +37,7 @@
           </div>
         <% end %>
       <% else %>
-        <span class="text-sm text-stone-100">No SSH keys added</span>
+        <span class="text-sm">No SSH keys added yet.</span>
       <% end %>
     </div>
   </div>
