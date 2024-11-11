@@ -1,4 +1,4 @@
-<div class="h-full w-full flex flex-col gap-10 bg-stone-800 sm:px-20 px-8 py-8">
+<div class="h-full w-full flex flex-col gap-10 sm:px-20 px-8 py-8">
   <% if current_user.team.nil? %>
     <span>You are not part of a team yet. Ask your admin to add you to a team or create a new team.</span>
 
@@ -32,11 +32,6 @@
           </div>
         <% end %>
       </div>
-    </div>
-
-    <div class="flex flex-col gap-2 p-4 rounded-md border-stone-300 border">
-      <span class="font-medium text-lg">Invite link</span>
-      <span class="text-sm bg-stone-700 p-2 rounded-md shadow-inner">Invite link here</span>
     </div>
   <% end %>
 </div>
