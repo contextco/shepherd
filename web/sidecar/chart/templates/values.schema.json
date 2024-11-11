@@ -167,17 +167,15 @@
       "items": {
         "type": "object"
       }
-    }
-  },
-
-  "environment": {
-    "type": "object",
-    "description": "Key-value pairs of environment variables",
-    "additionalProperties": {
-      "type": "string"
-    }
-  },
-  "secrets": {
+    },
+    "environment": {
+      "type": "object",
+      "description": "Key-value pairs of environment variables",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "secrets": {
     "type": "array",
     "description": "List of secret keys",
     "items": {
@@ -191,9 +189,10 @@
           "type": "string",
           "description": "Environment variable key"
         }
-      },
-      "required": ["name", "environmentKey"]
-    }
+          },
+          "required": ["name", "environmentKey"]
+        }
+      }
   },
   "additionalProperties": false
 }
