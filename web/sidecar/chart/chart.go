@@ -77,6 +77,10 @@ func (c *Chart) Validate() error {
 }
 
 func (c *Chart) Install(ctx context.Context) error {
+	if err := c.Validate(); err != nil {
+		return fmt.Errorf("failed to validate chart: %w", err)
+	}
+
 	actionConfig, err := actionConfig()
 	if err != nil {
 		return fmt.Errorf("failed to initialize helm configuration: %w", err)
