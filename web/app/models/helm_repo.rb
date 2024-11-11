@@ -14,15 +14,12 @@ class HelmRepo < ApplicationRecord
     command
   end
 
-  def pull_chart_command(service_name:)
-    service = ProjectService.find_by(name: service_name)
+  def pull_chart_command(service:)
     # eventually this will only expose the main chart and not individual chart but for now we can expose any service
     "helm pull #{name}/#{service.name} --untar"
   end
 
-  def install_chart_command(service_name:)
-    service = ProjectService.find_by(name: service_name)
-
+  def install_chart_command(service:)
     "helm install #{service.name} #{name}/#{service.name}"
   end
 
@@ -42,7 +39,7 @@ class HelmRepo < ApplicationRecord
 
   def base_url
     # TODO: this does not belong here
-    "http://localhost:3000" if Rails.env.development? || Rails.env.test?
+    return "http://localhost:3000" if Rails.env.development? || Rails.env.test?
 
     "https://vpc.context.ai"
   end
