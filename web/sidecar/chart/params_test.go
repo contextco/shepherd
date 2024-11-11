@@ -177,7 +177,7 @@ func TestParams_toValues(t *testing.T) {
 				t.Errorf("toValues() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if diff := cmp.Diff(got, tt.want, cmpopts.SortMaps(func(a, b string) bool { return a < b })); diff != "" {
+			if diff := cmp.Diff(got.Values, tt.want, cmpopts.SortMaps(func(a, b string) bool { return a < b })); diff != "" {
 				t.Errorf("toValues() = %v, want %v, diff = %s", got, tt.want, diff)
 			}
 		})
