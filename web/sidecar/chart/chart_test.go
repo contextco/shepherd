@@ -2,6 +2,7 @@ package chart
 
 import (
 	"context"
+	"fmt"
 	"sidecar/testcluster"
 	"strings"
 	"testing"
@@ -51,7 +52,7 @@ func TestChartValidate(t *testing.T) {
 }
 
 func TestChartInstall(t *testing.T) {
-
+	t.Parallel()
 	ctx := context.Background()
 	cluster := testcluster.New(t, ctx, "test")
 
@@ -63,8 +64,6 @@ func TestChartInstall(t *testing.T) {
 		{
 			name: "valid params",
 			params: &Params{
-				ChartName:    "test",
-				ChartVersion: "0.0.1",
 				Image: Image{
 					Name: "nginx",
 					Tag:  "latest",
@@ -84,6 +83,30 @@ func TestChartInstall(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "without environment variables",
+			params: &Params{
+				ReplicaCount: 1,
+				Secrets: []Secret{
+					{
+						Name:           "test-secret",
+						EnvironmentKey: "TEST_SECRET",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "without secrets",
+			params: &Params{
+				ReplicaCount: 1,
+				Environment: Environment{
+					"TEST_ENV":    "test-env",
+					"ANOTHER_ENV": "another-env",
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "invalid replica count",
 			params: &Params{
 				ReplicaCount: -1,
@@ -94,6 +117,10 @@ func TestChartInstall(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			tt.params.ChartName = fmt.Sprintf("test-%s", strings.ReplaceAll(tt.name, " ", "-"))
+			tt.params.ChartVersion = "0.0.1"
 			chart, err := NewFromParams(tt.params)
 			if err != nil {
 				t.Fatalf("failed to create chart: %v", err)
@@ -105,7 +132,7 @@ func TestChartInstall(t *testing.T) {
 			}
 
 			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
-				return strings.Contains(pod.Name, "test-0-0-1") && pod.Status.Phase == corev1.PodRunning
+				return strings.Contains(pod.Name, tt.params.ChartName) && pod.Status.Phase == corev1.PodRunning
 			}); err != nil {
 				t.Fatalf("failed to wait for pods: %v", err)
 			}
