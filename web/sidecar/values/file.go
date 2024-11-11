@@ -1,4 +1,4 @@
-package chart
+package values
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ValuesFile struct {
+type File struct {
 	Values map[string]interface{}
 }
 
-func (v *ValuesFile) Bytes() ([]byte, error) {
+func (v *File) Bytes() ([]byte, error) {
 	yaml, err := yaml.Marshal(v.Values)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal values: %w", err)

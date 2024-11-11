@@ -143,7 +143,3 @@ func TestChartInstall(t *testing.T) {
 		})
 	}
 }
-
-type ExpectedClusterState struct {
-	Pods []string
-}
