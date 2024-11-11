@@ -9,7 +9,10 @@
     },
     "image": {
       "type": "object",
-      "required": ["repository", "tag"],
+      "required": [
+        "repository",
+        "tag"
+      ],
       "properties": {
         "repository": {
           "type": "string",
@@ -33,7 +36,7 @@
       "description": "Override for the chart name"
     },
     "fullnameOverride": {
-      "type": "string", 
+      "type": "string",
       "description": "Override for the full chart name"
     },
     "serviceAccount": {
@@ -58,11 +61,16 @@
       }
     },
     "service": {
-      "type": "object", 
+      "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"],
+          "enum": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer",
+            "ExternalName"
+          ],
           "description": "Type of Kubernetes service"
         },
         "port": {
@@ -108,7 +116,11 @@
                     },
                     "pathType": {
                       "type": "string",
-                      "enum": ["Exact", "Prefix", "ImplementationSpecific"],
+                      "enum": [
+                        "Exact",
+                        "Prefix",
+                        "ImplementationSpecific"
+                      ],
                       "description": "Path type for the ingress rule"
                     }
                   }
@@ -162,7 +174,7 @@
       }
     },
     "volumeMounts": {
-      "type": "array", 
+      "type": "array",
       "description": "Volume mount configurations",
       "items": {
         "type": "object"
@@ -176,23 +188,30 @@
       }
     },
     "secrets": {
-    "type": "array",
-    "description": "List of secret keys",
-    "items": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the secret"
-        },
-        "environmentKey": {
-          "type": "string",
-          "description": "Environment variable key"
-        }
+      "type": "array",
+      "description": "List of secret keys",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the secret"
           },
-          "required": ["name", "environmentKey"]
-        }
+          "environmentKey": {
+            "type": "string",
+            "description": "Environment variable key"
+          },
+          "value": {
+            "type": "string",
+            "description": "Value of the secret"
+          }
+        },
+        "required": [
+          "name",
+          "environmentKey"
+        ]
       }
+    }
   },
   "additionalProperties": false
 }

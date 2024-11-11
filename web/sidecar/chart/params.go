@@ -3,6 +3,7 @@ package chart
 import (
 	"fmt"
 	"sidecar/generated/sidecar_pb"
+	"sidecar/values"
 
 	"helm.sh/helm/v3/pkg/chartutil"
 )
@@ -16,6 +17,14 @@ type Params struct {
 
 	Environment Environment
 	Secrets     Secrets
+}
+
+func (p *Params) ClientFacingValuesFile() (*values.File, error) {
+	return &values.File{
+		Values: compactMap(map[string]interface{}{
+			"secrets": p.Secrets.toValues(),
+		}),
+	}, nil
 }
 
 type Environment map[string]string
@@ -63,6 +72,18 @@ func (s Secrets) toValues() []map[string]interface{} {
 	return m
 }
 
+func (s Secrets) toClientFacingValues() []map[string]interface{} {
+	m := make([]map[string]interface{}, len(s))
+	for i, v := range s {
+		m[i] = map[string]interface{}{
+			"name":           v.Name,
+			"environmentKey": v.EnvironmentKey,
+			"value":          "",
+		}
+	}
+	return m
+}
+
 type Image struct {
 	Name string
 	Tag  string
@@ -81,16 +102,18 @@ func (p *Params) toYaml() (string, error) {
 		return "", fmt.Errorf("failed to convert params to helm values: %w", err)
 	}
 
-	return chartutil.Values(values).YAML()
+	return chartutil.Values(values.Values).YAML()
 }
 
-func (p *Params) toValues() (map[string]interface{}, error) {
-	return compactMap(map[string]interface{}{
-		"replicaCount": p.ReplicaCount,
-		"image":        p.Image.toValues(),
-		"environment":  p.Environment.toValues(),
-		"secrets":      p.Secrets.toValues(),
-	}), nil
+func (p *Params) toValues() (*values.File, error) {
+	return &values.File{
+		Values: compactMap(map[string]interface{}{
+			"replicaCount": p.ReplicaCount,
+			"image":        p.Image.toValues(),
+			"environment":  p.Environment.toValues(),
+			"secrets":      p.Secrets.toValues(),
+		}),
+	}, nil
 }
 
 func NewFromParams(params *Params) (*Chart, error) {
