@@ -28,7 +28,7 @@
   </head>
 
   <body>
-    <main class="relative h-dvh bg-stone-950 text-slate-100 overflow-x-hidden overflow-y-auto">
+    <main class="relative h-dvh text-stone-900 overflow-x-hidden overflow-y-auto">
       <%= content_for?(:content) ? yield(:content) : yield %>
       <%= render FlashMessagesComponent.new(flash: flash) %>
     </main>

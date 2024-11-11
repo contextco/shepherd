@@ -1,10 +1,10 @@
-<div class="h-full w-full flex flex-col gap-10 bg-stone-800 sm:px-20 px-8 py-8">
+<div class="h-full w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
   <div class="flex flex-col gap-8">
     <div class="flex w-full justify-between">
       <div class="flex flex-col">
-        <span class="text-xs sm:text-sm text-stone-400 font-medium text-stone-100">Application</span>
+        <span class="text-xs sm:text-sm text-stone-400 font-medium">Application</span>
         <div class="flex gap-2 items-center sm:text-2xl">
-          <span class="font-medium text-stone-100 w-fit"><%= @app.name %></span>
+          <span class="font-medium w-fit"><%= @app.name %></span>
         </div>
 
       </div>
@@ -12,8 +12,8 @@
       <div class="flex flex-col justify-center">
         <div class="flex gap-2 items-center">
 
-          <%= link_to edit_project_path(@app), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
-            <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
+          <%= link_to edit_project_path(@app), class: 'p-2' do %>
+            <%= heroicon 'cog', variant: :outline, class: 'size-5' %>
           <% end %>
         </div>
       </div>
@@ -23,17 +23,16 @@
 
   <div class="flex flex-col gap-4">
     <div class="flex w-full justify-between items-center">
-      <div class="flex items-center gap-2 font-medium">
-        <span class="text-stone-200">Version</span>
+      <div class="flex items-baseline font-medium">
         <%# TODO: make this a dropdown? %>
-        <span class="font-medium text-stone-500 w-fit font-mono"><%= @version.version %></span>
+        <span class="font-medium text-stone-600 w-fit font-mono">V<%= @version.version %></span>
       </div>
 
       <div class="flex items-center gap-2">
         <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
-        <%= link_to edit_project_version_path(@app, @version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
-          <%= heroicon 'cog-8-tooth', variant: :outline, class: 'size-5' %>
+        <%= link_to edit_project_version_path(@app, @version), class: 'p-2' do %>
+          <%= heroicon 'pencil', variant: :outline, class: 'size-4' %>
         <% end %>
       </div>
     </div>
