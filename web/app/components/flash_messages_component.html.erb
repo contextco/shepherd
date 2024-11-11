@@ -3,14 +3,14 @@
     data-controller="flash-messages-component"
     data-flash-messages-component-target="flash"
     data-action="keydown.esc@window->flash-messages-component#closeFlash"
-    class="absolute right-8 bottom-6 z-50 w-72 rounded bg-stone-700 overflow-hidden animate__animated animate__fadeInRight animate__faster">
+    class="absolute right-8 bottom-6 z-50 w-72 border border-stone-300 shadow rounded overflow-hidden animate__animated animate__fadeInRight animate__faster">
     <div
       data-flash-messages-component-target="progressBar"
       data-action="animationend->flash-messages-component#closeFlash"
       class="animate-shrink-right animation-fill-forwards <%= progress_bar_color %> w-full h-1"></div>
 
     <div class="p-2 h-full flex items-center gap-2 break-words w-full">
-      <div class="text-stone-400">
+      <div class="">
         <% if flash[:notice] %>
           <%= heroicon 'check', variant: :outline, class: 'size-4' %>
         <% end %>
@@ -19,7 +19,7 @@
           <%= heroicon 'exclamation-triangle', variant: :outline, class: 'size-4' %>
         <% end %>
       </div>
-      <div class="text-stone-300 text-sm break-words min-w-0"><%= message %></div>
+      <div class="text-stone-800 text-sm break-words min-w-0"><%= message %></div>
     </div>
   </div>
 <% end %>
