@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class HelmUser < ApplicationRecord
-  belongs_to :project
+  belongs_to :helm_repo
 
-  validates :project, presence: true
+  validates :helm_repo, presence: true
   validates :name, presence: true
   validates :password, presence: true
 end
