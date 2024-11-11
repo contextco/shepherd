@@ -26,6 +26,11 @@ class Project::VersionController < ApplicationController
   def edit; end
 
   def publish
+    if @version.project_services.empty?
+      flash[:error] = "No services attached to publish"
+      return redirect_to project_version_path
+    end
+
     @version.building!
     @version.project_services.each do |service|
       unless service.publish_chart
