@@ -1,9 +1,11 @@
 <% if version.published? %>
-  <%= button_to unpublish_project_version_path(version.project_id, version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+  <%= button_to unpublish_project_version_path(version.project_id, version), class: 'px-2 py-1 border rounded-md text-sm flex gap-1 items-center' do %>
+    <%= heroicon :pause, class: 'size-4' %>
     Unpublish
   <% end %>
 <% else %>
-  <%= button_to publish_project_version_path(version.project_id, version), class: 'p-2 rounded-md bg-stone-800 hover:bg-stone-700' do %>
+  <%= button_to publish_project_version_path(version.project_id, version), class: 'px-2 py-1 border border-stone-300 rounded-md text-sm flex gap-1 items-center' do %>
+    <%= heroicon :play, class: 'size-4' %>
     Publish
   <% end %>
 <% end %>

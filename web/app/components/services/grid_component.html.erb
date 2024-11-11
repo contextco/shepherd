@@ -7,8 +7,8 @@
 
       <div class="flex items-center">
         <%= link_to new_project_version_service_path(project_version.project_id, project_version), method: :get do %>
-          <div class="rounded-md hover:bg-stone-600 bg-stone-700 p-2 cursor-pointer">
-            <%= heroicon 'plus', class: 'size-4 stroke-2 text-stone-100' %>
+          <div class="rounded-md p-2 cursor-pointer">
+            <%= heroicon 'plus', class: 'size-4' %>
           </div>
         <% end %>
       </div>
@@ -16,7 +16,7 @@
   </div>
   <% if services.empty? %>
     <div class="flex items-center justify-center h-48 border border-stone-300 mt-6">
-      <div class="text-stone-300">Your Services will be visible here. Create your first service</div>
+      <div class="text-stone-500">Services will be visible here when created.</div>
     </div>
   <% else %>
     <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
