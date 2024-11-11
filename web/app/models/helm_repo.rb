@@ -39,7 +39,7 @@ class HelmRepo < ApplicationRecord
 
   def base_url
     # TODO: this does not belong here
-    "http://localhost:3000" if Rails.env.development? || Rails.env.test?
+    return "http://localhost:3000" if Rails.env.development? || Rails.env.test?
 
     "https://vpc.context.ai"
   end
