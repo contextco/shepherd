@@ -105,7 +105,13 @@ RSpec.describe Project::VersionController, type: :controller do
 
     it_behaves_like 'requires authentication'
 
-    context 'when user has access' do
+    context 'when there is an attached service' do
+      let!(:project_service) { create(:project_service, project_version:) }
+
+      before do
+        allow_any_instance_of(ProjectService).to receive(:publish_chart).and_return(true)
+      end
+
       it 'publishes the version' do
         expect { subject }
           .to change { project_version.reload.published? }
