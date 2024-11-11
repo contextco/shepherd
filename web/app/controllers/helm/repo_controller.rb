@@ -5,25 +5,20 @@ class Helm::RepoController < ApplicationController
 
   def download
     filename = sanitize_filename(params[:filename])
+    file = @repo.file_yaml(filename)
+    return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
-    bucket = GCSClient.onprem_bucket
-    file = bucket.file("#{params[:repo_name]}/#{filename}")
-
-    if file.present?
-      send_file file.download.string,
-                type: "application/x-tar",
-                disposition: "attachment",
-                filename:
-    else
-      render json: { error: "Chart not found" }, status: :not_found
-    end
+    send_file file.download.string,
+              type: "application/x-tar",
+              disposition: "attachment",
+              filename:
   end
 
   def index_yaml
     response.headers["Cache-Control"] = "no-cache"
 
     begin
-      file = bucket.file("#{params[:repo_name]}/index.yaml")
+      file = @repo.index_yaml
       raise "File not found" if file.nil?
 
       yaml = file.download.string
@@ -69,10 +64,7 @@ class Helm::RepoController < ApplicationController
   def sanitize_filename(filename)
     # Remove any path traversal attempts and restrict to expected format
     return nil unless filename.match?(/^[\w\-\.]+\.tgz$/)
-    filename
-  end
 
-  def bucket
-    @bucket ||= GCSClient.onprem_bucket
+    filename
   end
 end
