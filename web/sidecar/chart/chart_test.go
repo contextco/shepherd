@@ -116,8 +116,6 @@ func TestChartInstall(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
 			tt.params.ChartName = fmt.Sprintf("test-%s", strings.ReplaceAll(tt.name, " ", "-"))
 			tt.params.ChartVersion = "0.0.1"
 			chart, err := NewFromParams(tt.params)
