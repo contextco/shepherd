@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_08_165955) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_11_105537) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -73,13 +73,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_08_165955) do
     t.index ["owner_type", "owner_id"], name: "index_helm_charts_on_owner"
   end
 
-  create_table "helm_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "helm_repos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "project_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id", "name"], name: "index_helm_repos_on_project_id_and_name", unique: true
+    t.index ["project_id"], name: "index_helm_repos_on_project_id"
+  end
+
+  create_table "helm_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.string "password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_helm_users_on_project_id"
+    t.uuid "helm_repo_id", null: false
+    t.index ["helm_repo_id"], name: "index_helm_users_on_helm_repo_id"
   end
 
   create_table "project_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -149,7 +158,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_08_165955) do
   add_foreign_key "deployment_tokens", "deployments"
   add_foreign_key "deployments", "teams"
   add_foreign_key "event_logs", "containers"
-  add_foreign_key "helm_users", "projects"
+  add_foreign_key "helm_repos", "projects"
+  add_foreign_key "helm_users", "helm_repos"
   add_foreign_key "project_services", "project_versions"
   add_foreign_key "project_versions", "projects"
   add_foreign_key "projects", "teams"

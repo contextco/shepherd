@@ -8,6 +8,6 @@ entries:
     name: test-chart
     type: application
     urls:
-    - test-repo/test-chart-1.0.0.tgz/test-chart
+    - test-repo/test-chart-1.0.0.tgz
     version: 1.0.0
 generated: "2024-01-01T00:00:00Z"

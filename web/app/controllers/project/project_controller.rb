@@ -44,8 +44,9 @@ class Project::ProjectController < ApplicationController
         version: "0.0.1",
         state: :draft
       )
-      app.helm_users.create!(
-        name: app.name,
+      repo = app.create_helm_repo!(name: app.name)
+      repo.helm_users.create!(
+        name: "#{app.name}-user",
         password: SecureRandom.hex(8)
       )
     end

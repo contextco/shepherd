@@ -113,7 +113,7 @@ func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*
 		return nil, fmt.Errorf("failed to digest archive: %w", err)
 	}
 
-	objectName := fmt.Sprintf("%s/%s", repo, archive.Name)
+	objectName := filepath.Join(repo, archive.Name)
 	if err := c.store.Upload(ctx, objectName, bytes.NewReader(archive.Data)); err != nil {
 		return nil, fmt.Errorf("failed to upload archive: %w", err)
 	}
