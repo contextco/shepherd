@@ -1,4 +1,4 @@
-<%= form_for service_object, url:, method: method_type do |form| %>
+<%= form_with model: service_object, url:, method: form_method do |form| %>
   <div class="flex flex-col gap-6">
     <div class="flex items-center justify-between">
       <%= form.label :name, class: 'font-medium' %>
@@ -19,16 +19,16 @@
 
     <div class="flex flex-col gap-4">
       <span class="font-medium">Resources</span>
-      <%= form.fields_for :resources do |resources_form| %>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full items-center">
-          <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_request, field_label: 'Min CPU', default_value: service_object.resources&.dig('cpu_request') || 1, default_unit: service_object.resources&.dig('cpu_request_unit') || 'Cores') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :cpu_limit, field_label: 'Max CPU', default_value: service_object.resources&.dig('cpu_limit') || 2, default_unit: service_object.resources&.dig('cpu_limit_unit') || 'Cores') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_request, field_label: 'Min memory', default_value: service_object.resources&.dig('memory_request') || 1, default_unit: service_object.resources&.dig('memory_request_unit') || 'Gi') %>
-            <%= render Services::ResourceSelectorComponent.new(form: resources_form, field_name: :memory_limit, field_label: 'Max memory', default_value: service_object.resources&.dig('memory_limit') || 2, default_unit: service_object.resources&.dig('memory_limit_unit') || 'Gi') %>
-          </div>
+      <div class="flex flex-col gap-8 rounded-md p-8 pt-10 border border-stone-400 w-full items-start px-8">
+        <div class="flex items-start grow w-full gap-8">
+          <span class="font-medium">CPU</span>
+          <%= render Services::CPUSliderComponent.new(form: ) %>
         </div>
-      <% end %>
+        <div class="flex items-start grow w-full gap-8">
+          <span class="font-medium">RAM</span>
+          <%= render Services::MemorySliderComponent.new(form: ) %>
+        </div>
+      </div>
     </div>
 
     <%# TODO: add env variables and secrets. Env variables will need a checkbox to denote if hard coded or the user should override %>
@@ -40,21 +40,18 @@
           Do not put sensitive values here. Sensitive values should be stored in secrets.
         </span>
       </div>
-      <%= form.fields_for :environment_variables, index: '' do |env_var_form| %>
+      <%= form.fields_for :environment_variables do |env_var_form| %>
         <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
-            <% service_object&.environment_variables&.each do |environment_variable| %>
-              <%= render Services::EnvironmentVariableComponent.new(form: env_var_form, environment_variable:) %>
-            <% end %>
-            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) if service_object&.environment_variables.blank? %>
+            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+            <template data-dynamic-elements-target="template">
+              <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+            </template>
           </div>
           <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
             + Add
           </div>
         </div>
-        <template data-dynamic-elements-target="template">
-          <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
-        </template>
       <% end %>
     </div>
 
@@ -66,21 +63,18 @@
         </span>
       </div>
 
-      <%= form.fields_for :secrets, index: '' do |secret_form| %>
+      <%= form.fields_for :secrets do |secret_form| %>
         <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
           <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
-            <% service_object&.secrets&.each do |secret| %>
-              <%= render Services::SecretComponent.new(form: secret_form, secret:) %>
-            <% end %>
-            <%= render Services::SecretComponent.new(form: secret_form) if service_object&.secrets.blank? %>
+              <%= render Services::SecretComponent.new(form: secret_form) %>
           </div>
           <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
             + Add
           </div>
-          <template data-dynamic-elements-target="template">
-            <%= render Services::SecretComponent.new(form: secret_form) %>
-          </template>
         </div>
+        <template data-dynamic-elements-target="template">
+          <%= render Services::SecretComponent.new(form: secret_form) %>
+        </template>
       <% end %>
     </div>
 

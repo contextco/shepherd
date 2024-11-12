@@ -3,12 +3,10 @@
   <%= form.hidden_field :templated, value: '0' %>
   <%= form.text_field :name,
                       placeholder: 'ENV_NAME',
-                      value: environment_variable&.dig('name'),
                       class: 'w-4/6 p-2 rounded-md border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
   %>
   <%= form.text_field :value,
                       placeholder: 'value',
-                      value: environment_variable&.dig('value'),
                       class: 'w-2/6 p-2 rounded-md border border-stone-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none'
   %>
     <%= heroicon "minus-circle", class: 'flex-none size-6 text-red-800 cursor-pointer', data: { action: 'click->dynamic-elements#removeElement' } %>
