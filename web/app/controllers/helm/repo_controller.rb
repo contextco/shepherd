@@ -48,17 +48,13 @@ class Helm::RepoController < ActionController::Base
   end
 
   def create
-    render json: {
-      message: "This Helm repository is read-only. Charts cannot be uploaded via the API.",
-      help: ""
-    }, status: :forbidden
+    render plain: "This Helm repository is read-only. Charts cannot be uploaded via the API.",
+           status: :forbidden
   end
 
   def destroy
-    render json: {
-      message: "This Helm repository is read-only. Charts cannot be deleted via the API.",
-      help: ""
-    }, status: :forbidden
+    render plain: "This Helm repository is read-only. Charts cannot be deleted via the API.",
+           status: :forbidden
   end
 
   private
