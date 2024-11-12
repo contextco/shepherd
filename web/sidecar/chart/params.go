@@ -15,8 +15,31 @@ type Params struct {
 	Image        Image
 	ReplicaCount int
 
+	Resources Resources
+
 	Environment Environment
 	Secrets     Secrets
+}
+
+type Resources struct {
+	CPUCoresRequested int
+	CPUCoresLimit     int
+
+	MemoryBytesRequested int
+	MemoryBytesLimit     int
+}
+
+func (r Resources) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"limits": map[string]interface{}{
+			"cpu":    fmt.Sprintf("%dm", r.CPUCoresLimit*1000),
+			"memory": fmt.Sprintf("%d", r.MemoryBytesLimit),
+		},
+		"requests": map[string]interface{}{
+			"cpu":    fmt.Sprintf("%dm", r.CPUCoresRequested*1000),
+			"memory": fmt.Sprintf("%d", r.MemoryBytesRequested),
+		},
+	}
 }
 
 func (p *Params) ClientFacingValuesFile() (*values.File, error) {
@@ -112,6 +135,7 @@ func (p *Params) toValues() (*values.File, error) {
 			"image":        p.Image.toValues(),
 			"environment":  p.Environment.toValues(),
 			"secrets":      p.Secrets.toValues(),
+			"resources":    p.Resources.toValues(),
 		}),
 	}, nil
 }
