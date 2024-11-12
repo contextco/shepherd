@@ -11,6 +11,8 @@ class ProjectService < ApplicationRecord
   validates :name, presence: true
   validates :resources, presence: true
 
+  store_accessor :resources, :cpu_request, :memory_request
+
   def image_tag
     DockerImageUrlParser.new(image).tag
   end

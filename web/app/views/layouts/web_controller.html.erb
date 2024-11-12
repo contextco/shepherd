@@ -1,8 +1,8 @@
 <%= content_for :content do %>
-  <div class="h-full flex overflow-y-auto">
-    <div class="header flex flex-col justify-between p-4 gap-8 items-center border-r">
+  <div class="h-full flex">
+    <div class="header flex flex-col justify-between p-3 gap-8 items-center border-r">
       <div class="left font-bold flex flex-col items-center gap-8">
-        <%= link_to root_path, class: 'text-xl' do %>
+        <%= link_to root_path, class: 'text-2xl' do %>
         S
         <% end %>
         <div class="">
@@ -30,21 +30,8 @@
         <% end %>
       </div>
     </div>
-    <div class="content grow">
-      <% unless user_signed_in? %>
-        <div class="flex items-center justify-end gap-4 whitespace-nowrap p-6">
-          <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
-                        class: 'px-2 py-1 flex items-center gap-1 hover:bg-stone-100 rounded-md duration-200' do %>
-            Sign in
-          <% end %>
-          <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
-                        class: 'border rounded-md px-2 py-1 flex items-center gap-1 hover:bg-stone-100 duration-200 border-stone-400' do %>
-            Create account
-            <%= heroicon 'arrow-right', class: 'size-4' %>
-          <% end %>
-        </div>
-      <% end %>
-      <%= content_for?(:shepherd_content) ? yield(:shepherd_content) : yield %>
+    <div class="content grow overflow-y-auto pb-8">
+      <%= yield %>
     </div>
   </div>
 <% end %>
