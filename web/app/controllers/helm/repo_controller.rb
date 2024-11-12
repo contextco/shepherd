@@ -4,14 +4,29 @@ class Helm::RepoController < ApplicationController
   before_action :authenticate_request
 
   def download
-    filename = sanitize_filename(params[:filename])
+    if (filename = sanitize_filename(params[:filename])).nil?
+      return render json: { error: "Invalid filename" }, status: :bad_request
+    end
+
     file = @repo.file_yaml(filename)
     return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
-    send_file file.download.string,
+    temp_filename = "#{SecureRandom.hex(8)}-#{filename}"
+    tempfile = Tempfile.new(temp_filename)
+    file.download tempfile.path
+    tempfile.rewind
+
+    send_file tempfile.path,
+              filename:,
               type: "application/x-tar",
               disposition: "attachment",
-              filename:
+              stream: false,
+              status: :ok
+  ensure
+    if tempfile && response.sending?
+      tempfile.close
+      tempfile.unlink
+    end
   end
 
   def index_yaml
