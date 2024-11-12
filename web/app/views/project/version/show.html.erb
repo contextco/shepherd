@@ -14,7 +14,7 @@
 
         <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
-        <%= link_to edit_project_version_path(@app, @version), class: 'p-2' do %>
+        <%= link_to edit_version_path(@version), class: 'p-2' do %>
           <%= heroicon 'pencil', variant: :outline, class: 'size-4' %>
         <% end %>
       </div>

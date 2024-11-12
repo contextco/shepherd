@@ -34,14 +34,14 @@ class Project::VersionController < ApplicationController
     end
 
     flash[:notice] = "Application version created"
-    redirect_to project_version_path(@app, new_version)
+    redirect_to version_path(new_version)
   end
 
   def update
     @version.update!(description: params[:description])
 
     flash[:notice] = "Application version updated"
-    redirect_to project_version_path(@app, @version)
+    redirect_to version_path(@version)
   end
 
   def edit; end
@@ -49,7 +49,7 @@ class Project::VersionController < ApplicationController
   def publish
     if @version.services.empty?
       flash[:error] = "No services attached to publish"
-      return redirect_to project_version_path
+      return redirect_to version_path
     end
 
     @version.building!
@@ -57,13 +57,13 @@ class Project::VersionController < ApplicationController
       unless service.publish_chart
         @version.draft!
         flash[:error] = "Failed to publish service #{service.name}"
-        return redirect_to project_version_path
+        return redirect_to version_path
       end
     end
     @version.published!
 
     flash[:notice] = "Application version published"
-    redirect_to project_version_path
+    redirect_to version_path(@version)
   end
 
   def unpublish
@@ -74,7 +74,7 @@ class Project::VersionController < ApplicationController
     # Also need to make attached services not editable
 
     flash[:notice] = "Application version unpublished"
-    redirect_to project_version_path
+    redirect_to version_path(@version)
   end
 
   private
@@ -84,15 +84,17 @@ class Project::VersionController < ApplicationController
   end
 
   def fetch_application
-    @app = current_user.team.projects.find(params[:project_id])
-    @version = @app.project_versions.find(params[:id]) if params[:id].present?
+    @version = current_team.project_versions.find(params[:id]) if params[:id].present?
+    @app = @version&.project || current_team.projects.find(params[:project_id])
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "Application not found"
+    redirect_to root_path
   end
 
   def fetch_previous_version
     @previous_version = @app.project_versions.order(created_at: :desc).first
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "No previous version found"
+    redirect_to root_path
   end
 end

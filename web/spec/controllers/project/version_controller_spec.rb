@@ -53,7 +53,8 @@ RSpec.describe Project::VersionController, type: :controller do
 
       it 'returns forbidden status' do
         subject
-        expect(response).to have_http_status(:forbidden)
+        expect(flash[:error]).to eq('Application not found')
+        expect(response).to redirect_to(root_path)
       end
     end
   end
@@ -100,7 +101,7 @@ RSpec.describe Project::VersionController, type: :controller do
 
       it 'redirects to the project version page' do
         subject
-        expect(response).to redirect_to(project_version_path(project, ProjectVersion.order(:created_at).last))
+        expect(response).to redirect_to(version_path(ProjectVersion.order(:created_at).last))
       end
 
       it 'sets a success flash message' do
@@ -154,7 +155,7 @@ RSpec.describe Project::VersionController, type: :controller do
 
       it 'redirects to the project version page' do
         subject
-        expect(response).to redirect_to(project_version_path(project, project_version))
+        expect(response).to redirect_to(version_path(project_version))
       end
 
       it 'sets a success flash message' do
