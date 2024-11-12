@@ -16,6 +16,7 @@ RSpec.describe Helm::RepoController, type: :controller do
   before do
     allow(GCSClient).to receive(:onprem_bucket).and_return(mock_bucket)
     allow(mock_bucket).to receive(:file).with("sidecar/index.yaml").and_return(mock_file)
+    allow(mock_bucket).to receive(:file).with("sidecar/test-0.0.1.tgz").and_return(mock_file)
     allow(mock_file).to receive_message_chain(:download, :string).and_return(file_content)
 
     request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(username, password)
@@ -35,6 +36,23 @@ RSpec.describe Helm::RepoController, type: :controller do
     it "returns a yaml file" do
       get :index_yaml, params: { repo_name: "sidecar" }
       expect(response.body).to include("apiVersion")
+    end
+  end
+
+  describe 'GET #download' do
+    it 'returns a success response' do
+      get :download, params: { repo_name: "sidecar", filename: "test-0.0.1.tgz" }
+      expect(response).to be_successful
+    end
+
+    it 'returns a tar content type' do
+      get :download, params: { repo_name: "sidecar", filename: "test-0.0.1.tgz" }
+      expect(response.content_type).to eq('application/x-tar')
+    end
+
+    it "returns a filename test-0.0.1.tgz" do
+      get :download, params: { repo_name: "sidecar", filename: "test-0.0.1.tgz" }
+      expect(response.headers["Content-Disposition"]).to include("test-0.0.1.tgz")
     end
   end
 end

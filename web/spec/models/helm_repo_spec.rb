@@ -11,7 +11,7 @@ RSpec.describe HelmRepo do
 
   describe '#add_repo_command' do
     it 'returns the correct command' do
-      expect(helm_repo.add_repo_command).to eq("helm repo add test-repo https://vpc.context.ai/test-repo --username test-user --password test-password --insecure-skip-tls-verify")
+      expect(helm_repo.add_repo_command).to eq("helm repo add test-repo http://localhost:3000/repo/test-repo --username test-user --password test-password --insecure-skip-tls-verify")
     end
   end
 
