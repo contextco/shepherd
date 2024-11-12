@@ -133,6 +133,12 @@ func TestParams_toValues(t *testing.T) {
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
 				},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
 			},
 			want: map[string]interface{}{
 				"image": map[string]interface{}{
@@ -143,6 +149,16 @@ func TestParams_toValues(t *testing.T) {
 				"environment": map[string]interface{}{
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
+				},
+				"resources": map[string]interface{}{
+					"limits": map[string]interface{}{
+						"cpu":    "2000m",
+						"memory": "2048",
+					},
+					"requests": map[string]interface{}{
+						"cpu":    "1000m",
+						"memory": "1024",
+					},
 				},
 			},
 			wantErr: false,
@@ -158,6 +174,12 @@ func TestParams_toValues(t *testing.T) {
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
 			},
 			want: map[string]interface{}{
 				"image": map[string]interface{}{
@@ -165,6 +187,16 @@ func TestParams_toValues(t *testing.T) {
 					"tag":        "latest",
 				},
 				"replicaCount": 3,
+				"resources": map[string]interface{}{
+					"limits": map[string]interface{}{
+						"cpu":    "2000m",
+						"memory": "2048",
+					},
+					"requests": map[string]interface{}{
+						"cpu":    "1000m",
+						"memory": "1024",
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -205,6 +237,12 @@ func TestParams_toYaml(t *testing.T) {
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
 				},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
 			},
 			want: `environment:
   ENV_VAR1: value1
@@ -213,6 +251,13 @@ image:
   repository: test-image
   tag: latest
 replicaCount: 3
+resources:
+  limits:
+    cpu: 2000m
+    memory: "2048"
+  requests:
+    cpu: 1000m
+    memory: "1024"
 `,
 			wantErr: false,
 		},
@@ -227,11 +272,24 @@ replicaCount: 3
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
 			},
 			want: `image:
   repository: test-image
   tag: latest
 replicaCount: 3
+resources:
+  limits:
+    cpu: 2000m
+    memory: "2048"
+  requests:
+    cpu: 1000m
+    memory: "1024"
 `,
 			wantErr: false,
 		},
