@@ -19,12 +19,12 @@ RSpec.describe Project::ServiceController, type: :controller do
     end
 
     it 'redirects to the project version path' do
-      expect(subject).to redirect_to(project_version_path(project, project_version))
+      expect(subject).to redirect_to(version_path(project_version))
     end
   end
 
   describe 'GET #new' do
-    subject { get :new, params: { project_version_id: project_version.id } }
+    subject { get :new, params: { version_id: project_version.id } }
 
     it 'renders the new template' do
       expect(subject).to render_template(:new)
@@ -33,7 +33,7 @@ RSpec.describe Project::ServiceController, type: :controller do
 
   describe 'POST #create' do
     let(:valid_params) { {
-      project_version_id: project_version.id,
+      version_id: project_version.id,
       service_form: {
         service_id: project_service.id,
         name: 'service',
