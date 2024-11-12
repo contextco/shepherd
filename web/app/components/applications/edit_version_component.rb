@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class Services::ElementComponent < ApplicationComponent
-  attribute :service
+class Applications::EditVersionComponent < ApplicationComponent
   attribute :version
 
   def enabled?
