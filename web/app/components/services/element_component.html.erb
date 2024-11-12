@@ -1,5 +1,5 @@
 <li class="grid items-stretch">
-  <%= link_to project_version_service_path(version.project_id, version, service), class: 'w-full border border-solid border-stone-400 p-4 cursor-pointer duration-200 flex flex-col gap-4' do %>
+  <%= link_to edit_project_version_service_path(version.project_id, version, service), class: 'w-full border border-solid border-stone-400 p-4 cursor-pointer duration-200 flex flex-col gap-4' do %>
     <div class="flex justify-between items-center">
       <h6 class="">
         <%= service.name %>
