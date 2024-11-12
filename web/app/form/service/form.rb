@@ -45,6 +45,14 @@ class Service::Form
   validate :image_format
   validate :name_format
 
+  def self.empty
+    f = Service::Form.new
+    f.environment_variables.build
+    f.secrets.build
+
+    f
+  end
+
   def self.from_service(service)
     f = Service::Form.new
       f.assign_attributes(
