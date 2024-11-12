@@ -188,6 +188,12 @@ func TestAdd_valuesFile(t *testing.T) {
 					Name: "test-image",
 					Tag:  "latest",
 				},
+				Resources: chart.Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
 			},
 		},
 	}
