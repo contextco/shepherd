@@ -1,5 +1,5 @@
 <li class="grid items-stretch">
-  <%= link_to edit_project_version_service_path(version.project_id, version, service), class: 'w-full border border-solid border-stone-400 p-4 cursor-pointer duration-200 flex flex-col gap-4' do %>
+  <%= link_to edit_project_service_path(service), class: 'w-full border border-solid border-stone-400 p-4 cursor-pointer duration-200 flex flex-col gap-4' do %>
     <div class="flex justify-between items-center">
       <h6 class="">
         <%= service.name %>
@@ -13,9 +13,9 @@
       <div class="p-1 bg-stone-100 border rounded-md px-2 font-mono text-xs flex items-center gap-2">
         <%= heroicon 'cpu-chip', class: 'size-4' %>
         <span>
-        <%= pluralize(service.cpu_request, 'core') %>
+        <%= pluralize(service.cpu_cores, 'core') %>
           <span class="text-stone-400">|</span>
-          <%= pluralize(service.memory_request, 'MB') %>
+          <%= pluralize(service.memory_bytes, 'MB') %>
         </span>
       </div>
     </div>
