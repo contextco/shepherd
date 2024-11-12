@@ -3,48 +3,12 @@
 class Service::Form
   include FormObject
 
+  attribute :service_id
   attribute :name
   attribute :image
 
-  attribute :resources do
-    attribute :cpu_request, default: 1
-    attribute :cpu_limit, default: 2
-    attribute :memory_request, default: 1
-    attribute :memory_limit, default: 2
-
-    attribute :cpu_request_unit, default: "Cores"
-    attribute :cpu_limit_unit, default: "Cores"
-    attribute :memory_request_unit, default: "Gi"
-    attribute :memory_limit_unit, default: "Gi"
-
-    validates :cpu_request, presence: true, numericality: { greater_than: 0, less_than: 10000 }
-    validates :cpu_limit, presence: true, numericality: { greater_than: 0, less_than: 10000 }
-    validates :memory_request, presence: true, numericality: { greater_than: 0, less_than: 10000 }
-    validates :memory_limit, presence: true, numericality: { greater_than: 0, less_than: 10000 }
-
-    validates :cpu_request_unit, presence: true, inclusion: { in: %w[Cores mCores] }
-    validates :cpu_limit_unit, presence: true, inclusion: { in: %w[Cores mCores] }
-    validates :memory_request_unit, presence: true, inclusion: { in: %w[Gi Mi Ki] }
-    validates :memory_limit_unit, presence: true, inclusion: { in: %w[Gi Mi Ki] }
-    validate :cpu_limit_less_than_cpu_request
-    validate :memory_limit_less_than_memory_request
-
-    def cpu_limit_less_than_cpu_request
-      cpu_request_total = cpu_request.to_i * (cpu_request_unit == "Cores" ? 1000 : 1)
-      cpu_limit_total = cpu_limit.to_i * (cpu_limit_unit == "Cores" ? 1000 : 1)
-      return if cpu_limit_total >= cpu_request_total
-
-      errors.add(:cpu_limit, "must be greater than or equal to CPU request")
-    end
-
-    def memory_limit_less_than_memory_request
-      memory_request_total = memory_request.to_i * (memory_request_unit == "Gi" ? 1024**2 : memory_request_unit == "Mi" ? 1024**1 : 1)
-      memory_limit_total = memory_limit.to_i * (memory_limit_unit == "Gi" ? 1024**2 : memory_limit_unit == "Mi" ? 1024**1 : 1)
-      return if memory_limit_total >= memory_request_total
-
-      errors.add(:memory_limit, "must be greater than or equal to memory request")
-    end
-  end
+  attribute :cpu_cores, default: 1
+  attribute :memory_bytes, default: 1.gigabyte
 
   attribute :environment_variables, multiple: true do
     attribute :templated, default: false
@@ -81,6 +45,23 @@ class Service::Form
   validate :image_format
   validate :name_format
 
+  def self.from_service(service)
+    f = Service::Form.new
+      f.assign_attributes(
+        service_id: service.id,
+        name: service.name,
+        image: service.image,
+        cpu_cores: service.cpu_cores,
+        memory_bytes: service.memory_bytes,
+        environment_variables: service.environment_variables.map do |env|
+          { name: env[:name], value: env[:value], templated: env[:templated] }
+        end,
+        secrets: service.secrets.map { |secret| { name: secret } }
+      )
+
+    f
+  end
+
   def build_service
     ProjectService.new(**service_params)
   end
@@ -99,26 +80,10 @@ class Service::Form
     {
       name:,
       image:,
-      resources: resources_object,
+      cpu_cores: cpu_cores.to_i,
+      memory_bytes: memory_bytes.to_i,
       environment_variables: environment_variables_object,
       secrets: secrets_object
-    }
-  end
-
-  def resources_object
-    {
-      cpu_request_combined: "#{resources.cpu_request}#{resources.cpu_request_unit}",
-      cpu_limit_combined: "#{resources.cpu_limit}#{resources.cpu_limit_unit}",
-      memory_request_combined: "#{resources.memory_request}#{resources.memory_request_unit}",
-      memory_limit_combined: "#{resources.memory_limit}#{resources.memory_limit_unit}",
-      cpu_request: resources.cpu_request,
-      cpu_limit: resources.cpu_limit,
-      memory_request: resources.memory_request,
-      memory_limit: resources.memory_limit,
-      cpu_request_unit: resources.cpu_request_unit,
-      cpu_limit_unit: resources.cpu_limit_unit,
-      memory_request_unit: resources.memory_request_unit,
-      memory_limit_unit: resources.memory_limit_unit
     }
   end
 

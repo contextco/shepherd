@@ -1,0 +1,48 @@
+<div class="slider w-full max-w-4xl block mb-8"
+     data-controller="step-slider"
+     data-step-slider-options-value="<%= steps %>"
+     data-step-slider-disabled-options-value="<%= disabled_steps %>"
+>
+  <div class="relative h-2">
+    <div class="grid grid-flow-col w-full">
+      <%= range_field_tag nil, 0, class: 'appearance-none rounded top-0 h-2 bg-transparent',
+                           data: {
+                             'step-slider-target': 'input',
+                             'action': 'input->step-slider#slide',
+                           } %>
+
+    </div>
+    <%= form.hidden_field name, data: { 'step-slider-target': 'hiddenField' } %>
+
+    <div class="absolute top-0 left-0 flex justify-between w-full items-center h-full w-full px-2">
+      <div class="grid grid-flow-col w-full h-1 overflow-hidden">
+        <% steps[1..].each do |step| %>
+          <% if disabled_steps.include?(step) %>
+            <div class="bg-stone-300 h-1"></div>
+          <% else %>
+            <div class="bg-stone-400 h-1"></div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class="absolute top-0 left-0 flex justify-between w-full items-center h-full grid auto-cols-max grid-flow-col px-2">
+      <% steps.zip(labels).each do |step, label| %>
+        <div class="relative">
+          <div class="flex justify-center">
+            <div class="bg-stone-400 size-1 origin-center translate-y-1/2"></div>
+          </div>
+
+          <%= content_tag :div, class: ['absolute text-xs flex justify-center -translate-x-1/2 whitespace-nowrap mt-3', {
+            'text-stone-400': disabled_steps.include?(step),
+            'text-stone-600': !disabled_steps.include?(step),
+          }] do %>
+            <div class="text">
+              <%= label %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+</div>

@@ -4,7 +4,7 @@ class Services::GridComponent < ApplicationComponent
   attribute :project_version
 
   def services
-    project_version&.project_services || []
+    project_version&.services || []
   end
 
   def enabled_add_service_button?
