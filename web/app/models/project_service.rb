@@ -11,6 +11,10 @@ class ProjectService < ApplicationRecord
 
   validates :name, presence: true
 
+  def environment_variables
+    super&.map(&:with_indifferent_access)
+  end
+
   def image_tag
     DockerImageUrlParser.new(image).tag
   end
