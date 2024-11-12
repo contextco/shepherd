@@ -3,27 +3,27 @@
     {
       "warning_type": "File Access",
       "warning_code": 16,
-      "fingerprint": "6ae4cd8ef1e4c1a3cba9dea3161d9afcc793fc5110d337f6eb18a38ae985391b",
+      "fingerprint": "043ee9c176f4b5fd263a669194e1a3eddf90625acd6e0a6035035a53990c3f4a",
       "check_name": "SendFile",
-      "message": "Model attribute used in file name",
+      "message": "Parameter value used in file name",
       "file": "app/controllers/helm/repo_controller.rb",
-      "line": 11,
+      "line": 19,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "send_file(HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).download.string, :type => \"application/x-tar\", :disposition => \"attachment\", :filename => sanitize_filename(params[:filename]))",
+      "code": "send_file(Tempfile.new(\"#{SecureRandom.hex(8)}-#{sanitize_filename(params[:filename])}\").path, :filename => sanitize_filename(params[:filename]), :type => \"application/x-tar\", :disposition => \"attachment\", :stream => false, :status => :ok)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Helm::RepoController",
         "method": "download"
       },
-      "user_input": "HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).download.string",
-      "confidence": "Medium",
+      "user_input": "params[:filename]",
+      "confidence": "Weak",
       "cwe_id": [
         22
       ],
       "note": ""
     }
   ],
-  "updated": "2024-11-11 11:29:43 +0000",
+  "updated": "2024-11-12 10:53:29 +0000",
   "brakeman_version": "6.2.2"
 }
