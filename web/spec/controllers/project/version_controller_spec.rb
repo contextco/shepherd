@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Project::VersionController, type: :controller do
   let(:user) { create(:user, team:) }
   let(:team) { create(:team) }
-  let(:project) { create(:project, team:) }
+  let!(:project) { create(:project, team:) }
   let(:project_version) { project.project_versions.first }
   let(:valid_params) do
     {
@@ -54,6 +54,70 @@ RSpec.describe Project::VersionController, type: :controller do
       it 'returns forbidden status' do
         subject
         expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
+  describe 'GET #new' do
+    subject { get :new, params: { project_id: project.id } }
+
+    it_behaves_like 'requires authentication'
+
+    context 'when user has access' do
+      it 'returns http success' do
+        subject
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'assigns previous version' do
+        subject
+        expect(assigns(:previous_version)).to eq(project_version)
+      end
+    end
+  end
+
+  describe 'POST #create' do
+    subject { post :create, params: valid_params }
+
+    let(:valid_params) do
+      {
+        project_version: {
+          major_version: 1,
+          minor_version: 0,
+          patch_version: 1,
+          description: 'New version'
+        },
+        project_id: project.id
+      }
+    end
+
+    it_behaves_like 'requires authentication'
+
+    context 'with valid params' do
+      it 'creates a new version' do
+        expect { subject }.to change { ProjectVersion.count }.by(1)
+      end
+
+      it 'redirects to the project version page' do
+        subject
+        expect(response).to redirect_to(project_version_path(project, ProjectVersion.order(:created_at).last))
+      end
+
+      it 'sets a success flash message' do
+        subject
+        expect(flash[:notice]).to eq('Application version created')
+      end
+
+      context 'when the previous version has services' do
+        let!(:service) { create(:project_service, project_version:) }
+
+        it 'creates a new version with the same services' do
+          expect { subject }.to change { ProjectService.count }.by(1)
+        end
+
+        it 'creates a new version with the same service attributes' do
+          expect { subject }.to change { ProjectService.where(name: service.name).count }.by(1)
+        end
       end
     end
   end
