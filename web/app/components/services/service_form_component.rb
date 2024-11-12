@@ -1,26 +1,24 @@
 # frozen_string_literal: true
 
 class Services::ServiceFormComponent < ApplicationComponent
-  attribute :service
-  attribute :method_type, default: :post
+  attribute :service_form_object
+  attribute :form_method, default: :post
 
   def service_object
-    @service_object ||= service || ProjectService.new
-  end
-
-  def url
-    return project_version_service_path if update?
-
-    project_version_service_index_path
+    @service_object ||= service_form_object || Service::Form.new
   end
 
   def update_create_text
     update? ? "Update" : "Create"
   end
 
+  def url
+    update? ? project_service_path(service_form_object.service_id) : services_path
+  end
+
   private
 
   def update?
-    method_type == :patch
+    form_method == :patch
   end
 end

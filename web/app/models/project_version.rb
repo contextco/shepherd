@@ -2,7 +2,7 @@
 
 class ProjectVersion < ApplicationRecord
   belongs_to :project
-  has_many :project_services, dependent: :destroy
+  has_many :services, dependent: :destroy, class_name: 'ProjectService'
   has_one :helm_repo, through: :project
   has_one :helm_chart, dependent: :destroy, as: :owner
 

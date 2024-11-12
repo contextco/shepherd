@@ -2,5 +2,4 @@
 
 class Services::EnvironmentVariableComponent < ApplicationComponent
   attribute :form
-  attribute :environment_variable
 end

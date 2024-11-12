@@ -42,10 +42,11 @@
 input[type=range]::-webkit-slider-thumb {
     appearance: none;
     z-index: 100;
-    width: 20px;
-    height: 20px;
-    background: #a59a88;
-    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    background: #37322d;
+    /*border-radius: 50%;*/
+    /*transform: rotate(45deg);*/
     cursor: pointer;
     position: relative;
     border: 5px solid transparent;

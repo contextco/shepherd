@@ -23,7 +23,7 @@ class Project::ServiceController < ApplicationController
     @service = form.create_service(@version)
 
     flash[:notice] = "Service #{@service.name} created"
-    redirect_to project_version_service_path(@app, @version, @service)
+    redirect_to project_service_path(@service)
   end
 
   def edit; end
@@ -38,18 +38,16 @@ class Project::ServiceController < ApplicationController
     form.update_service(@service)
 
     flash[:notice] = "Service #{@service.name} updated"
-    redirect_to project_version_service_path(@app, @version, @service)
+    redirect_to project_service_path(@service)
   end
 
   private
 
   def form
-    @form ||= Service::Form.new(params[:project_service])
+    @form ||= Service::Form.new(params[:service_form])
   end
 
   def fetch_application
-    @app = current_user.team.projects.find(params[:project_id])
-    @version = @app.project_versions.find(params[:version_id])
-    @service = @version.project_services.find(params[:id]) if params[:id].present?
+    @service = current_team.services.find(params[:id]) if params[:id].present?
   end
 end
