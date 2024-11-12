@@ -22,7 +22,7 @@ class Project::ProjectController < ApplicationController
     @app.update!(name: params[:name])
 
     flash[:notice] = "Application #{@app.name} updated"
-    redirect_to project_version_path(@app, @app.latest_version)
+    redirect_to version_path(@app.project_versions.last)
   end
 
   def create
@@ -52,7 +52,7 @@ class Project::ProjectController < ApplicationController
     end
 
     flash[:notice] = "Application #{app.name} created"
-    redirect_to project_version_path(app, version)
+    redirect_to version_path(version)
   end
 
   private
