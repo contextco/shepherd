@@ -1,7 +1,8 @@
 
 class Project::VersionController < ApplicationController
   before_action :authenticate_user!
-  before_action :fetch_application, only: %i[show edit update destroy publish unpublish]
+  before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish]
+  before_action :fetch_previous_version, only: %i[new create]
 
   def show; end
 
@@ -12,8 +13,21 @@ class Project::VersionController < ApplicationController
     redirect_to root_path
   end
 
+  def new; end
+
   def create
-    raise "Not implemented"
+    new_version = @app.project_versions.new(version_params)
+
+    if @previous_version.version_integer >= new_version.version_integer
+      flash[:error] = "Version must be greater than the previous version V#{@previous_version.version}"
+      @previous_version = new_version
+      return render :new, status: :unprocessable_entity
+    end
+
+    new_version.save!
+
+    flash[:notice] = "Application version created"
+    redirect_to project_version_path(@app, new_version)
   end
 
   def update
@@ -58,9 +72,19 @@ class Project::VersionController < ApplicationController
 
   private
 
+  def version_params
+    params.require(:project_version).permit(:description, :patch_version, :minor_version, :major_version)
+  end
+
   def fetch_application
     @app = current_user.team.projects.find(params[:project_id])
-    @version = @app.project_versions.find(params[:id])
+    @version = @app.project_versions.find(params[:id]) if params[:id].present?
+  rescue ActiveRecord::RecordNotFound
+    render status: :forbidden, json: { error: "Access denied" }
+  end
+
+  def fetch_previous_version
+    @previous_version = @app.project_versions.order(created_at: :desc).first
   rescue ActiveRecord::RecordNotFound
     render status: :forbidden, json: { error: "Access denied" }
   end
