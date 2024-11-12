@@ -21,11 +21,11 @@
       <span class="font-medium">Resources</span>
       <div class="flex flex-col gap-8 rounded-md p-8 pt-10 border border-stone-400 w-full items-start px-8">
         <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium">CPU</span>
+          <span class="font-medium w-16">CPU</span>
           <%= render Services::CPUSliderComponent.new(form: ) %>
         </div>
         <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium">RAM</span>
+          <span class="font-medium w-16">RAM</span>
           <%= render Services::MemorySliderComponent.new(form: ) %>
         </div>
       </div>
@@ -40,19 +40,17 @@
           Do not put sensitive values here. Sensitive values should be stored in secrets.
         </span>
       </div>
-      <%= form.fields_for :environment_variables do |env_var_form| %>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
-          <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
+        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl" data-dynamic-elements-target="container">
+          <%= form.fields_for :environment_variables do |env_var_form| %>
             <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
-            <template data-dynamic-elements-target="template">
-              <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
-            </template>
-          </div>
-          <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
+          <% end %>
+          <div class="text-sm rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
             + Add
           </div>
         </div>
-      <% end %>
+      <template data-dynamic-elements-target="template">
+        <%= render Services::EnvironmentVariableComponent.new(form: ) %>
+      </template>
     </div>
 
     <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
