@@ -5,7 +5,7 @@ class Services::ServiceFormComponent < ApplicationComponent
   attribute :form_method, default: :post
 
   def service_object
-    @service_object ||= service_form_object || Service::Form.new
+    @service_object ||= service_form_object || Service::Form.empty
   end
 
   def update_create_text
