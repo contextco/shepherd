@@ -52,8 +52,8 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect { subject }.to change { ProjectService.count }.by(1)
       end
 
-      it 'redirects to the project service path' do
-        expect(subject).to redirect_to(project_service_path(ProjectService.order(:created_at).last))
+      it 'redirects to the version path' do
+        expect(subject).to redirect_to(version_path(project_version))
       end
 
       it 'sets a flash notice' do
