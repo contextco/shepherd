@@ -31,9 +31,11 @@ Rails.application.routes.draw do
       post :publish, on: :member
       post :unpublish, on: :member
 
-      resources :service, only: [ :create, :new, :show, :destroy, :update, :edit ], controller: "project/service"
     end
   end
+
+  resources :services, only: [ :create, :new, :show, :destroy, :update, :edit ], controller: "project/service",
+            as: :project_services
 
   resources :team, only: [ :index, :create ]
 

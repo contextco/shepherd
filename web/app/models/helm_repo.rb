@@ -8,7 +8,7 @@ class HelmRepo < ApplicationRecord
 
   def add_repo_command
     # helm command to add repo
-    command = "helm repo add #{name} #{base_url}/#{name} --username #{helm_users.first.name} --password #{helm_users.first.password}"
+    command = "helm repo add #{name} #{base_url}/repo/#{name} --username #{helm_users.first.name} --password #{helm_users.first.password}"
     command = "#{command} --insecure-skip-tls-verify" if Rails.env.development? || Rails.env.test?
 
     command

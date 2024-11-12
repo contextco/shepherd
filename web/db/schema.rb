@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_11_105537) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_12_123341) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -96,10 +96,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_105537) do
     t.string "image"
     t.jsonb "environment_variables", default: {}
     t.jsonb "secrets", default: []
-    t.jsonb "resources", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "project_version_id"
+    t.float "cpu_cores"
+    t.integer "memory_bytes"
     t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
   end
 

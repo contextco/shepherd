@@ -1,17 +1,35 @@
 require "google/cloud/storage"
 
-class Helm::RepoController < ApplicationController
+class Helm::RepoController < ActionController::Base
   before_action :authenticate_request
 
   def download
-    filename = sanitize_filename(params[:filename])
+    if (filename = sanitize_filename(params[:filename])).nil?
+      return render json: { error: "Invalid filename" }, status: :bad_request
+    end
+
     file = @repo.file_yaml(filename)
     return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
-    send_file file.download.string,
-              type: "application/x-tar",
-              disposition: "attachment",
-              filename:
+    begin
+      signed_url = file.signed_url(
+        version: :v4,
+        expires: 300, # 5 minutes
+        query: {
+          "response-content-disposition" => "attachment; filename=#{filename}",
+          "response-content-type" => "application/x-tar"
+        }
+      )
+
+      redirect_to signed_url, allow_other_host: true, status: :temporary_redirect
+    rescue Google::Cloud::Storage::SignedUrlUnavailable => e
+      Rails.logger.error("SignedUrlUnavailable error: #{e.message}")
+      render json: { error: "Missing credentials for signed URL" }, status: :internal_server_error
+    rescue StandardError => e
+      Rails.logger.error("Error generating signed URL: #{e.class}: #{e.message}")
+      Rails.logger.error(e.backtrace&.join("\n"))
+      render json: { error: "Could not generate download URL" }, status: :internal_server_error
+    end
   end
 
   def index_yaml
