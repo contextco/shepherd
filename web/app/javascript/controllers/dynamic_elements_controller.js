@@ -7,7 +7,7 @@ export default class extends Controller {
 
   addElement() {
     const content = this.templateTarget.innerHTML;
-    this.containerTarget.insertAdjacentHTML('beforeend', content);
+    this.containerTarget.insertAdjacentHTML('afterbegin', content);
   }
 
   removeElement(event) {
