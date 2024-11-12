@@ -75,7 +75,7 @@ class Service::Form
   end
 
   def create_service(project_version)
-    project_version.project_services.create!(**service_params)
+    project_version.services.create!(**service_params)
   end
 
   def update_service(service)
