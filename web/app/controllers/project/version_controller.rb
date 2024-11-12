@@ -24,7 +24,14 @@ class Project::VersionController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    new_version.save!
+    ProjectVersion.transaction do
+      new_version.save!
+      @previous_version.services.each do |service|
+        service = service.dup
+        service.project_version = new_version
+        service.save!
+      end
+    end
 
     flash[:notice] = "Application version created"
     redirect_to project_version_path(@app, new_version)
@@ -77,15 +84,17 @@ class Project::VersionController < ApplicationController
   end
 
   def fetch_application
-    @app = current_user.team.projects.find(params[:project_id])
-    @version = @app.project_versions.find(params[:id]) if params[:id].present?
+    @version = current_team.project_versions.find(params[:id]) if params[:id].present?
+    @app = @version.project
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "Application not found"
+    redirect_to root_path
   end
 
   def fetch_previous_version
     @previous_version = @app.project_versions.order(created_at: :desc).first
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "No previous version found"
+    redirect_to root_path
   end
 end
