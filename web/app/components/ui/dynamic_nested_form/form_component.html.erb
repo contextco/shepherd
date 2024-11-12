@@ -1,0 +1,30 @@
+<div data-controller="dynamic-nested-form-form-component"
+     data-dynamic-nested-form-form-component-index-placeholder-string-value="<%= index_placeholder_string %>"
+     data-dynamic-nested-form-form-component-maximum-subforms-value="<%= maximum_subforms %>"
+     data-dynamic-nested-form-form-component-minimum-subforms-value="<%= minimum_subforms %>"
+     data-dynamic-nested-form-form-component-subforms-count-value="<%= initial_subforms_count_value %>"
+     id="<%= id %>"
+     class="w-full nested-form-component-<%= id %>">
+
+  <template
+    data-action="turbo:morph-element->dynamic-nested-form-form-component#handleTemplateMorph"
+    data-dynamic-nested-form-form-component-target="subformTemplate">
+    <div class="subform-component w-full"><%= subform_content %></div>
+  </template>
+
+  <div
+    data-dynamic-nested-form-form-component-target="subformsWrapper"
+    class="<%= wrapper_classes %>"
+    id="<%= id %>_subforms_wrapper">
+    <% previous_values&.each_with_index do |value, index| %>
+      <div class="subform-component w-full">
+        <%= subform(value, index:) %>
+      </div>
+    <% end %>
+
+    <% if previous_values.empty? && always_renders_one %>
+      <div class="subform-component w-full"><%= subform_content %></div>
+    <% end %>
+
+  </div>
+</div>

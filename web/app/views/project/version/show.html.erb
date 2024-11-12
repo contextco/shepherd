@@ -1,26 +1,4 @@
-<div class="h-full w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
-  <div class="flex flex-col gap-8">
-    <div class="flex w-full justify-between">
-      <div class="flex flex-col">
-        <span class="text-xs sm:text-sm text-stone-400 font-medium">Application</span>
-        <div class="flex gap-2 items-center sm:text-2xl">
-          <span class="font-medium w-fit"><%= @app.name %></span>
-        </div>
-
-      </div>
-
-      <div class="flex flex-col justify-center">
-        <div class="flex gap-2 items-center">
-
-          <%= link_to edit_project_path(@app), class: 'p-2' do %>
-            <%= heroicon 'cog', variant: :outline, class: 'size-5' %>
-          <% end %>
-        </div>
-      </div>
-    </div>
-    <hr class="border-stone-400 border-t-2 w-full">
-  </div>
-
+<%= render layout: 'layouts/project' do %>
   <div class="flex flex-col gap-4">
     <div class="flex w-full justify-between items-center">
       <div class="flex items-baseline font-medium">
@@ -29,6 +7,11 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <%= link_to new_project_version_path(@app), class: 'px-2 py-1 border border-stone-300 rounded-md text-sm flex gap-1 items-center' do %>
+          <%= heroicon 'plus', variant: :outline, class: 'size-4' %>
+          New Version
+        <% end %>
+
         <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
         <%= link_to edit_project_version_path(@app, @version), class: 'p-2' do %>
@@ -41,9 +24,9 @@
   <% if @version.published? %>
     <div class="flex flex-col gap-4">
       <%= render CommandSnippetComponent.new(title: "Add Helm repository", snippet: @app.helm_repo.add_repo_command ) %>
-      <%= render CommandSnippetComponent.new(title: "Install Chart", snippet: @app.helm_repo.install_chart_command(service: @version.project_services.first) ) %>
+      <%= render CommandSnippetComponent.new(title: "Install Chart", snippet: @app.helm_repo.install_chart_command(service: @version.services.first) ) %>
     </div>
   <% end %>
 
   <%= render Services::GridComponent.new(project_version: @version) %>
-</div>
+<% end %>

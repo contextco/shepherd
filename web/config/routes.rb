@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   end
 
   resources :application, only: [ :new, :create, :destroy, :edit, :update ], controller: "project/project", as: :project do
-    resources :version, only: [ :create, :destroy, :show, :update, :edit ], controller: "project/version" do
+    resources :version, only: [ :new, :create, :destroy, :show, :update, :edit ], controller: "project/version" do
       post :publish, on: :member
       post :unpublish, on: :member
     end
