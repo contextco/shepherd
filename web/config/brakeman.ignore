@@ -1,29 +1,29 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "File Access",
-      "warning_code": 16,
-      "fingerprint": "043ee9c176f4b5fd263a669194e1a3eddf90625acd6e0a6035035a53990c3f4a",
-      "check_name": "SendFile",
-      "message": "Parameter value used in file name",
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "86e784c6ba5872a4c4482bbb2c10afa24d913e8e1b79070026ea8337ae9fe75d",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
       "file": "app/controllers/helm/repo_controller.rb",
-      "line": 19,
-      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "send_file(Tempfile.new(\"#{SecureRandom.hex(8)}-#{sanitize_filename(params[:filename])}\").path, :filename => sanitize_filename(params[:filename]), :type => \"application/x-tar\", :disposition => \"attachment\", :stream => false, :status => :ok)",
+      "line": 24,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).signed_url(:version => :v4, :expires => 300, :query => ({ \"response-content-disposition\" => (\"attachment; filename=#{sanitize_filename(params[:filename])}\"), \"response-content-type\" => \"application/x-tar\" })), :allow_other_host => true, :status => :temporary_redirect)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Helm::RepoController",
         "method": "download"
       },
-      "user_input": "params[:filename]",
+      "user_input": "HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).signed_url(:version => :v4, :expires => 300, :query => ({ \"response-content-disposition\" => (\"attachment; filename=#{sanitize_filename(params[:filename])}\"), \"response-content-type\" => \"application/x-tar\" }))",
       "confidence": "Weak",
       "cwe_id": [
-        22
+        601
       ],
       "note": ""
     }
   ],
-  "updated": "2024-11-12 10:53:29 +0000",
+  "updated": "2024-11-12 11:46:29 +0000",
   "brakeman_version": "6.2.2"
 }
