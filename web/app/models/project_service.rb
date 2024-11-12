@@ -9,9 +9,6 @@ class ProjectService < ApplicationRecord
   has_one :helm_repo, through: :project_version
 
   validates :name, presence: true
-  validates :resources, presence: true
-
-  store_accessor :resources, :cpu_request, :memory_request
 
   def image_tag
     DockerImageUrlParser.new(image).tag

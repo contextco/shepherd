@@ -2,5 +2,4 @@
 
 class Services::SecretComponent < ApplicationComponent
   attribute :form
-  attribute :secret
 end
