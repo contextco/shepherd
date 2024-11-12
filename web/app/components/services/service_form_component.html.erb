@@ -33,27 +33,40 @@
 
     <%# TODO: add env variables and secrets. Env variables will need a checkbox to denote if hard coded or the user should override %>
 
-    <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
+    <div class="flex items-start justify-between gap-10">
       <div class="flex flex-col gap-1 max-w-96">
         <span class="font-medium text-stone-800 flex-none">Environment Variables</span>
         <span class="text-stone-600 text-sm">
           Do not put sensitive values here. Sensitive values should be stored in secrets.
         </span>
       </div>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl" data-dynamic-elements-target="container">
-          <%= form.fields_for :environment_variables do |env_var_form| %>
-            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+        <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-full max-w-4xl">
+          <%= render UI::DynamicNestedForm::FormComponent.new(
+            form: ,
+            id: :environment_variable_form,
+            association_name: :environment_variables,
+            model_class: Service::Form::EnvironmentVariableForm,
+            wrapper_classes: 'flex flex-col gap-2',
+            maximum_subforms: 10,
+            ) do |component| %>
+            <% component.with_subform_content do |env_var_form| %>
+              <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
+            <% end %>
           <% end %>
-          <div class="text-sm rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
-            + Add
-          </div>
+
+          <%= render UI::DynamicNestedForm::AddButtonComponent.new(
+            for_id: :environment_variable_form,
+            ) do |component| %>
+            <% component.with_button do %>
+              <div class="text-sm rounded-md cursor-pointer w-fit">
+                + Add
+              </div>
+            <% end %>
+          <% end %>
         </div>
-      <template data-dynamic-elements-target="template">
-        <%= render Services::EnvironmentVariableComponent.new(form: ) %>
-      </template>
     </div>
 
-    <div class="flex items-start justify-between gap-10" data-controller="dynamic-elements">
+    <div class="flex items-start justify-between gap-10">
       <div class="flex flex-col gap-1 max-w-96">
         <span class="font-medium text-stone-800 flex-none">Secrets</span>
         <span class="text-stone-600 text-sm">
@@ -61,19 +74,30 @@
         </span>
       </div>
 
-      <%= form.fields_for :secrets do |secret_form| %>
-        <div class="flex flex-col gap-4 rounded-md p-4 border border-stone-400 w-full max-w-4xl">
-          <div class="flex flex-col gap-4" data-dynamic-elements-target="container">
-              <%= render Services::SecretComponent.new(form: secret_form) %>
-          </div>
-          <div class="text-sm p-2 rounded-md cursor-pointer w-fit" data-action="click->dynamic-elements#addElement">
-            + Add
-          </div>
-        </div>
-        <template data-dynamic-elements-target="template">
-          <%= render Services::SecretComponent.new(form: secret_form) %>
-        </template>
-      <% end %>
+      <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-full max-w-4xl">
+        <%= render UI::DynamicNestedForm::FormComponent.new(
+          form: ,
+          id: :secret_form,
+          association_name: :secrets,
+          model_class: Service::Form::SecretForm,
+          wrapper_classes: 'flex flex-col gap-2',
+          maximum_subforms: 10,
+          ) do |component| %>
+          <% component.with_subform_content do |secret_form| %>
+            <%= render Services::SecretComponent.new(form: secret_form) %>
+          <% end %>
+        <% end %>
+
+        <%= render UI::DynamicNestedForm::AddButtonComponent.new(
+          for_id: :secret_form,
+        ) do |component| %>
+          <% component.with_button do %>
+            <div class="text-sm rounded-md cursor-pointer w-fit">
+              + Add
+            </div>
+          <% end %>
+        <% end %>
+      </div>
     </div>
 
     <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>

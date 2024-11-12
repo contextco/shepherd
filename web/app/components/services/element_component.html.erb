@@ -13,9 +13,9 @@
       <div class="p-1 bg-stone-100 border rounded-md px-2 font-mono text-xs flex items-center gap-2">
         <%= heroicon 'cpu-chip', class: 'size-4' %>
         <span>
-        <%= pluralize(service.cpu_cores, 'core') %>
+        <%= pluralize(service.cpu_cores.to_i, 'core') %>
           <span class="text-stone-400">|</span>
-          <%= pluralize(service.memory_bytes, 'MB') %>
+          <%= number_to_human_size(service.memory_bytes) %>
         </span>
       </div>
     </div>
