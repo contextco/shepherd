@@ -1,0 +1,9 @@
+<% if enabled? %>
+  <%= link_to edit_version_path(version), class: 'p-2' do %>
+    <%= heroicon 'pencil', variant: :outline, class: 'size-4' %>
+  <% end %>
+<% else %>
+  <div class="p-1.5 bg-stone-100 text-stone-500 rounded-md cursor-not-allowed">
+    <%= heroicon 'pencil', variant: :outline, class: 'size-4' %>
+  </div>
+<% end %>
