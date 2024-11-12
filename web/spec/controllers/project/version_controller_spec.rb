@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Project::VersionController, type: :controller do
   let(:user) { create(:user, team:) }
   let(:team) { create(:team) }
-  let(:project) { create(:project, team:) }
+  let!(:project) { create(:project, team:) }
   let(:project_version) { project.project_versions.first }
   let(:valid_params) do
     {
