@@ -4,3 +4,10 @@ image:
   repository: test-image
   tag: latest
 replicaCount: 1
+resources:
+  limits:
+    cpu: 2000m
+    memory: "2048"
+  requests:
+    cpu: 1000m
+    memory: "1024"
