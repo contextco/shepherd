@@ -7,7 +7,7 @@
 
       <% if enabled_add_service_button? %>
         <div class="flex items-center">
-          <%= link_to new_project_service_path(project_version.project_id, project_version), method: :get do %>
+          <%= link_to new_project_service_path(project_version_id: project_version), method: :get do %>
             <div class="rounded-md p-2 cursor-pointer">
               <%= heroicon 'plus', class: 'size-4' %>
             </div>
