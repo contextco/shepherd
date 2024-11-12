@@ -3,6 +3,7 @@
 class ProjectService < ApplicationRecord
   include ::ServiceRPC
 
+  delegate :project, to: :project_version
   belongs_to :project_version
   has_one :team, through: :project_version
   has_one :helm_chart, dependent: :destroy, as: :owner

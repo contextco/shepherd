@@ -3,6 +3,7 @@
 class Services::ServiceFormComponent < ApplicationComponent
   attribute :service_form_object
   attribute :form_method, default: :post
+  attribute :version # hack, we can def remove this somehow.
 
   def service_object
     @service_object ||= service_form_object || Service::Form.empty
@@ -13,7 +14,7 @@ class Services::ServiceFormComponent < ApplicationComponent
   end
 
   def url
-    update? ? project_service_path(service_form_object.service_id) : services_path
+    update? ? project_service_path(service_form_object.service_id) : version_project_services_path(version_id: version.id)
   end
 
   private

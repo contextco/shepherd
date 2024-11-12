@@ -48,6 +48,7 @@ class Project::ServiceController < ApplicationController
   end
 
   def fetch_application
+    @version = current_team.project_versions.find(params[:version_id]) if params[:version_id].present?
     @service = current_team.services.find(params[:id]) if params[:id].present?
     @version = @service&.project_version || current_team.project_versions.find(params[:project_version_id])
     @app = @version&.project

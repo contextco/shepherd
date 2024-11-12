@@ -84,15 +84,17 @@ class Project::VersionController < ApplicationController
   end
 
   def fetch_application
-    @app = current_user.team.projects.find(params[:project_id])
-    @version = @app.project_versions.find(params[:id]) if params[:id].present?
+    @version = current_team.project_versions.find(params[:id]) if params[:id].present?
+    @app = @version.project
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "Application not found"
+    redirect_to root_path
   end
 
   def fetch_previous_version
     @previous_version = @app.project_versions.order(created_at: :desc).first
   rescue ActiveRecord::RecordNotFound
-    render status: :forbidden, json: { error: "Access denied" }
+    flash[:error] = "No previous version found"
+    redirect_to root_path
   end
 end
