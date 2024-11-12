@@ -24,7 +24,14 @@ class Project::VersionController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    new_version.save!
+    ProjectVersion.transaction do
+      new_version.save!
+      @previous_version.services.each do |service|
+        service = service.dup
+        service.project_version = new_version
+        service.save!
+      end
+    end
 
     flash[:notice] = "Application version created"
     redirect_to project_version_path(@app, new_version)
