@@ -160,6 +160,16 @@ func TestParams_toValues(t *testing.T) {
 						"memory": "1024",
 					},
 				},
+				"ingress": map[string]any{
+					"enabled": false,
+				},
+				"service": map[string]any{
+					"type": "ClusterIP",
+					"port": 8000,
+				},
+				"serviceAccount": map[string]any{
+					"create": false,
+				},
 			},
 			wantErr: false,
 		},
@@ -196,6 +206,16 @@ func TestParams_toValues(t *testing.T) {
 						"cpu":    "1000m",
 						"memory": "1024",
 					},
+				},
+				"ingress": map[string]any{
+					"enabled": false,
+				},
+				"service": map[string]any{
+					"type": "ClusterIP",
+					"port": 8000,
+				},
+				"serviceAccount": map[string]any{
+					"create": false,
 				},
 			},
 			wantErr: false,
@@ -250,6 +270,8 @@ func TestParams_toYaml(t *testing.T) {
 image:
   repository: test-image
   tag: latest
+ingress:
+  enabled: false
 replicaCount: 3
 resources:
   limits:
@@ -258,6 +280,11 @@ resources:
   requests:
     cpu: 1000m
     memory: "1024"
+service:
+  port: 8000
+  type: ClusterIP
+serviceAccount:
+  create: false
 `,
 			wantErr: false,
 		},
@@ -282,6 +309,8 @@ resources:
 			want: `image:
   repository: test-image
   tag: latest
+ingress:
+  enabled: false
 replicaCount: 3
 resources:
   limits:
@@ -290,6 +319,11 @@ resources:
   requests:
     cpu: 1000m
     memory: "1024"
+service:
+  port: 8000
+  type: ClusterIP
+serviceAccount:
+  create: false
 `,
 			wantErr: false,
 		},
@@ -302,8 +336,8 @@ resources:
 				t.Errorf("toYaml() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("toYaml() = %v, want %v", got, tt.want)
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("toYaml() = %v, want %v, diff = %s", got, tt.want, diff)
 			}
 		})
 	}
