@@ -27,7 +27,8 @@ class User < ApplicationRecord
       end
 
       ActiveRecord::Base.transaction do
-        user = create_user_from_omniauth(data)
+        team = Team.create!
+        user = create_user_from_omniauth(team, data)
       end
 
       user
@@ -35,8 +36,8 @@ class User < ApplicationRecord
 
     private
 
-    def create_user_from_omniauth(data)
-      User.create!(
+    def create_user_from_omniauth(team, data)
+      team.users.create!(
         name: data["name"],
         email: data["email"],
         first_name: data["first_name"],
