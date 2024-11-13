@@ -83,9 +83,7 @@ RSpec.describe Project::VersionController, type: :controller do
     let(:valid_params) do
       {
         project_version: {
-          major_version: 1,
-          minor_version: 0,
-          patch_version: 1,
+          version: '1.0.0',
           description: 'New version'
         },
         project_id: project.id
