@@ -7,19 +7,37 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/url"
 	"os"
 	"path/filepath"
-	"sidecar/chart"
-	"sidecar/clock"
+	"strings"
 	"testing"
 	"time"
 
+	"sidecar/chart"
+	"sidecar/clock"
+	"sidecar/testcluster"
+
 	"github.com/google/go-cmp/cmp"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type fakeStore struct {
-	files map[string][]byte
+	files  map[string][]byte
+	tmpDir string
+}
+
+func newFakeStore(t *testing.T) *fakeStore {
+	t.Helper()
+
+	tmpDir := t.TempDir()
+
+	log.Printf("test %s using tmpdir: %s", t.Name(), tmpDir)
+
+	return &fakeStore{
+		tmpDir: tmpDir,
+	}
 }
 
 func (f *fakeStore) Upload(_ context.Context, path string, reader io.Reader) error {
@@ -31,6 +49,14 @@ func (f *fakeStore) Upload(_ context.Context, path string, reader io.Reader) err
 		return err
 	}
 	f.files[path] = data
+
+	filePath := filepath.Join(f.tmpDir, path)
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -202,7 +228,7 @@ func TestAdd_valuesFile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
 
-			store := &fakeStore{}
+			store := newFakeStore(t)
 			chart, err := chart.NewFromParams(tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create empty chart: %v", err)
@@ -264,7 +290,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
 
-			store := &fakeStore{}
+			store := newFakeStore(t)
 			chart, err := chart.NewFromParams(tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create empty chart: %v", err)
@@ -286,6 +312,73 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAdd_chartsAreInstallable(t *testing.T) {
+	ctx := context.Background()
+	cluster := testcluster.New(t, ctx, "test-cluster")
+
+	cases := []struct {
+		name   string
+		params *chart.Params
+	}{
+		{
+			name: "chart is installable",
+			params: &chart.Params{
+				ChartName:    "test-chart",
+				ChartVersion: "1.0.0",
+				ReplicaCount: 1,
+				Environment: map[string]string{
+					"FOO": "bar",
+				},
+				Secrets: chart.Secrets{
+					{
+						Name:           "foo",
+						EnvironmentKey: "FOO",
+					},
+					{
+						Name:           "bar",
+						EnvironmentKey: "BAR",
+					},
+				},
+				Image: chart.Image{
+					Name: "nginx",
+					Tag:  "alpine",
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			store := newFakeStore(t)
+			c, err := chart.NewFromParams(tc.params)
+			if err != nil {
+				t.Fatalf("Failed to create chart: %v", err)
+			}
+
+			addChartToRepo(t, ctx, store, c, "test-repo")
+
+			loadedChart, err := chart.LoadFromArchive(&chart.ChartArchive{
+				Name: "test-chart-1.0.0.tgz",
+				Data: store.files["test-repo/test-chart-1.0.0.tgz"],
+			}, &chart.Params{ChartName: "test-chart", ChartVersion: "1.0.0"})
+			if err != nil {
+				t.Fatalf("Failed to load chart from archive: %v", err)
+			}
+
+			if err := loadedChart.Install(ctx); err != nil {
+				t.Fatalf("Failed to install chart: %v", err)
+			}
+
+			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
+				return strings.Contains(pod.Name, tc.params.ChartName) && pod.Status.Phase == corev1.PodRunning
+			}); err != nil {
+				t.Fatalf("failed to wait for pods: %v", err)
+			}
+		})
+	}
+
 }
 
 func addChartToRepo(t *testing.T, ctx context.Context, store *fakeStore, chart *chart.Chart, repo string) {
