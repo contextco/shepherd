@@ -5,9 +5,6 @@ class Project < ApplicationRecord
   validates :name, presence: true
 
   has_many :project_versions, dependent: :destroy
+  has_one :latest_project_version, -> { order(created_at: :desc) }, class_name: "ProjectVersion"
   has_one :helm_repo, dependent: :destroy
-
-  def latest_version
-    project_versions.order(:created_at).last
-  end
 end
