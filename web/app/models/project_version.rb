@@ -10,6 +10,8 @@ class ProjectVersion < ApplicationRecord
 
   enum :state, { draft: 0, building: 1, published: 2, failed: 3 }
 
+  validates :version, uniqueness: { scope: :project_id }
+
   def next_version
     versions = project.project_versions.order(created_at: :desc)
     return nil if versions.first == self
@@ -22,5 +24,19 @@ class ProjectVersion < ApplicationRecord
     return nil if versions.last == self
 
     versions[versions.find_index(self) + 1]
+  end
+
+  def fork!(version_params)
+    transaction do
+      new_version = project.project_versions.new(version_params)
+      new_version.save!
+      services.each do |service|
+        service = service.dup
+        service.project_version = new_version
+        service.save!
+      end
+
+      new_version
+    end
   end
 end
