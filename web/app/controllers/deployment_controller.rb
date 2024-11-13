@@ -1,12 +1,9 @@
 
 class DeploymentController < ApplicationController
   def index
-    redirect_to team_index_path if current_user && current_user.team.nil?
   end
 
   def show
-    redirect_to team_index_path if current_user && current_user.team.nil?
-
     @deployment = current_team.deployments.find(params[:id])
   end
 
