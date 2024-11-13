@@ -37,15 +37,7 @@ class Project::VersionController < ApplicationController
       return redirect_to version_path
     end
 
-    @version.building!
-    @version.services.each do |service|
-      unless service.publish_chart
-        @version.draft!
-        flash[:error] = "Failed to publish service #{service.name}"
-        return redirect_to version_path
-      end
-    end
-    @version.published!
+    @version.publish!
 
     flash[:notice] = "Application version published"
     redirect_to version_path(@version)
