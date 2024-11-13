@@ -2,31 +2,12 @@
   <div class="flex gap-2 items-center">
     <span class="font-medium w-fit text-stone-500">New Version</span>
   </div>
-  <%= form_for @previous_version, url: project_version_index_path(project_id: @app), method: :post do |form| %>
+  <%= form_with model: @previous_version, url: project_version_index_path(project_id: @app), method: :post do |form| %>
     <div class="flex flex-col gap-6">
       <div class="flex items-center justify-between">
-        <span class="font-medium">Version</span>
+        <span class="font-medium">Version Label</span>
 
-        <div class="flex items-center gap-2 justify-end">
-          <%= form.number_field :major_version,
-                                class: 'w-1/4 p-2 rounded-md',
-                                min: 0,
-                                step: 1,
-                                max: 1000,
-                                required: true %>
-          <%= form.number_field :minor_version,
-                                class: 'w-1/4 p-2 rounded-md',
-                                min: 0,
-                                step: 1,
-                                max: 1000,
-                                required: true %>
-          <%= form.number_field :patch_version,
-                                class: 'w-1/4 p-2 rounded-md',
-                                min: 0,
-                                step: 1,
-                                max: 1000,
-                                required: true %>
-        </div>
+        <%= form.text_field :version, required: true, class: 'w-1/2 p-2 rounded-md' %>
       </div>
 
       <div class="flex items-center justify-between">
