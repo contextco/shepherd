@@ -13,17 +13,11 @@ module ServiceRPC
     resp.valid
   end
 
-  def publish_chart
+  def publish_chart!
     # this only lives here ftm. Eventually the project_version will handle all publishing
     repository_directory = helm_repo.name
     req = PublishChartRequest.new(chart: rpc_chart, repository_directory:)
     rpc_client.publish_chart(req)
-
-    true
-  rescue GRPC::Unknown => e
-    Rails.logger.error("SideCar Validation Error: #{e.message}")
-
-    false
   end
 
   private

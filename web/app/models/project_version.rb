@@ -26,6 +26,12 @@ class ProjectVersion < ApplicationRecord
     versions[versions.find_index(self) + 1]
   end
 
+  def publish!
+    building!
+    services.each(&:publish_chart!)
+    published!
+  end
+
   def fork!(version_params)
     transaction do
       new_version = project.project_versions.new(version_params)
