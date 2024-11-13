@@ -32,26 +32,9 @@ class Project::ProjectController < ApplicationController
       return render action: :new, status: :unprocessable_entity
     end
 
-    team = current_user.team
-    app = nil
-    version = nil
-    team.transaction do
-      app = team.projects.create!(
-        name: project_params[:name],
-        )
-      version = app.project_versions.create!(
-        description: project_params[:description],
-        version: "0.0.1",
-        state: :draft
-      )
-      repo = app.create_helm_repo!(name: app.name)
-      repo.helm_users.create!(
-        name: "#{app.name}-user",
-        password: SecureRandom.hex(8)
-      )
-    end
+    version = current_team.setup_scaffolding!(project_params[:name], project_params[:description])
 
-    flash[:notice] = "Application #{app.name} created"
+    flash[:notice] = "Application #{project_params[:name]} created"
     redirect_to version_path(version)
   end
 

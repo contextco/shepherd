@@ -25,7 +25,7 @@
     <div class="flex flex-col gap-2 overflow-y-auto px-4 pb-8" id="<%= dom_id(@app, :version_list) %>" data-preserve-scroll>
       <% @app.project_versions.order(created_at: :desc).each do |version| %>
         <%= link_to version_path(version), class: ["p-2 flex flex-col gap-2 duration-200", {
-          'bg-stone-200 border border-stone-400': version == @version,
+          'bg-stone-100 border border-stone-400': version == @version,
           'hover:bg-stone-100 border-transparent border': version != @version
         }] do %>
           <div class="flex justify-between item">
@@ -37,8 +37,18 @@
             </div>
           </div>
 
-          <div class="flex gap-4 items-center text-sm">
-            <%= version.services.count %> service
+          <div class="flex justify-between items-center text-sm">
+            <div class="flex gap-4 items-center">
+              <%= pluralize(version.services.count, 'service') %>
+            </div>
+
+            <div class="div uppercase">
+              <% if version.published? %>
+                <%= heroicon 'document-check', class: 'size-5' %>
+              <% elsif version.draft? %>
+                <%= heroicon 'document', class: 'size-5 text-stone-400' %>
+              <% end %>
+            </div>
           </div>
         <% end %>
       <% end %>
