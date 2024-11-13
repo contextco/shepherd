@@ -7,9 +7,6 @@
           <span class="font-medium text-stone-600 w-fit font-mono"><%= @version.version %></span>
         </div>
       </div>
-      <div class="flex items-baseline font-medium">
-        <%# TODO: make this a dropdown? %>
-      </div>
 
       <div class="flex items-center gap-2">
         <%= render Applications::PublishButtonComponent.new(version: @version) %>

@@ -16,16 +16,7 @@ class Project::VersionController < ApplicationController
   def new; end
 
   def create
-    new_version = @app.project_versions.new(version_params)
-
-    @previous_version.transaction do
-      new_version.save!
-      @previous_version.services.each do |service|
-        service = service.dup
-        service.project_version = new_version
-        service.save!
-      end
-    end
+    new_version = @previous_version.fork!(version_params)
 
     flash[:notice] = "Application version created"
     redirect_to version_path(new_version)

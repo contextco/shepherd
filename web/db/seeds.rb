@@ -25,3 +25,11 @@ end
 
 create_containers('web', %w[1234 5678], d)
 create_containers('worker', %w[45222 234234], d)
+
+p = t.projects.create!(name: 'sample project')
+
+v = p.project_versions.create!(description: 'sample version', version: FFaker::SemVer.rand)
+v.services.create!(name: 'web', image: 'nginx:alpine', cpu_cores: 2, memory_bytes: 2.gigabytes)
+54.times do
+  v = v.fork!(description: FFaker::Lorem.sentence, version: FFaker::SemVer.next(v.version))
+end
