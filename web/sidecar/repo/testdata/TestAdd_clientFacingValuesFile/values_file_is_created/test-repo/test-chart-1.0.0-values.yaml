@@ -1,5 +1,7 @@
 secrets:
 - environmentKey: FOO
   name: foo
+  value: ""
 - environmentKey: BAR
   name: bar
+  value: ""

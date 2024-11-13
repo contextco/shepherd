@@ -90,6 +90,7 @@ func (s Secrets) toValues() []map[string]interface{} {
 		m[i] = map[string]interface{}{
 			"name":           v.Name,
 			"environmentKey": v.EnvironmentKey,
+			"value":          "",
 		}
 	}
 	return m
@@ -130,12 +131,22 @@ func (p *Params) toYaml() (string, error) {
 
 func (p *Params) toValues() (*values.File, error) {
 	return &values.File{
-		Values: compactMap(map[string]interface{}{
+		Values: compactMap(map[string]any{
 			"replicaCount": p.ReplicaCount,
 			"image":        p.Image.toValues(),
 			"environment":  p.Environment.toValues(),
 			"secrets":      p.Secrets.toValues(),
 			"resources":    p.Resources.toValues(),
+			"ingress": map[string]any{
+				"enabled": false,
+			},
+			"service": map[string]any{
+				"port": 8000, // TODO: make this configurable
+				"type": "ClusterIP",
+			},
+			"serviceAccount": map[string]any{
+				"create": false,
+			},
 		}),
 	}, nil
 }
