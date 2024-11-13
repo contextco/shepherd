@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -26,6 +28,15 @@ type Chart struct {
 type ChartArchive struct {
 	Name string
 	Data []byte
+}
+
+func LoadFromArchive(archive *ChartArchive, params *Params) (*Chart, error) {
+	chart, err := loader.LoadArchive(bytes.NewReader(archive.Data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load chart from archive: %w", err)
+	}
+
+	return &Chart{template: &Template{chart: chart}, params: params}, nil
 }
 
 func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
