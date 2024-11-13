@@ -3,6 +3,8 @@ environment:
 image:
   repository: test-image
   tag: latest
+ingress:
+  enabled: false
 replicaCount: 1
 resources:
   limits:
@@ -11,3 +13,8 @@ resources:
   requests:
     cpu: 1000m
     memory: "1024"
+service:
+  port: 8000
+  type: ClusterIP
+serviceAccount:
+  create: false
