@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :project_version do
-    version { '1.0.0' }
+    version { 3.times.map { rand(100) }.join('.') }
     description { 'This is a description' }
     state { :draft }
 

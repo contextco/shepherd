@@ -1,6 +1,6 @@
 <div class="flex h-full">
-  <div class="w-96 border-r min-h-full p-4 flex flex-col gap-4">
-    <div class="flex w-full justify-between">
+  <div class="w-96 border-r min-h-full flex flex-col gap-2">
+    <div class="flex w-full justify-between p-4">
       <div class="flex flex-col">
         <span class="text-xs sm:text-sm text-stone-400 font-medium">Application</span>
         <div class="flex gap-2 items-center sm:text-2xl">
@@ -22,9 +22,12 @@
       </div>
     </div>
 
-    <div class="versions">
+    <div class="flex flex-col gap-2 overflow-y-auto px-4 pb-8" id="<%= dom_id(@app, :version_list) %>" data-preserve-scroll>
       <% @app.project_versions.order(created_at: :desc).each do |version| %>
-        <%= link_to version_path(version), class: "version p-2 bg-stone-100 flex flex-col gap-2 rounded-md" do %>
+        <%= link_to version_path(version), class: ["p-2 flex flex-col gap-2 duration-200", {
+          'bg-stone-200 border border-stone-400': version == @version,
+          'hover:bg-stone-100 border-transparent border': version != @version
+        }] do %>
           <div class="flex justify-between item">
             <div  class="font-semibold">
               <%= version.version %>
