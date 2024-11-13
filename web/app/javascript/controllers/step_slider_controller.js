@@ -10,8 +10,8 @@ export default class extends Controller {
   }
 
   connect() {
-    this.updateOutput()
     this.setupSlider()
+    this.updateOutput()
   }
 
   setupSlider() {
@@ -19,7 +19,7 @@ export default class extends Controller {
     slider.setAttribute("min", 0)
     slider.setAttribute("max", this.optionsValue.length - 1)
     slider.setAttribute("step", 1)
-    slider.value = 0
+    slider.value = this.optionsValue.findIndex((value) => value == this.hiddenFieldTarget.value)
   }
 
   updateOutput() {
