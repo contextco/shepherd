@@ -1,10 +1,10 @@
 <div class="flex flex-col gap-1 text-sm">
   <span class="font-medium"><%= title %></span>
-  <div class="flex items-center text-white bg-stone-800">
-    <span class="w-full font-mono whitespace-nowrap overflow-y-scroll p-3 scrollbar-hide"><%= snippet %></span>
-    <div class="p-2 pl-6 cursor-pointer" data-controller="copy" data-copy-text-value="<%= snippet %>" data-action="click->copy#copy">
-      <%= heroicon 'clipboard-document', class: 'size-4', data: { 'copy-target': 'pendingIcon' } %>
-      <%= heroicon 'clipboard-document-check', class: 'size-4 hidden', data: { 'copy-target': 'doneIcon' } %>
+  <div class="flex items-center text-white bg-stone-800 p-4 gap-4">
+    <div class="cursor-pointer" data-controller="copy" data-copy-text-value="<%= snippet %>" data-action="click->copy#copy">
+      <%= heroicon 'clipboard-document', class: 'size-5', data: { 'copy-target': 'pendingIcon' } %>
+      <%= heroicon 'clipboard-document-check', class: 'size-5 hidden', data: { 'copy-target': 'doneIcon' } %>
     </div>
+    <span class="w-full font-mono whitespace-nowrap overflow-y-scroll scrollbar-hide"><%= snippet %></span>
   </div>
 </div>
