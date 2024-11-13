@@ -5,7 +5,7 @@
 >
   <div class="relative h-2">
     <div class="grid grid-flow-col w-full">
-      <%= range_field_tag nil, 0, class: 'appearance-none rounded top-0 h-2 bg-transparent',
+      <%= range_field_tag nil, 0, class: 'appearance-none rounded top-0 h-2 bg-transparent px-2',
                           value: steps.find_index(form.object[name]),
                           min: 0,
                           max: steps.size - 1,
