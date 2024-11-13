@@ -18,13 +18,7 @@ class Project::VersionController < ApplicationController
   def create
     new_version = @app.project_versions.new(version_params)
 
-    if @previous_version.version_integer >= new_version.version_integer
-      flash[:error] = "Version must be greater than the previous version V#{@previous_version.version}"
-      @previous_version = new_version
-      return render :new, status: :unprocessable_entity
-    end
-
-    ProjectVersion.transaction do
+    @previous_version.transaction do
       new_version.save!
       @previous_version.services.each do |service|
         service = service.dup
@@ -80,7 +74,7 @@ class Project::VersionController < ApplicationController
   private
 
   def version_params
-    params.require(:project_version).permit(:description, :patch_version, :minor_version, :major_version)
+    params.require(:project_version).permit(:description, :version)
   end
 
   def fetch_application
