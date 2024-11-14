@@ -20,7 +20,7 @@ class HelmRepo < ApplicationRecord
   end
 
   def install_chart_command(service:)
-    "helm install #{service.name} #{name}/#{service.name}"
+    "helm install #{service.name} #{name}/#{service.name} --version #{service.project_version.version}"
   end
 
   def valid_credentials?(name, password)
