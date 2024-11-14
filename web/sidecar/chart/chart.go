@@ -170,3 +170,17 @@ func newSettings() *settings {
 		config: genericclioptions.NewConfigFlags(true),
 	}
 }
+
+func Capabilities() ([]string, error) {
+	dc, err := newSettings().RESTClientGetter().ToDiscoveryClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create discovery client: %w", err)
+	}
+
+	versions, err := action.GetVersionSet(dc)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get version set: %w", err)
+	}
+
+	return versions, nil
+}
