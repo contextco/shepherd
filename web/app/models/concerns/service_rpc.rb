@@ -23,7 +23,7 @@ module ServiceRPC
   private
 
   def rpc_chart
-    ChartParams.new(
+    Sidecar::ChartParams.new(
       name: name,
       version: project_version.version,
       replica_count: 1,
@@ -34,7 +34,7 @@ module ServiceRPC
   end
 
   def rpc_resources
-    Resources.new(
+    Sidecar::Resources.new(
       cpu_cores_requested: cpu_cores,
       cpu_cores_limit: cpu_cores,
       memory_bytes_requested: memory_bytes,
@@ -43,12 +43,12 @@ module ServiceRPC
   end
 
   def rpc_image
-    Image.new(name: image_without_tag, tag: image_tag)
+    Sidecar::Image.new(name: image_without_tag, tag: image_tag)
   end
 
   def rpc_environment_config
     env_vars = environment_variables.map do |env_var|
-      EnvironmentVariable.new(
+      Sidecar::EnvironmentVariable.new(
         name: env_var["name"],
         value: env_var["value"]
       )
@@ -62,7 +62,7 @@ module ServiceRPC
       )
     end
 
-    EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
+    Sidecar::EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
   end
 
   def rpc_client
