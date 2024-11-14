@@ -16,6 +16,11 @@ class Project::VersionController < ApplicationController
   def new; end
 
   def create
+    error_msg = version_error_msg(@previous_version.version, version_params[:version])
+    if error_msg.present?
+      flash[:error] = error_msg
+      return render :new, status: :unprocessable_entity
+    end
     new_version = @previous_version.fork!(version_params)
 
     flash[:notice] = "Application version created"
@@ -58,6 +63,13 @@ class Project::VersionController < ApplicationController
 
   def version_params
     params.require(:project_version).permit(:description, :version)
+  end
+
+  def version_error_msg(previous_version, candidate_version)
+    return "Version must be a semantic version in the form of major.minor.patch" unless candidate_version.match?(/\d+\.\d+\.\d+/)
+    return "Version must be greater than the previous version" unless Gem::Version.new(candidate_version) > Gem::Version.new(previous_version)
+
+    nil
   end
 
   def fetch_application
