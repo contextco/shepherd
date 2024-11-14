@@ -25,7 +25,7 @@ module ServiceRPC
   def rpc_chart
     ChartParams.new(
       name: name,
-      version: "0.0.1",
+      version: project_version.version,
       image: rpc_image,
       environment_config: rpc_environment_config,
       )
