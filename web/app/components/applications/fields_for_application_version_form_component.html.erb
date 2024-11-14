@@ -1,5 +1,10 @@
 <div class="flex items-center justify-between">
-  <span class="font-medium">Description</span>
+  <div class="flex flex-col gap-1 max-w-96">
+    <span class="font-medium text-stone-800 flex-none">Description</span>
+    <span class="text-stone-600 text-sm">
+      Optional description for this application. Will be visible when installing via Helm.
+    </span>
+  </div>
 
   <%= form.text_field :description,
                       value: project_version&.description,
