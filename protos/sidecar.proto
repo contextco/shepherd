@@ -25,9 +25,12 @@ message ValidateChartResponse {
     repeated string errors = 2;
 }
 
+// Next ID: 7
 message ChartParams {
     string name = 1;
     string version = 2;
+
+    int32 replica_count = 7;
 
     Image image = 3;
 
@@ -67,6 +70,6 @@ message Image {
 message Resources {
     int32 cpu_cores_requested = 1;
     int32 cpu_cores_limit = 2;
-    int32 memory_bytes_requested = 3;
-    int32 memory_bytes_limit = 4;
+    int64 memory_bytes_requested = 3;
+    int64 memory_bytes_limit = 4;
 }
