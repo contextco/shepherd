@@ -34,9 +34,9 @@ class Service::Form
 
     def name_valid
       return if name.blank?
-      return if name.match?(/\A[a-z0-9][a-z0-9.-]*[a-z0-9]\z/)
+      return if name.match?(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
 
-      errors.add(:name, "must start and end with a letter or number and contain only letters, numbers, periods, and hyphens")
+      errors.add(:name, "must start with a letter or underscore and contain only letters, numbers, and underscores")
     end
   end
 
@@ -44,6 +44,7 @@ class Service::Form
   validates :image, presence: true
   validate :image_format
   validate :name_format
+  validate :unique_environment_variable_secret_names
 
   def self.empty
     f = Service::Form.new
@@ -105,6 +106,26 @@ class Service::Form
 
   def secrets_object
     secrets.select { |secret| secret.name.present? }.map(&:name)
+  end
+
+  # def unique_environment_variable_secret_names
+  #   # validate that all environment variable and secret names are unique
+  #   names = environment_variables.map(&:name) + secrets.map(&:name)
+  #   return if names.uniq.length == names.length
+  #
+  #   errors.add(:environment_variables, "and secrets must have unique names")
+  # end
+
+  def unique_environment_variable_secret_names
+    names = environment_variables.map(&:name) + secrets.map(&:name)
+    duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys
+
+    return if duplicates.empty?
+
+    errors.add(
+      :environment_variables,
+      "and secrets must have unique names. Duplicates found: #{duplicates.join(', ')}"
+    )
   end
 
   def name_format
