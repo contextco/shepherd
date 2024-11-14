@@ -17,6 +17,7 @@ RSpec.describe Project::VersionController, type: :controller do
 
   before do
     sign_in user
+    project_version.update!(version: '0.0.1')
   end
 
   shared_examples 'requires authentication' do
