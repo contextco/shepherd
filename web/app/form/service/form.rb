@@ -110,7 +110,7 @@ class Service::Form
 
   def unique_environment_variable_secret_names
     names = environment_variables.map(&:name) + secrets.map(&:name)
-    duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys
+    duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys.reject(&:empty?)
 
     return if duplicates.empty?
 

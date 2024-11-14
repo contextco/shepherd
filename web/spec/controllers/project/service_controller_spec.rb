@@ -111,6 +111,44 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(flash[:error]).to eq('Environment variables and secrets must have unique names. Duplicates found: MY_ENV')
       end
     end
+
+    context 'with no environment variables or secrets' do
+      let(:no_vars_valid_params) { valid_params.deep_merge(service_form: { environment_variables: [], secrets: [] }) }
+
+      subject { post :create, params: no_vars_valid_params }
+
+      it 'creates a new service' do
+        expect { subject }.to change { ProjectService.count }.by(1)
+      end
+
+      it 'redirects to the version path' do
+        expect(subject).to redirect_to(version_path(project_version))
+      end
+
+      it 'sets a flash notice' do
+        subject
+        expect(flash[:notice]).to eq('Service service created')
+      end
+    end
+
+    context 'with empty environment variables and secrets' do
+      let(:empty_vars_valid_params) { valid_params.deep_merge(service_form: { environment_variables: [ { name: '', value: '' } ], secrets: [ { name: '' } ] }) }
+
+      subject { post :create, params: empty_vars_valid_params }
+
+      it 'creates a new service' do
+        expect { subject }.to change { ProjectService.count }.by(1)
+      end
+
+      it 'redirects to the version path' do
+        expect(subject).to redirect_to(version_path(project_version))
+      end
+
+      it 'sets a flash notice' do
+        subject
+        expect(flash[:notice]).to eq('Service service created')
+      end
+    end
   end
 
   describe 'GET #edit' do
