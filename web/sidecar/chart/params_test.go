@@ -148,7 +148,7 @@ func TestParams_toValues(t *testing.T) {
 					"repository": "test-image",
 					"tag":        "latest",
 				},
-				"replicaCount": 3,
+				"replicaCount": int32(3),
 				"environment": map[string]interface{}{
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
@@ -203,7 +203,7 @@ func TestParams_toValues(t *testing.T) {
 					"repository": "test-image",
 					"tag":        "latest",
 				},
-				"replicaCount": 3,
+				"replicaCount": int32(3),
 				"resources": map[string]interface{}{
 					"limits": map[string]interface{}{
 						"cpu":    "2000m",

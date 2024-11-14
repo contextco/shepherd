@@ -48,7 +48,6 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 FROM golang:1.23.2-alpine3.20 AS sidecar
 
-
 WORKDIR /sidecar
 
 COPY ./sidecar /sidecar

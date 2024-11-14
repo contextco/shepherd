@@ -13,7 +13,7 @@ type Params struct {
 	ChartVersion string
 
 	Image        Image
-	ReplicaCount int
+	ReplicaCount int32
 
 	Resources Resources
 
@@ -41,8 +41,8 @@ type Resources struct {
 	CPUCoresRequested int
 	CPUCoresLimit     int
 
-	MemoryBytesRequested int
-	MemoryBytesLimit     int
+	MemoryBytesRequested int64
+	MemoryBytesLimit     int64
 }
 
 func (r Resources) toValues() map[string]interface{} {
@@ -181,6 +181,7 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 	return NewFromParams(&Params{
 		ChartName:    proto.GetName(),
 		ChartVersion: proto.GetVersion(),
+		ReplicaCount: proto.GetReplicaCount(),
 		Image: Image{
 			Name: proto.GetImage().GetName(),
 			Tag:  proto.GetImage().GetTag(),
