@@ -72,7 +72,7 @@ class Service::Form
   end
 
   def build_service
-    ProjectService.new(**service_params)
+    ProjectService.new(**service_params.merge(id: service_id))
   end
 
   def create_service(project_version)
@@ -87,7 +87,6 @@ class Service::Form
 
   def service_params
     {
-      id: service_id,
       name:,
       image:,
       cpu_cores: cpu_cores.to_i,
