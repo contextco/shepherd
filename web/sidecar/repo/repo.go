@@ -66,13 +66,15 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 		return fmt.Errorf("failed to check if index file exists: %w", err)
 	}
 
-	indexFile := newIndexFile(chart, archive)
+	indexFile := newIndexFile()
 	if repoExists {
-		indexFile, err = c.updateIndex(ctx, repo, chart, archive)
+		indexFile, err = c.loadIndexFile(ctx, repo)
 		if err != nil {
-			return fmt.Errorf("failed to update index: %w", err)
+			return fmt.Errorf("failed to load index file: %w", err)
 		}
 	}
+
+	indexFile.Add(chart, archive)
 
 	indexFileBytes, err := indexFile.Bytes()
 	if err != nil {
@@ -82,7 +84,7 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 	return c.store.Upload(ctx, filepath.Join(repo, indexFileName), bytes.NewReader(indexFileBytes))
 }
 
-func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) (*indexFile, error) {
+func (c *Client) loadIndexFile(ctx context.Context, repo string) (*indexFile, error) {
 	buf, err := c.store.ReadAll(ctx, filepath.Join(repo, indexFileName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read index file: %w", err)
@@ -92,9 +94,6 @@ func (c *Client) updateIndex(ctx context.Context, repo string, chart *chart.Char
 	if err != nil {
 		return nil, fmt.Errorf("failed to load index file: %w", err)
 	}
-
-	indexFile.MustAdd(chart.Metadata(), chart.Name(), archive.objectName, archive.hash)
-	indexFile.SortEntries()
 
 	return indexFile, nil
 }

@@ -14,12 +14,8 @@ type indexFile struct {
 	*helmrepo.IndexFile
 }
 
-func newIndexFile(chart *chart.Chart, archive *ChartArchive) *indexFile {
+func newIndexFile() *indexFile {
 	idxFile := helmrepo.NewIndexFile()
-	idxFile.Generated = clock.Canonical.Now()
-	idxFile.MustAdd(chart.Metadata(), filepath.Base(archive.objectName), "", archive.hash)
-	idxFile.Entries[chart.Metadata().Name][len(idxFile.Entries[chart.Metadata().Name])-1].Created = clock.Canonical.Now()
-	idxFile.SortEntries()
 	return &indexFile{IndexFile: idxFile}
 }
 
@@ -58,4 +54,11 @@ func newIndexFileFromBytes(buf []byte) (*indexFile, error) {
 		return nil, fmt.Errorf("failed to load index file: %w", err)
 	}
 	return &indexFile{IndexFile: idxFile}, nil
+}
+
+func (i *indexFile) Add(chart *chart.Chart, archive *ChartArchive) {
+	i.MustAdd(chart.Metadata(), filepath.Base(archive.objectName), "", archive.hash)
+	i.Generated = clock.Canonical.Now()
+	i.Entries[chart.Metadata().Name][len(i.Entries[chart.Metadata().Name])-1].Created = clock.Canonical.Now()
+	i.SortEntries()
 }
