@@ -74,6 +74,9 @@ func TestChartInstall(t *testing.T) {
 						EnvironmentKey: "TEST_SECRET",
 					},
 				},
+				Services: []*Service{
+					{Port: 8000},
+				},
 				Environment: Environment{
 					"TEST_ENV":    "test-env",
 					"ANOTHER_ENV": "another-env",
@@ -101,10 +104,19 @@ func TestChartInstall(t *testing.T) {
 			params: &Params{
 				ReplicaCount: 1,
 				Image:        image,
+				Services:     []*Service{{Port: 8000}},
 				Environment: Environment{
 					"TEST_ENV":    "test-env",
 					"ANOTHER_ENV": "another-env",
 				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "without services",
+			params: &Params{
+				ReplicaCount: 1,
+				Image:        image,
 			},
 			wantErr: false,
 		},
