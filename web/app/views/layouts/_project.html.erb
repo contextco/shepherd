@@ -43,11 +43,7 @@
             </div>
 
             <div class="div uppercase">
-              <% if version.published? %>
-                <%= heroicon 'document-check', class: 'size-5' %>
-              <% elsif version.draft? %>
-                <%= heroicon 'document', class: 'size-5 text-stone-400' %>
-              <% end %>
+              <%= image_tag 'kubernetes-icon-black.svg', class: 'h-4' if version.published? %>
             </div>
           </div>
         <% end %>
