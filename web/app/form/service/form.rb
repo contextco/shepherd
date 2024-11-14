@@ -56,17 +56,17 @@ class Service::Form
 
   def self.from_service(service)
     f = Service::Form.new
-      f.assign_attributes(
-        service_id: service.id,
-        name: service.name,
-        image: service.image,
-        cpu_cores: service.cpu_cores,
-        memory_bytes: service.memory_bytes,
-        environment_variables: service.environment_variables.map do |env|
-          { name: env[:name], value: env[:value], templated: env[:templated] }
-        end,
-        secrets: service.secrets.map { |secret| { name: secret } }
-      )
+    f.assign_attributes(
+      service_id: service.id,
+      name: service.name,
+      image: service.image,
+      cpu_cores: service.cpu_cores,
+      memory_bytes: service.memory_bytes,
+      environment_variables: service.environment_variables.map do |env|
+        { name: env[:name], value: env[:value], templated: env[:templated] }
+      end,
+      secrets: service.secrets.map { |secret| { name: secret } }
+    )
 
     f
   end
@@ -87,6 +87,7 @@ class Service::Form
 
   def service_params
     {
+      id: service_id,
       name:,
       image:,
       cpu_cores: cpu_cores.to_i,
