@@ -408,6 +408,8 @@ func stripIndexDigests(t *testing.T, indexData []byte) []byte {
 }
 
 func TestClientAddUpdatesExistingIndex(t *testing.T) {
+	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+
 	store := &fakeStore{
 		files: map[string][]byte{
 			"test-repo/index.yaml": []byte(`apiVersion: v1
@@ -415,6 +417,8 @@ entries:
   test-chart:
     - name: test-chart
       version: 0.9.0
+      urls:
+        - test-chart-0.9.0.tgz
 `),
 		},
 	}
@@ -427,7 +431,7 @@ entries:
 
 	chart, err := chart.NewFromParams(&chart.Params{
 		ChartName:    "test-chart",
-		ChartVersion: "0.1.0",
+		ChartVersion: "1.0.0",
 	})
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
@@ -439,8 +443,14 @@ entries:
 
 	// Verify both versions exist in index
 	indexData := store.files["test-repo/index.yaml"]
-	if !bytes.Contains(indexData, []byte("version: 0.9.0")) || !bytes.Contains(indexData, []byte("version: 0.1.0")) {
+	if !bytes.Contains(indexData, []byte("version: 1.0.0")) || !bytes.Contains(indexData, []byte("version: 0.9.0")) {
 		t.Error("Index file does not contain both versions")
+	}
+
+	store.files["test-repo/index.yaml"] = stripIndexDigests(t, indexData)
+
+	if err := store.VerifyAgainstFixture(t, "test-repo/index.yaml"); err != nil {
+		t.Fatalf("Failed to verify fixtures: %v", err)
 	}
 }
 
