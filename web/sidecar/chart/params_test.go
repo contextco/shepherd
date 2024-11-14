@@ -133,6 +133,9 @@ func TestParams_toValues(t *testing.T) {
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
 				},
+				Services: []*Service{
+					{Port: 8000},
+				},
 				Resources: Resources{
 					CPUCoresRequested:    1,
 					CPUCoresLimit:        2,
@@ -163,9 +166,10 @@ func TestParams_toValues(t *testing.T) {
 				"ingress": map[string]any{
 					"enabled": false,
 				},
-				"service": map[string]any{
-					"type": "ClusterIP",
-					"port": 8000,
+				"services": []map[string]any{
+					{
+						"port": 8000,
+					},
 				},
 				"serviceAccount": map[string]any{
 					"create": false,
@@ -184,6 +188,9 @@ func TestParams_toValues(t *testing.T) {
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
+				Services: []*Service{
+					{Port: 8000},
+				},
 				Resources: Resources{
 					CPUCoresRequested:    1,
 					CPUCoresLimit:        2,
@@ -210,9 +217,10 @@ func TestParams_toValues(t *testing.T) {
 				"ingress": map[string]any{
 					"enabled": false,
 				},
-				"service": map[string]any{
-					"type": "ClusterIP",
-					"port": 8000,
+				"services": []map[string]any{
+					{
+						"port": 8000,
+					},
 				},
 				"serviceAccount": map[string]any{
 					"create": false,
@@ -253,6 +261,7 @@ func TestParams_toYaml(t *testing.T) {
 					Tag:  "latest",
 				},
 				ReplicaCount: 3,
+				Services:     []*Service{{Port: 8000}},
 				Environment: Environment{
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
@@ -280,11 +289,10 @@ resources:
   requests:
     cpu: 1000m
     memory: "1024"
-service:
-  port: 8000
-  type: ClusterIP
 serviceAccount:
   create: false
+services:
+- port: 8000
 `,
 			wantErr: false,
 		},
@@ -299,6 +307,7 @@ serviceAccount:
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
+				Services:     []*Service{{Port: 8000}},
 				Resources: Resources{
 					CPUCoresRequested:    1,
 					CPUCoresLimit:        2,
@@ -319,11 +328,10 @@ resources:
   requests:
     cpu: 1000m
     memory: "1024"
-service:
-  port: 8000
-  type: ClusterIP
 serviceAccount:
   create: false
+services:
+- port: 8000
 `,
 			wantErr: false,
 		},
