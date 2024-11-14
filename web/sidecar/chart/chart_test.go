@@ -68,7 +68,7 @@ func TestChartInstall(t *testing.T) {
 			name: "valid params",
 			params: &Params{
 				Image: image,
-				Secrets: Secrets{
+				Secrets: []Secret{
 					{
 						Name:           "test-secret",
 						EnvironmentKey: "TEST_SECRET",
