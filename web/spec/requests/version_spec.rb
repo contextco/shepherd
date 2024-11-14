@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Project::VersionController, type: :request do
-  let(:project_version) { create(:project_version, team: user.team) }
+  let(:project_version) { create(:project_version, team: user.team, version: '0.0.1') }
 
   let(:user) { create(:user) }
 
