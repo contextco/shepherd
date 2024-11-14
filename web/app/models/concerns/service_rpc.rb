@@ -43,10 +43,38 @@ module ServiceRPC
       )
     end
 
-    EnvironmentConfig.new(environment_variables: env_vars)
+    secret_vars = secrets.map do |secret|
+      name = env_to_k8s_secret_name(secret)
+      Secret.new(
+        name:,
+        environment_key: secret
+      )
+    end
+
+    EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
   end
 
   def rpc_client
     @rpc_client ||= SidecarClient.client
+  end
+
+  def env_to_k8s_secret_name(env_name)
+    # Convert to lowercase and replace invalid characters
+    secret_name = env_name.to_s.downcase
+                          .gsub(/[^a-z0-9.\-]/, "-")  # Replace invalid chars with hyphen
+                          .gsub(/^\W+|\W+$/, "")      # Remove leading/trailing non-word chars
+                          .gsub(/[-.]{2,}/, "-")      # Replace multiple dots/hyphens with single hyphen
+
+    # Ensure it starts and ends with alphanumeric
+    secret_name = "x#{secret_name}" if secret_name.match?(/^[^a-z0-9]/)
+    secret_name = "#{secret_name}x" if secret_name.match?(/[^a-z0-9]$/)
+
+    # Truncate to maximum length while preserving valid ending
+    if secret_name.length > 253
+      secret_name = secret_name[0...252]
+      secret_name = secret_name.sub(/[^a-z0-9]$/, "x")
+    end
+
+    secret_name
   end
 end
