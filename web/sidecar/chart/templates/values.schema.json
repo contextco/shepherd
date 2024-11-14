@@ -211,6 +211,18 @@
           "environmentKey"
         ]
       }
+    },
+    "services": {
+      "type": "array",
+      "description": "List of services",
+      "items": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "description": "Port the service will listen on"
+          }
+      }
     }
   },
   "additionalProperties": false
