@@ -1,7 +1,7 @@
 
 # in routes this is the application resource
 class Project::ProjectController < ApplicationController
-  before_action :fetch_application, only: %i[edit update destroy]
+  before_action :fetch_application, only: %i[edit destroy]
 
   def destroy
     @app.destroy!
@@ -13,17 +13,6 @@ class Project::ProjectController < ApplicationController
   def new; end
 
   def edit; end
-
-  def update
-    unless project_params[:name].match?(/\A[a-z0-9-]+\z/) && project_params[:name].length <= 100
-      flash[:error] = "Name must be lower case and contain only letters, numbers, hyphens and be less than 100 characters"
-      return render action: :new, status: :unprocessable_entity
-    end
-    @app.update!(name: params[:name])
-
-    flash[:notice] = "Application #{@app.name} updated"
-    redirect_to version_path(@app.project_versions.last)
-  end
 
   def create
     # turn into a form when we have more fields
