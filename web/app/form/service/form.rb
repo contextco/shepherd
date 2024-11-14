@@ -56,23 +56,23 @@ class Service::Form
 
   def self.from_service(service)
     f = Service::Form.new
-      f.assign_attributes(
-        service_id: service.id,
-        name: service.name,
-        image: service.image,
-        cpu_cores: service.cpu_cores,
-        memory_bytes: service.memory_bytes,
-        environment_variables: service.environment_variables.map do |env|
-          { name: env[:name], value: env[:value], templated: env[:templated] }
-        end,
-        secrets: service.secrets.map { |secret| { name: secret } }
-      )
+    f.assign_attributes(
+      service_id: service.id,
+      name: service.name,
+      image: service.image,
+      cpu_cores: service.cpu_cores,
+      memory_bytes: service.memory_bytes,
+      environment_variables: service.environment_variables.map do |env|
+        { name: env[:name], value: env[:value], templated: env[:templated] }
+      end,
+      secrets: service.secrets.map { |secret| { name: secret } }
+    )
 
     f
   end
 
   def build_service
-    ProjectService.new(**service_params)
+    ProjectService.new(**service_params.merge(id: service_id))
   end
 
   def create_service(project_version)
@@ -110,7 +110,7 @@ class Service::Form
 
   def unique_environment_variable_secret_names
     names = environment_variables.map(&:name) + secrets.map(&:name)
-    duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys
+    duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys.reject(&:empty?)
 
     return if duplicates.empty?
 
