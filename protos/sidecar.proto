@@ -34,6 +34,12 @@ message ChartParams {
     Resources resources = 4;
 
     EnvironmentConfig environment_config = 5;
+
+    repeated Service services = 6; // Currently only one service is supported.
+}
+
+message Service {
+    int32 port = 1;
 }
 
 message EnvironmentConfig {

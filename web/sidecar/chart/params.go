@@ -18,7 +18,23 @@ type Params struct {
 	Resources Resources
 
 	Environment Environment
-	Secrets     Secrets
+	Secrets     []Secret
+
+	Services []*Service
+}
+
+type Service struct {
+	Port int
+}
+
+func (s *Service) Name() string {
+	return fmt.Sprintf("service-%d", s.Port)
+}
+
+func (s Service) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"port": s.Port,
+	}
 }
 
 type Resources struct {
@@ -45,7 +61,7 @@ func (r Resources) toValues() map[string]interface{} {
 func (p *Params) ClientFacingValuesFile() (*values.File, error) {
 	return &values.File{
 		Values: compactMap(map[string]interface{}{
-			"secrets": p.Secrets.toValues(),
+			"secrets": sliceToClientFacingValues(p.Secrets),
 		}),
 	}, nil
 }
@@ -76,36 +92,25 @@ type Secret struct {
 	EnvironmentKey string
 }
 
-type Secrets []Secret
-
-func (s Secrets) LoadFromProto(protos []*sidecar_pb.Secret) {
-	for _, v := range protos {
-		s = append(s, Secret{Name: v.GetName(), EnvironmentKey: v.GetEnvironmentKey()})
+func (s Secret) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"name":           s.Name,
+		"environmentKey": s.EnvironmentKey,
+		"value":          "",
 	}
 }
 
-func (s Secrets) toValues() []map[string]interface{} {
-	m := make([]map[string]interface{}, len(s))
-	for i, v := range s {
-		m[i] = map[string]interface{}{
-			"name":           v.Name,
-			"environmentKey": v.EnvironmentKey,
-			"value":          "",
-		}
+func (s Secret) toClientFacingValues() map[string]interface{} {
+	return map[string]interface{}{
+		"name":           s.Name,
+		"environmentKey": s.EnvironmentKey,
+		"value":          "",
 	}
-	return m
 }
 
-func (s Secrets) toClientFacingValues() []map[string]interface{} {
-	m := make([]map[string]interface{}, len(s))
-	for i, v := range s {
-		m[i] = map[string]interface{}{
-			"name":           v.Name,
-			"environmentKey": v.EnvironmentKey,
-			"value":          "",
-		}
-	}
-	return m
+func (s Secret) LoadFromProto(proto *sidecar_pb.Secret) {
+	s.Name = proto.GetName()
+	s.EnvironmentKey = proto.GetEnvironmentKey()
 }
 
 type Image struct {
@@ -135,15 +140,12 @@ func (p *Params) toValues() (*values.File, error) {
 			"replicaCount": p.ReplicaCount,
 			"image":        p.Image.toValues(),
 			"environment":  p.Environment.toValues(),
-			"secrets":      p.Secrets.toValues(),
+			"secrets":      sliceToValues(p.Secrets),
 			"resources":    p.Resources.toValues(),
 			"ingress": map[string]any{
 				"enabled": false,
 			},
-			"service": map[string]any{
-				"port": 8000, // TODO: make this configurable
-				"type": "ClusterIP",
-			},
+			"services": sliceToValues(p.Services),
 			"serviceAccount": map[string]any{
 				"create": false,
 			},
@@ -169,8 +171,12 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 	env := Environment{}
 	env.LoadFromProto(proto.GetEnvironmentConfig())
 
-	secrets := Secrets{}
-	secrets.LoadFromProto(proto.GetEnvironmentConfig().GetSecrets())
+	secrets := []Secret{}
+	for _, v := range proto.GetEnvironmentConfig().GetSecrets() {
+		s := Secret{}
+		s.LoadFromProto(v)
+		secrets = append(secrets, s)
+	}
 
 	return NewFromParams(&Params{
 		ChartName:    proto.GetName(),
@@ -233,4 +239,28 @@ func valueOrZero[T any](v *T) *T {
 		return &zero
 	}
 	return v
+}
+
+type valuable interface {
+	toValues() map[string]interface{}
+}
+
+type clientFacingValuable interface {
+	toClientFacingValues() map[string]interface{}
+}
+
+func sliceToValues[T valuable](s []T) []map[string]interface{} {
+	m := make([]map[string]interface{}, len(s))
+	for i, v := range s {
+		m[i] = v.toValues()
+	}
+	return m
+}
+
+func sliceToClientFacingValues[T clientFacingValuable](s []T) []map[string]interface{} {
+	m := make([]map[string]interface{}, len(s))
+	for i, v := range s {
+		m[i] = v.toClientFacingValues()
+	}
+	return m
 }
