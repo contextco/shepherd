@@ -24,9 +24,11 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            {{- range .Values.services }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
               protocol: TCP
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:

@@ -1,7 +1,13 @@
 <%= form_with model: service_object, url:, method: form_method do |form| %>
   <div class="flex flex-col gap-6">
     <div class="flex items-center justify-between">
-      <%= form.label :name, class: 'font-medium' %>
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= form.label :name, class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+          Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces.
+        </span>
+      </div>
+
       <%= form.text_field :name,
                           required: true,
                           'data-1p-ignore': true,
@@ -10,10 +16,16 @@
     </div>
 
     <div class="flex items-center justify-between">
-      <%= form.label :image, class: 'font-medium' %>
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= form.label :image, class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+          Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
+        </span>
+      </div>
 
       <%= form.text_field :image,
                           required: true,
+                          placeholder: 'docker.io/library/nginx:1.24.0-alpine3.17',
                           class: 'w-1/2 p-2 rounded-md' %>
     </div>
 
