@@ -268,7 +268,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 				Environment: map[string]string{
 					"FOO": "bar",
 				},
-				Secrets: chart.Secrets{
+				Secrets: []chart.Secret{
 					{
 						Name:           "foo",
 						EnvironmentKey: "FOO",
@@ -331,7 +331,7 @@ func TestAdd_chartsAreInstallable(t *testing.T) {
 				Environment: map[string]string{
 					"FOO": "bar",
 				},
-				Secrets: chart.Secrets{
+				Secrets: []chart.Secret{
 					{
 						Name:           "foo",
 						EnvironmentKey: "FOO",
