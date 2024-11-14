@@ -26,8 +26,19 @@ module ServiceRPC
     ChartParams.new(
       name: name,
       version: project_version.version,
+      replica_count: 1,
       image: rpc_image,
+      resources: rpc_resources,
       environment_config: rpc_environment_config,
+      )
+  end
+
+  def rpc_resources
+    Resources.new(
+      cpu_cores_requested: cpu_cores,
+      cpu_cores_limit: cpu_cores,
+      memory_bytes_requested: memory_bytes,
+      memory_bytes_limit: memory_bytes
       )
   end
 
