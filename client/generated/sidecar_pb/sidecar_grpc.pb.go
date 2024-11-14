@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Sidecar_PublishChart_FullMethodName  = "/Sidecar/PublishChart"
-	Sidecar_ValidateChart_FullMethodName = "/Sidecar/ValidateChart"
+	Sidecar_PublishChart_FullMethodName  = "/sidecar.Sidecar/PublishChart"
+	Sidecar_ValidateChart_FullMethodName = "/sidecar.Sidecar/ValidateChart"
 )
 
 // SidecarClient is the client API for Sidecar service.
@@ -142,7 +142,7 @@ func _Sidecar_ValidateChart_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Sidecar_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Sidecar",
+	ServiceName: "sidecar.Sidecar",
 	HandlerType: (*SidecarServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

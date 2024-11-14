@@ -98,7 +98,7 @@ func RegisterSidecarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/.Sidecar/PublishChart", runtime.WithHTTPPathPattern("/Sidecar/PublishChart"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/sidecar.Sidecar/PublishChart", runtime.WithHTTPPathPattern("/sidecar.Sidecar/PublishChart"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -123,7 +123,7 @@ func RegisterSidecarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/.Sidecar/ValidateChart", runtime.WithHTTPPathPattern("/Sidecar/ValidateChart"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/sidecar.Sidecar/ValidateChart", runtime.WithHTTPPathPattern("/sidecar.Sidecar/ValidateChart"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -187,7 +187,7 @@ func RegisterSidecarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/.Sidecar/PublishChart", runtime.WithHTTPPathPattern("/Sidecar/PublishChart"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/sidecar.Sidecar/PublishChart", runtime.WithHTTPPathPattern("/sidecar.Sidecar/PublishChart"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -209,7 +209,7 @@ func RegisterSidecarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/.Sidecar/ValidateChart", runtime.WithHTTPPathPattern("/Sidecar/ValidateChart"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/sidecar.Sidecar/ValidateChart", runtime.WithHTTPPathPattern("/sidecar.Sidecar/ValidateChart"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -229,9 +229,9 @@ func RegisterSidecarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_Sidecar_PublishChart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"Sidecar", "PublishChart"}, ""))
+	pattern_Sidecar_PublishChart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"sidecar.Sidecar", "PublishChart"}, ""))
 
-	pattern_Sidecar_ValidateChart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"Sidecar", "ValidateChart"}, ""))
+	pattern_Sidecar_ValidateChart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"sidecar.Sidecar", "ValidateChart"}, ""))
 )
 
 var (
