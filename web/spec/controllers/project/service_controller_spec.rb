@@ -41,7 +41,7 @@ RSpec.describe Project::ServiceController, type: :controller do
         cpu_cores: 1,
         memory_bytes: 2.gigabytes,
         environment_variables: [ { name: 'MY_ENV', value: 'value', templated: false } ],
-        secrets: [ { name: 'my-secret' } ]
+        secrets: [ { name: 'MY_SECRET' } ]
       }
     } }
 
@@ -70,7 +70,7 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(service.memory_bytes).to eq(2.gigabytes)
         expect(service.environment_variables.first['name']).to eq('MY_ENV')
         expect(service.environment_variables.first['value']).to eq('value')
-        expect(service.secrets.first).to eq('my-secret')
+        expect(service.secrets.first).to eq('MY_SECRET')
       end
     end
 
@@ -90,6 +90,25 @@ RSpec.describe Project::ServiceController, type: :controller do
       it 'sets a flash error' do
         subject
         expect(flash[:error]).to eq('Image must specify an image version and not latest')
+      end
+    end
+
+    context 'with a secret name which is shared with an environment variable' do
+      subject { post :create, params: invalid_params }
+
+      let(:invalid_params) { valid_params.deep_merge(service_form: { secrets: [ { name: 'MY_ENV' } ] }) }
+
+      it 'does not create a new service' do
+        expect { subject }.not_to change { ProjectService.count }
+      end
+
+      it 'renders the new template' do
+        expect(subject).to render_template(:new)
+      end
+
+      it 'sets a flash error' do
+        subject
+        expect(flash[:error]).to eq('Environment variables and secrets must have unique names. Duplicates found: MY_ENV')
       end
     end
   end
