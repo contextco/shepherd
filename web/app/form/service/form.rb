@@ -108,14 +108,6 @@ class Service::Form
     secrets.select { |secret| secret.name.present? }.map(&:name)
   end
 
-  # def unique_environment_variable_secret_names
-  #   # validate that all environment variable and secret names are unique
-  #   names = environment_variables.map(&:name) + secrets.map(&:name)
-  #   return if names.uniq.length == names.length
-  #
-  #   errors.add(:environment_variables, "and secrets must have unique names")
-  # end
-
   def unique_environment_variable_secret_names
     names = environment_variables.map(&:name) + secrets.map(&:name)
     duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys
