@@ -189,7 +189,7 @@ func (c *Chart) Uninstall() error {
 }
 
 func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
-	chart, err := c.template.ApplyParams(c.params.Merge(params))
+	chart, err := c.template.ApplyParams(params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to apply params: %w", err)
 	}

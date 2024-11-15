@@ -5,12 +5,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"sidecar/store"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -74,6 +74,7 @@ func (f *Fixture) VerifyWithinArchive(t *testing.T, ctx context.Context, archive
 		return fmt.Errorf("failed to create archive reader: %w", err)
 	}
 
+	var files []string
 	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
@@ -82,6 +83,8 @@ func (f *Fixture) VerifyWithinArchive(t *testing.T, ctx context.Context, archive
 		if err != nil {
 			return err
 		}
+
+		files = append(files, header.Name)
 
 		if header.Name != path {
 			continue
@@ -99,7 +102,7 @@ func (f *Fixture) VerifyWithinArchive(t *testing.T, ctx context.Context, archive
 		return nil
 	}
 
-	return errors.New("fixture not found")
+	return fmt.Errorf("fixture for %s not found in archive %s, files: %s", path, archivePath, strings.Join(files, "\n"))
 }
 
 func archiveReader(data []byte) (*tar.Reader, error) {

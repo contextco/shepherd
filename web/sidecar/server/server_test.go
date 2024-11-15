@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 	"testing"
@@ -128,16 +127,9 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Errorf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if err := verifyChartFiles(t, ctx, store, tt.req.Chart.Name, tt.req.Chart.Version); err != nil {
+			if err := verifyChartFiles(t, ctx, store, tt.req.Chart); err != nil {
 				t.Errorf("Failed to verify chart files: %v", err)
 			}
-
-			dir := t.TempDir()
-			if err := store.Dump(dir); err != nil {
-				t.Fatalf("Failed to dump store: %v", err)
-			}
-
-			log.Printf("dir: %s", dir)
 
 			chartName := fmt.Sprintf("%s-%s", tt.req.Chart.Name, tt.req.Chart.Version)
 			c, err := chart.LoadFromArchive(&chart.ChartArchive{
@@ -161,7 +153,7 @@ func TestServer_PublishChart(t *testing.T) {
 	}
 }
 
-func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartName string, chartVersion string) error {
+func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {
 	keyFiles := []string{
 		"test-repo/index.yaml",
 	}
@@ -175,12 +167,17 @@ func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStor
 	}
 
 	keyArchiveFiles := []string{
-		fmt.Sprintf("%s/Chart.yaml", chartName),
-		fmt.Sprintf("%s/values.yaml", chartName),
+		fmt.Sprintf("%s/Chart.yaml", chartParams.Name),
+		fmt.Sprintf("%s/values.yaml", chartParams.Name),
+	}
+
+	for _, service := range chartParams.Services {
+		keyArchiveFiles = append(keyArchiveFiles, fmt.Sprintf("%s/charts/%s/Chart.yaml", chartParams.Name, service.Name))
+		keyArchiveFiles = append(keyArchiveFiles, fmt.Sprintf("%s/charts/%s/values.yaml", chartParams.Name, service.Name))
 	}
 
 	for _, file := range keyArchiveFiles {
-		if err := testfixture.VerifyWithinArchive(t, ctx, store, fmt.Sprintf("test-repo/%s-%s.tgz", chartName, chartVersion), file); err != nil {
+		if err := testfixture.VerifyWithinArchive(t, ctx, store, fmt.Sprintf("test-repo/%s-%s.tgz", chartParams.Name, chartParams.Version), file); err != nil {
 			return err
 		}
 	}
