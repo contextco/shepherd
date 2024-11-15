@@ -15,7 +15,7 @@ func (s *Server) ValidateChart(ctx context.Context, req *sidecar_pb.ValidateChar
 		return nil, errors.New("chart is required")
 	}
 
-	c, err := chart.NewFromProto(req.GetChart())
+	c, err := chart.NewFromProto("test", "1.0.0", req.GetChart().GetServices()[0]) // TODO: handle multiple services
 	if err != nil {
 		return nil, err
 	}

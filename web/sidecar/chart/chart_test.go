@@ -3,7 +3,7 @@ package chart
 import (
 	"context"
 	"fmt"
-	"sidecar/testcluster"
+	"sidecar/test/testcluster"
 	"strings"
 	"testing"
 
@@ -38,9 +38,14 @@ func TestChartValidate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chart, err := NewFromParams(tt.params)
+			chart, err := NewParentChart()
 			if err != nil {
 				t.Fatalf("failed to create chart: %v", err)
+			}
+
+			chart, err = chart.ApplyParams(tt.params)
+			if err != nil {
+				t.Fatalf("failed to apply params to chart: %v", err)
 			}
 
 			err = chart.Validate()
@@ -136,7 +141,11 @@ func TestChartInstall(t *testing.T) {
 
 			tt.params.ChartName = fmt.Sprintf("test-%s", strings.ReplaceAll(tt.name, " ", "-"))
 			tt.params.ChartVersion = "0.0.1"
-			chart, err := NewFromParams(tt.params)
+			parent, err := NewParentChart()
+			if err != nil {
+				t.Fatalf("failed to create parent chart: %v", err)
+			}
+			chart, err := parent.ApplyParams(tt.params)
 			if err != nil {
 				t.Fatalf("failed to create chart: %v", err)
 			}
