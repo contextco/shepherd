@@ -32,18 +32,27 @@ message ChartParams {
     string name = 1;
     string version = 2;
 
-    int32 replica_count = 7;
+    repeated ServiceParams services = 7;
 
-    Image image = 3;
-
-    Resources resources = 4;
-
-    EnvironmentConfig environment_config = 5;
-
-    repeated Service services = 6; // Currently only one service is supported.
+    reserved 3 to 6;
 }
 
-message Service {
+// Next ID: 7
+message ServiceParams {
+    string name = 6;
+
+    int32 replica_count = 1;
+
+    Image image = 2;
+
+    Resources resources = 3;
+
+    EnvironmentConfig environment_config = 4;
+
+    repeated Endpoint endpoints = 5; // Currently only one service is supported.
+}
+
+message Endpoint {
     int32 port = 1;
 }
 

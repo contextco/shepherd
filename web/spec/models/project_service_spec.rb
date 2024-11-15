@@ -43,8 +43,8 @@ RSpec.describe ProjectService do
           expect(method).to eq(:validate_chart)
           expect(request.chart.name).to eq('test-service')
           expect(request.chart.version).to eq(project_version.version)
-          expect(request.chart.replica_count).to eq(1)
-          expect(request.chart.services).to contain_exactly(
+          expect(request.chart.services.first.replica_count).to eq(1)
+          expect(request.chart.services.first.endpoints).to contain_exactly(
             have_attributes(port: 80),
             have_attributes(port: 443)
           )
@@ -94,9 +94,9 @@ RSpec.describe ProjectService do
         expect(method).to eq(:publish_chart)
         expect(request.chart.name).to eq('test-service')
         expect(request.chart.version).to eq(project_version.version)
-        expect(request.chart.replica_count).to eq(1)
+        expect(request.chart.services.first.replica_count).to eq(1)
         expect(request.repository_directory).to eq('test-repo')
-        expect(request.chart.services).to contain_exactly(
+        expect(request.chart.services.first.endpoints).to contain_exactly(
           have_attributes(port: 80),
           have_attributes(port: 443)
         )
@@ -120,22 +120,21 @@ RSpec.describe ProjectService do
     subject(:chart) { service.send(:rpc_chart) }
 
     it 'creates chart with correct attributes' do
-      expect(chart).to have_attributes(
+      expect(chart.to_h.slice(:name, :version)).to eq(
                          name: 'test-service',
                          version: project_version.version,
-                         replica_count: 1
                        )
     end
 
     it 'includes correct image configuration' do
-      expect(chart.image).to have_attributes(
+      expect(chart.services.first.image).to have_attributes(
                                name: 'registry.example.com/org/app',
                                tag: 'v1.2.3'
                              )
     end
 
     it 'includes correct resource configuration' do
-      expect(chart.resources).to have_attributes(
+      expect(chart.services.first.resources).to have_attributes(
                                    cpu_cores_requested: 2,
                                    cpu_cores_limit: 2,
                                    memory_bytes_requested: 512_000_000,
@@ -144,7 +143,7 @@ RSpec.describe ProjectService do
     end
 
     it 'includes correct environment variables' do
-      env_vars = chart.environment_config.environment_variables
+      env_vars = chart.services.first.environment_config.environment_variables
       expect(env_vars).to contain_exactly(
                             have_attributes(name: 'ENV_VAR1', value: 'value1'),
                             have_attributes(name: 'ENV_VAR2', value: 'value2')
@@ -152,7 +151,7 @@ RSpec.describe ProjectService do
     end
 
     it 'includes correct services' do
-      services = chart.services
+      services = chart.services.first.endpoints
       expect(services).to contain_exactly(
         have_attributes(port: 80),
         have_attributes(port: 443)

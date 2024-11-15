@@ -10,13 +10,9 @@ func TestNew(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	cluster := New(t, ctx, "test-cluster")
+	cluster := New(t, ctx)
 	if cluster == nil {
 		t.Fatal("expected cluster to not be nil")
-	}
-
-	if cluster.name != "test-cluster" {
-		t.Errorf("expected cluster name to be test-cluster, got %s", cluster.name)
 	}
 
 	if cluster.KubeConfig == nil {
