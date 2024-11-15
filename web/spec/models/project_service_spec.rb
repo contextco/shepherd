@@ -14,7 +14,9 @@ RSpec.describe ProjectService do
            environment_variables: [
              { 'name' => 'ENV_VAR1', 'value' => 'value1' },
              { 'name' => 'ENV_VAR2', 'value' => 'value2' }
-           ])
+           ],
+           ports: %w[80 443]
+    )
   end
 
   let(:mock_client) { double(:sidecar_client) }
@@ -42,6 +44,10 @@ RSpec.describe ProjectService do
           expect(request.chart.name).to eq('test-service')
           expect(request.chart.version).to eq(project_version.version)
           expect(request.chart.replica_count).to eq(1)
+          expect(request.chart.services).to contain_exactly(
+            have_attributes(port: 80),
+            have_attributes(port: 443)
+          )
           response
         end
 
@@ -90,6 +96,10 @@ RSpec.describe ProjectService do
         expect(request.chart.version).to eq(project_version.version)
         expect(request.chart.replica_count).to eq(1)
         expect(request.repository_directory).to eq('test-repo')
+        expect(request.chart.services).to contain_exactly(
+          have_attributes(port: 80),
+          have_attributes(port: 443)
+        )
         response
       end
 
@@ -139,6 +149,14 @@ RSpec.describe ProjectService do
                             have_attributes(name: 'ENV_VAR1', value: 'value1'),
                             have_attributes(name: 'ENV_VAR2', value: 'value2')
                           )
+    end
+
+    it 'includes correct services' do
+      services = chart.services
+      expect(services).to contain_exactly(
+        have_attributes(port: 80),
+        have_attributes(port: 443)
+      )
     end
   end
 
