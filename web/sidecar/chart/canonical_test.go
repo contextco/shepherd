@@ -5,14 +5,14 @@ import (
 )
 
 func TestCanonical(t *testing.T) {
-	_, err := Empty()
+	_, err := NewServiceChart()
 	if err != nil {
 		t.Fatalf("error getting canonical chart: %v", err)
 	}
 }
 
 func TestTemplateFiles(t *testing.T) {
-	files, err := templateFiles()
+	files, err := templateFiles("templates/service")
 	if err != nil {
 		t.Fatalf("error getting template files: %v", err)
 	}

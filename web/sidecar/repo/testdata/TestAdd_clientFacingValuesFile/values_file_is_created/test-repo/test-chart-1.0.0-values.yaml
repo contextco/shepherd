@@ -1,7 +1,8 @@
-secrets:
-- environmentKey: FOO
-  name: foo
-  value: ""
-- environmentKey: BAR
-  name: bar
-  value: ""
+test-service:
+  secrets:
+  - environmentKey: FOO
+    name: foo
+    value: ""
+  - environmentKey: BAR
+    name: bar
+    value: ""
