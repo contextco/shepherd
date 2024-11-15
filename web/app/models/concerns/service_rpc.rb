@@ -4,8 +4,8 @@ module ServiceRPC
   extend ActiveSupport::Concern
 
   def validate_chart
-    req = ValidateChartRequest.new(chart: rpc_chart)
-    resp = rpc_client.validate_chart(req)
+    req = Sidecar::ValidateChartRequest.new(chart: rpc_chart)
+    resp = rpc_client.call(:validate_chart, req)
 
     errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
     Rails.logger.info(errors) unless resp.valid
@@ -17,7 +17,7 @@ module ServiceRPC
     # this only lives here ftm. Eventually the project_version will handle all publishing
     repository_directory = helm_repo.name
     req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory:)
-    rpc_client.publish_chart(req)
+    rpc_client.call(:publish_chart, req)
   end
 
   private
@@ -56,7 +56,7 @@ module ServiceRPC
 
     secret_vars = secrets.map do |secret|
       name = env_to_k8s_secret_name(secret)
-      Secret.new(
+      Sidecar::Secret.new(
         name:,
         environment_key: secret
       )
@@ -70,10 +70,11 @@ module ServiceRPC
   end
 
   def env_to_k8s_secret_name(env_name)
+    raise ArgumentError, "Env variable cannot be empty" if env_name.blank?
+
     # Convert to lowercase and replace invalid characters
     secret_name = env_name.to_s.downcase
                           .gsub(/[^a-z0-9.\-]/, "-")  # Replace invalid chars with hyphen
-                          .gsub(/^\W+|\W+$/, "")      # Remove leading/trailing non-word chars
                           .gsub(/[-.]{2,}/, "-")      # Replace multiple dots/hyphens with single hyphen
 
     # Ensure it starts and ends with alphanumeric
