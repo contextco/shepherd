@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "test.fullname" . }}
+  labels:
+    {{- include "test.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "test.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "test.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "test.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            {{- range .Values.services }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: TCP
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.environment }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Release.Name }}-{{ .Chart.Name }}-config
+                  key: {{ $key }}
+            {{- end }}
+            {{- range $key, $value := .Values.secrets }}
+            - name: {{ $value.environmentKey }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-{{ .Chart.Name }}-secrets
+                  key: {{ $value.environmentKey }}
+            {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

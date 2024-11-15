@@ -18,7 +18,7 @@ type Params struct {
 	Resources Resources
 
 	Environment Environment
-	Secrets     []Secret
+	Secrets     []*Secret
 
 	Services []*Service
 }
@@ -92,7 +92,7 @@ type Secret struct {
 	EnvironmentKey string
 }
 
-func (s Secret) toValues() map[string]interface{} {
+func (s *Secret) toValues() map[string]interface{} {
 	return map[string]interface{}{
 		"name":           s.Name,
 		"environmentKey": s.EnvironmentKey,
@@ -100,7 +100,7 @@ func (s Secret) toValues() map[string]interface{} {
 	}
 }
 
-func (s Secret) toClientFacingValues() map[string]interface{} {
+func (s *Secret) toClientFacingValues() map[string]interface{} {
 	return map[string]interface{}{
 		"name":           s.Name,
 		"environmentKey": s.EnvironmentKey,
@@ -108,7 +108,7 @@ func (s Secret) toClientFacingValues() map[string]interface{} {
 	}
 }
 
-func (s Secret) LoadFromProto(proto *sidecar_pb.Secret) {
+func (s *Secret) LoadFromProto(proto *sidecar_pb.Secret) {
 	s.Name = proto.GetName()
 	s.EnvironmentKey = proto.GetEnvironmentKey()
 }
@@ -153,41 +153,50 @@ func (p *Params) toValues() (*values.File, error) {
 	}, nil
 }
 
-func NewFromParams(params *Params) (*Chart, error) {
-	template, err := canonicalTemplate()
+func NewServiceChartFromParams(params *Params) (*Chart, error) {
+	c, err := NewServiceChart()
 	if err != nil {
-		return nil, fmt.Errorf("error getting canonical chart: %w", err)
+		return nil, fmt.Errorf("error getting service chart: %w", err)
 	}
 
-	chart, err := template.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("error applying params: %w", err)
-	}
-
-	return chart, nil
+	return c.ApplyParams(params)
 }
 
-func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
+func NewFromProto(name, version string, proto *sidecar_pb.ServiceParams) (*Chart, error) {
 	env := Environment{}
 	env.LoadFromProto(proto.GetEnvironmentConfig())
 
-	secrets := []Secret{}
+	secrets := []*Secret{}
 	for _, v := range proto.GetEnvironmentConfig().GetSecrets() {
-		s := Secret{}
+		s := &Secret{}
 		s.LoadFromProto(v)
 		secrets = append(secrets, s)
 	}
 
-	return NewFromParams(&Params{
-		ChartName:    proto.GetName(),
-		ChartVersion: proto.GetVersion(),
+	services := []*Service{}
+	for _, v := range proto.GetEndpoints() {
+		s := Service{}
+		s.Port = int(v.GetPort())
+		services = append(services, &s)
+	}
+
+	return NewServiceChartFromParams(&Params{
+		ChartName:    name,
+		ChartVersion: version,
 		ReplicaCount: proto.GetReplicaCount(),
 		Image: Image{
 			Name: proto.GetImage().GetName(),
 			Tag:  proto.GetImage().GetTag(),
 		},
+		Resources: Resources{
+			CPUCoresRequested:    int(proto.GetResources().GetCpuCoresRequested()),
+			CPUCoresLimit:        int(proto.GetResources().GetCpuCoresLimit()),
+			MemoryBytesRequested: proto.GetResources().GetMemoryBytesRequested(),
+			MemoryBytesLimit:     proto.GetResources().GetMemoryBytesLimit(),
+		},
 		Environment: env,
 		Secrets:     secrets,
+		Services:    services,
 	})
 }
 

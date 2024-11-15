@@ -1,5 +1,3 @@
-environment:
-  FOO: bar
 image:
   repository: test-image
   tag: latest
@@ -8,10 +6,10 @@ ingress:
 replicaCount: 1
 resources:
   limits:
-    cpu: 2000m
-    memory: "2048"
+    cpu: 0m
+    memory: "0"
   requests:
-    cpu: 1000m
-    memory: "1024"
+    cpu: 0m
+    memory: "0"
 serviceAccount:
   create: false

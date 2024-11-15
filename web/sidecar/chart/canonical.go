@@ -12,8 +12,8 @@ import (
 //go:embed all:templates
 var template embed.FS
 
-func Empty() (*Chart, error) {
-	template, err := canonicalTemplate()
+func NewServiceChart() (*Chart, error) {
+	template, err := loadTemplate("templates/service")
 	if err != nil {
 		return nil, fmt.Errorf("error getting canonical template: %w", err)
 	}
@@ -21,8 +21,17 @@ func Empty() (*Chart, error) {
 	return New(template, &Params{}), nil
 }
 
-func canonicalTemplate() (*Template, error) {
-	files, err := templateFiles()
+func NewParentChart() (*Chart, error) {
+	template, err := loadTemplate("templates/parent")
+	if err != nil {
+		return nil, fmt.Errorf("error getting canonical template: %w", err)
+	}
+
+	return New(template, &Params{}), nil
+}
+
+func loadTemplate(dir string) (*Template, error) {
+	files, err := templateFiles(dir)
 	if err != nil {
 		return nil, fmt.Errorf("error getting template files: %w", err)
 	}
@@ -35,9 +44,9 @@ func canonicalTemplate() (*Template, error) {
 	return &Template{chart: chart}, nil
 }
 
-func templateFiles() ([]*loader.BufferedFile, error) {
+func templateFiles(dir string) ([]*loader.BufferedFile, error) {
 	bufferedFiles := []*loader.BufferedFile{}
-	err := fs.WalkDir(template, "templates", func(path string, d fs.DirEntry, err error) error {
+	err := fs.WalkDir(template, dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -50,7 +59,7 @@ func templateFiles() ([]*loader.BufferedFile, error) {
 			return fmt.Errorf("error reading template file %s: %w", path, err)
 		}
 
-		name, err := filepath.Rel("templates", path)
+		name, err := filepath.Rel(dir, path)
 		if err != nil {
 			return fmt.Errorf("error getting relative path for %s: %w", path, err)
 		}
