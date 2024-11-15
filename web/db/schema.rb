@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_12_123341) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_15_141050) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -101,6 +101,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_12_123341) do
     t.uuid "project_version_id"
     t.float "cpu_cores"
     t.bigint "memory_bytes"
+    t.jsonb "ports", default: []
     t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
   end
 

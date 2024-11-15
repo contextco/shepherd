@@ -41,7 +41,8 @@ RSpec.describe Project::ServiceController, type: :controller do
         cpu_cores: 1,
         memory_bytes: 2.gigabytes,
         environment_variables: [ { name: 'MY_ENV', value: 'value', templated: false } ],
-        secrets: [ { name: 'MY_SECRET' } ]
+        secrets: [ { name: 'MY_SECRET' } ],
+        ports: [ { port: 80 }, { port: 443 } ]
       }
     } }
 
@@ -71,6 +72,7 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(service.environment_variables.first['name']).to eq('MY_ENV')
         expect(service.environment_variables.first['value']).to eq('value')
         expect(service.secrets.first).to eq('MY_SECRET')
+        expect(service.ports).to eq(%w[80 443])
       end
     end
 
@@ -147,6 +149,38 @@ RSpec.describe Project::ServiceController, type: :controller do
       it 'sets a flash notice' do
         subject
         expect(flash[:notice]).to eq('Service service created')
+      end
+    end
+
+    context 'with empty ports' do
+      let(:empty_ports_valid_params) { valid_params.deep_merge(service_form: { ports: [ { port: '' } ] }) }
+
+      subject { post :create, params: empty_ports_valid_params }
+
+      it 'creates a new service' do
+        expect { subject }.to change { ProjectService.count }.by(1)
+      end
+
+      it 'sets no ports' do
+        subject
+        service = ProjectService.order(:created_at).last
+        expect(service.ports).to eq([])
+      end
+    end
+
+    context 'with no ports' do
+      let(:no_ports_valid_params) { valid_params.deep_merge(service_form: { ports: [] }) }
+
+      subject { post :create, params: no_ports_valid_params }
+
+      it 'creates a new service' do
+        expect { subject }.to change { ProjectService.count }.by(1)
+      end
+
+      it 'sets no ports' do
+        subject
+        service = ProjectService.order(:created_at).last
+        expect(service.ports).to eq([])
       end
     end
   end
