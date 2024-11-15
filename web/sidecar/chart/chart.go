@@ -23,6 +23,9 @@ var ValidationError = errors.New("chart validation error")
 type Chart struct {
 	template *Template
 	params   *Params
+
+	parent       *Chart
+	dependencies []*Chart
 }
 
 type ChartArchive struct {
@@ -36,11 +39,45 @@ func LoadFromArchive(archive *ChartArchive, params *Params) (*Chart, error) {
 		return nil, fmt.Errorf("failed to load chart from archive: %w", err)
 	}
 
-	return &Chart{template: &Template{chart: chart}, params: params}, nil
+	parent := &Chart{template: &Template{chart: chart}, params: params}
+
+	for _, dep := range chart.Dependencies() {
+		parent.AddService(&Chart{template: &Template{chart: dep}, params: &Params{}})
+	}
+
+	return parent, nil
+}
+
+func (c *Chart) AddService(service *Chart) {
+	c.dependencies = append(c.dependencies, service)
+	service.parent = c
+	c.template.chart.AddDependency(service.template.chart)
+	c.template.chart.Metadata.Dependencies = append(c.template.chart.Metadata.Dependencies, &chart.Dependency{
+		Name:    service.template.chart.Metadata.Name,
+		Version: service.template.chart.Metadata.Version,
+	})
 }
 
 func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
-	return c.params.ClientFacingValuesFile()
+	if c.parent != nil {
+		return c.params.ClientFacingValuesFile()
+	}
+
+	vs := values.Empty()
+	for _, dep := range c.dependencies {
+		if _, ok := vs.Values[dep.Name()]; ok {
+			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
+		}
+
+		depVs, err := dep.ClientFacingValuesFile()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get client facing values file for dependency %s: %w", dep.template.chart.Name(), err)
+		}
+
+		vs.Values[dep.Name()] = depVs.Values
+	}
+
+	return vs, nil
 }
 
 func (c *Chart) releaseName() string {
@@ -79,13 +116,30 @@ func (c *Chart) Archive() (*ChartArchive, error) {
 	return &ChartArchive{Name: filepath.Base(archivePath), Data: archive}, nil
 }
 
+func (c *Chart) Values() (*values.File, error) {
+	vs, err := c.params.toValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert params to helm values: %w", err)
+	}
+
+	for _, dep := range c.dependencies {
+		if _, ok := vs.Values[dep.template.chart.Name()]; ok {
+			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
+		}
+
+		vs.Values[dep.template.chart.Name()] = values.Empty().Values
+	}
+
+	return vs, nil
+}
+
 func (c *Chart) Validate() error {
-	values, err := c.params.toValues()
+	vs, err := c.Values()
 	if err != nil {
 		return fmt.Errorf("failed to convert params to helm values: %w", err)
 	}
 
-	if err := chartutil.ValidateAgainstSchema(c.template.chart, values.Values); err != nil {
+	if err := chartutil.ValidateAgainstSchema(c.template.chart, vs.Values); err != nil {
 		return fmt.Errorf("%w: %s", ValidationError, err.Error())
 	}
 
@@ -139,6 +193,8 @@ func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to apply params: %w", err)
 	}
+
+	chart.params = params
 
 	return chart, nil
 }
