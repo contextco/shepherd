@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -23,10 +24,10 @@ type Cluster struct {
 }
 
 // New creates a new test cluster with the given name
-func New(t *testing.T, ctx context.Context, name string) *Cluster {
+func New(t *testing.T, ctx context.Context) *Cluster {
 
 	cluster := &Cluster{
-		name: name,
+		name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-")),
 	}
 
 	_ = cluster.delete(ctx) // ignore error if cluster does not exist

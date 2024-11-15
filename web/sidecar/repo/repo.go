@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"os"
 	"path/filepath"
 	"sidecar/chart"
 	"strings"
@@ -20,7 +19,7 @@ const (
 
 type Client struct {
 	baseURL *url.URL
-	store   Store
+	store   RepoStore
 }
 
 func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error {
@@ -99,12 +98,6 @@ func (c *Client) loadIndexFile(ctx context.Context, repo string) (*indexFile, er
 }
 
 func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*ChartArchive, error) {
-	tempDir, err := os.MkdirTemp("", "sidecar-repo")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create temp dir: %w", err)
-	}
-	defer os.RemoveAll(tempDir)
-
 	archive, err := chart.Archive()
 	if err != nil {
 		return nil, fmt.Errorf("failed to archive chart: %w", err)
@@ -126,7 +119,7 @@ func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*
 	}, nil
 }
 
-func NewClient(ctx context.Context, store Store, baseURL *url.URL) (*Client, error) {
+func NewClient(ctx context.Context, store RepoStore, baseURL *url.URL) (*Client, error) {
 	return &Client{baseURL: baseURL, store: store}, nil
 }
 

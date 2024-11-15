@@ -1,0 +1,16 @@
+{{- if .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "test.fullname" . }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "test.selectorLabels" . | nindent 4 }}
+  ports:
+    {{- range .Values.services }}
+    - port: {{ .port }}
+      protocol: TCP
+      name: {{ .name }}
+    {{- end }}
+{{- end }}
