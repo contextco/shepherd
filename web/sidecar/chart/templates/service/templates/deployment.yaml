@@ -36,14 +36,14 @@ spec:
             - name: {{ $key }}
               valueFrom:
                 configMapKeyRef:
-                  name: {{ $.Release.Name }}-{{ .Chart.Name }}-config
+                  name: {{ $.Release.Name }}-{{ $.Chart.Name }}-config
                   key: {{ $key }}
             {{- end }}
             {{- range $key, $value := .Values.secrets }}
             - name: {{ $value.environmentKey }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $.Release.Name }}-{{ .Chart.Name }}-secrets
+                  name: {{ $.Release.Name }}-{{ $.Chart.Name }}-secrets
                   key: {{ $value.environmentKey }}
             {{- end }}
           {{- with .Values.volumeMounts }}
