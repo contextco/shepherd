@@ -5,7 +5,7 @@ class SidecarClient
 
   class << self
     def client
-      @client ||= ::Gruf::Client.new(service: Sidecar)
+      @client ||= ::Gruf::Client.new(service: Sidecar::Sidecar)
     end
   end
 end
