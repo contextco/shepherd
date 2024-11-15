@@ -26,10 +26,14 @@ module ServiceRPC
     Sidecar::ChartParams.new(
       name: name,
       version: project_version.version,
-      replica_count: 1,
-      image: rpc_image,
-      resources: rpc_resources,
-      environment_config: rpc_environment_config,
+      services: [
+        Sidecar::ServiceParams.new(
+          replica_count: 1,
+          image: rpc_image,
+          resources: rpc_resources,
+          environment_config: rpc_environment_config,
+          )
+      ]
       )
   end
 

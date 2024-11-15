@@ -153,21 +153,16 @@ func (p *Params) toValues() (*values.File, error) {
 	}, nil
 }
 
-func NewFromParams(params *Params) (*Chart, error) {
-	template, err := canonicalTemplate()
+func NewServiceChartFromParams(params *Params) (*Chart, error) {
+	c, err := NewServiceChart()
 	if err != nil {
-		return nil, fmt.Errorf("error getting canonical chart: %w", err)
+		return nil, fmt.Errorf("error getting service chart: %w", err)
 	}
 
-	chart, err := template.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("error applying params: %w", err)
-	}
-
-	return chart, nil
+	return c.ApplyParams(params)
 }
 
-func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
+func NewFromProto(name, version string, proto *sidecar_pb.ServiceParams) (*Chart, error) {
 	env := Environment{}
 	env.LoadFromProto(proto.GetEnvironmentConfig())
 
@@ -178,13 +173,19 @@ func NewFromProto(proto *sidecar_pb.ChartParams) (*Chart, error) {
 		secrets = append(secrets, s)
 	}
 
-	return NewFromParams(&Params{
-		ChartName:    proto.GetName(),
-		ChartVersion: proto.GetVersion(),
+	return NewServiceChartFromParams(&Params{
+		ChartName:    name,
+		ChartVersion: version,
 		ReplicaCount: proto.GetReplicaCount(),
 		Image: Image{
 			Name: proto.GetImage().GetName(),
 			Tag:  proto.GetImage().GetTag(),
+		},
+		Resources: Resources{
+			CPUCoresRequested:    int(proto.GetResources().GetCpuCoresRequested()),
+			CPUCoresLimit:        int(proto.GetResources().GetCpuCoresLimit()),
+			MemoryBytesRequested: proto.GetResources().GetMemoryBytesRequested(),
+			MemoryBytesLimit:     proto.GetResources().GetMemoryBytesLimit(),
 		},
 		Environment: env,
 		Secrets:     secrets,
