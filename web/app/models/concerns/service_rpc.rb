@@ -30,6 +30,7 @@ module ServiceRPC
       image: rpc_image,
       resources: rpc_resources,
       environment_config: rpc_environment_config,
+      services: rpc_services
       )
   end
 
@@ -44,6 +45,10 @@ module ServiceRPC
 
   def rpc_image
     Sidecar::Image.new(name: image_without_tag, tag: image_tag)
+  end
+
+  def rpc_services
+    ports.map(&:to_i).map { |port| Sidecar::Service.new(port:) }
   end
 
   def rpc_environment_config
