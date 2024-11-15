@@ -20,9 +20,14 @@ func TestValidateChart(t *testing.T) {
 			chart: &sidecar_pb.ChartParams{
 				Name:    "test",
 				Version: "0.1.0",
-				Image: &sidecar_pb.Image{
-					Name: "",
-					Tag:  "latest",
+				Services: []*sidecar_pb.ServiceParams{
+					{
+						Name: "test-service",
+						Image: &sidecar_pb.Image{
+							Name: "nginx",
+							Tag:  "latest",
+						},
+					},
 				},
 			},
 			wantErr: false,
@@ -30,7 +35,7 @@ func TestValidateChart(t *testing.T) {
 		{
 			name:    "empty chart",
 			chart:   &sidecar_pb.ChartParams{},
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name:    "nil chart",
