@@ -1,0 +1,10 @@
+<div class="dynamic-element flex gap-4 items-center">
+  <%= form.text_field :port,
+                      placeholder: '80',
+                      pattern: '\d*',
+                      title: 'Port must be a number between 1 and 65535',
+                      min: 1,
+                      max: 65535,
+                      class: 'w-full p-2 rounded-md' %>
+  <%= heroicon "minus-circle", class: 'flex-none size-6 text-red-600 cursor-pointer', data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } %>
+</div>

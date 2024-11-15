@@ -40,16 +40,24 @@ class Service::Form
     end
   end
 
+  attribute :ports, multiple: true do
+    attribute :port
+
+    validates :port, numericality: { greater_than: 0, less_than: 65536 }, allow_blank: true
+  end
+
   validates :name, presence: true
   validates :image, presence: true
   validate :image_format
   validate :name_format
   validate :unique_environment_variable_secret_names
+  validate :unique_port_numbers
 
   def self.empty
     f = Service::Form.new
     f.environment_variables.build
     f.secrets.build
+    f.ports.build
 
     f
   end
@@ -65,7 +73,8 @@ class Service::Form
       environment_variables: service.environment_variables.map do |env|
         { name: env[:name], value: env[:value], templated: env[:templated] }
       end,
-      secrets: service.secrets.map { |secret| { name: secret } }
+      secrets: service.secrets.map { |secret| { name: secret } },
+      ports: service.ports.map { |port| { port: port } }
     )
 
     f
@@ -92,7 +101,8 @@ class Service::Form
       cpu_cores: cpu_cores.to_i,
       memory_bytes: memory_bytes.to_i,
       environment_variables: environment_variables_object,
-      secrets: secrets_object
+      secrets: secrets_object,
+      ports: ports_object
     }
   end
 
@@ -108,6 +118,10 @@ class Service::Form
     secrets.select { |secret| secret.name.present? }.map(&:name)
   end
 
+  def ports_object
+    ports.map(&:port).reject(&:empty?)
+  end
+
   def unique_environment_variable_secret_names
     names = environment_variables.map(&:name) + secrets.map(&:name)
     duplicates = names.group_by(&:itself).select { |_, group| group.length > 1 }.keys.reject(&:empty?)
@@ -118,6 +132,13 @@ class Service::Form
       :environment_variables,
       "and secrets must have unique names. Duplicates found: #{duplicates.join(', ')}"
     )
+  end
+
+  def unique_port_numbers
+    present_ports = ports.map(&:port).reject(&:empty?)
+    return if present_ports.uniq.length == present_ports.length
+
+    errors.add(:ports, "must have unique port numbers")
   end
 
   def name_format
