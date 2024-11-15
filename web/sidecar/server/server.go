@@ -36,29 +36,12 @@ func (s *Server) PublishChart(ctx context.Context, req *sidecar_pb.PublishChartR
 		return nil, status.Error(codes.InvalidArgument, "services are required")
 	}
 
-	parentChart, err := chart.NewParentChart()
+	chart, err := chart.NewFromProto(req.GetChart().GetName(), req.GetChart().GetVersion(), req.GetChart())
 	if err != nil {
 		return nil, err
 	}
 
-	parentChart, err = parentChart.ApplyParams(&chart.Params{
-		ChartName:    req.GetChart().GetName(),
-		ChartVersion: req.GetChart().GetVersion(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	for _, service := range req.GetChart().GetServices() {
-		serviceChart, err := chart.NewFromProto(service.GetName(), req.GetChart().GetVersion(), service)
-		if err != nil {
-			return nil, err
-		}
-
-		parentChart.AddService(serviceChart)
-	}
-
-	if err := s.repoClient.Add(ctx, parentChart, req.RepositoryDirectory); err != nil {
+	if err := s.repoClient.Add(ctx, chart, req.RepositoryDirectory); err != nil {
 		return nil, err
 	}
 
