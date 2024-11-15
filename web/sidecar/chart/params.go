@@ -162,42 +162,64 @@ func NewServiceChartFromParams(params *Params) (*Chart, error) {
 	return c.ApplyParams(params)
 }
 
-func NewFromProto(name, version string, proto *sidecar_pb.ServiceParams) (*Chart, error) {
-	env := Environment{}
-	env.LoadFromProto(proto.GetEnvironmentConfig())
-
-	secrets := []*Secret{}
-	for _, v := range proto.GetEnvironmentConfig().GetSecrets() {
-		s := &Secret{}
-		s.LoadFromProto(v)
-		secrets = append(secrets, s)
+func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*Chart, error) {
+	parentChart, err := NewParentChart()
+	if err != nil {
+		return nil, fmt.Errorf("error getting parent chart: %w", err)
 	}
 
-	services := []*Service{}
-	for _, v := range proto.GetEndpoints() {
-		s := Service{}
-		s.Port = int(v.GetPort())
-		services = append(services, &s)
-	}
-
-	return NewServiceChartFromParams(&Params{
+	parentChart, err = parentChart.ApplyParams(&Params{
 		ChartName:    name,
 		ChartVersion: version,
-		ReplicaCount: proto.GetReplicaCount(),
-		Image: Image{
-			Name: proto.GetImage().GetName(),
-			Tag:  proto.GetImage().GetTag(),
-		},
-		Resources: Resources{
-			CPUCoresRequested:    int(proto.GetResources().GetCpuCoresRequested()),
-			CPUCoresLimit:        int(proto.GetResources().GetCpuCoresLimit()),
-			MemoryBytesRequested: proto.GetResources().GetMemoryBytesRequested(),
-			MemoryBytesLimit:     proto.GetResources().GetMemoryBytesLimit(),
-		},
-		Environment: env,
-		Secrets:     secrets,
-		Services:    services,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("error applying params to parent chart: %w", err)
+	}
+
+	for _, service := range proto.GetServices() {
+		env := Environment{}
+		env.LoadFromProto(service.GetEnvironmentConfig())
+
+		secrets := []*Secret{}
+		for _, v := range service.GetEnvironmentConfig().GetSecrets() {
+			s := &Secret{}
+			s.LoadFromProto(v)
+			secrets = append(secrets, s)
+		}
+
+		services := []*Service{}
+		for _, v := range service.GetEndpoints() {
+			s := Service{}
+			s.Port = int(v.GetPort())
+			services = append(services, &s)
+		}
+
+		c, err := NewServiceChartFromParams(&Params{
+			ChartName:    service.GetName(),
+			ChartVersion: version,
+			ReplicaCount: service.GetReplicaCount(),
+			Image: Image{
+				Name: service.GetImage().GetName(),
+				Tag:  service.GetImage().GetTag(),
+			},
+			Resources: Resources{
+				CPUCoresRequested:    int(service.GetResources().GetCpuCoresRequested()),
+				CPUCoresLimit:        int(service.GetResources().GetCpuCoresLimit()),
+				MemoryBytesRequested: service.GetResources().GetMemoryBytesRequested(),
+				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
+			},
+			Environment: env,
+			Secrets:     secrets,
+			Services:    services,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error applying params to service chart: %w", err)
+		}
+
+		parentChart.AddService(c)
+	}
+
+	return parentChart, nil
 }
 
 func firstNonEmpty[T comparable](values ...T) T {
