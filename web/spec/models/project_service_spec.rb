@@ -27,9 +27,9 @@ RSpec.describe ProjectService do
       let(:response) { double('Response', valid: true, errors: []) }
 
       before do
-        allow(mock_client).to receive(:call)
-                                .with(:validate_chart, kind_of(Sidecar::ValidateChartRequest))
-                                .and_return(response)
+        allow(mock_client).to receive(:send)
+          .with(:validate_chart, kind_of(Sidecar::ValidateChartRequest))
+          .and_return(response)
       end
 
       it 'returns true' do
@@ -37,7 +37,7 @@ RSpec.describe ProjectService do
       end
 
       it 'calls validate_chart with correct parameters' do
-        expect(mock_client).to receive(:call) do |method, request|
+        expect(mock_client).to receive(:send) do |method, request|
           expect(method).to eq(:validate_chart)
           expect(request.chart.name).to eq('test-service')
           expect(request.chart.version).to eq(project_version.version)
@@ -54,7 +54,7 @@ RSpec.describe ProjectService do
       let(:response) { double('Response', valid: false, errors: validation_errors) }
 
       before do
-        allow(mock_client).to receive(:call)
+        allow(mock_client).to receive(:send)
                                 .with(:validate_chart, kind_of(Sidecar::ValidateChartRequest))
                                 .and_return(response)
         allow(Rails.logger).to receive(:info)
@@ -78,13 +78,13 @@ RSpec.describe ProjectService do
 
     before do
       allow(service).to receive(:helm_repo).and_return(helm_repo)
-      allow(mock_client).to receive(:call)
+      allow(mock_client).to receive(:send)
         .with(:publish_chart, kind_of(Sidecar::PublishChartRequest))
         .and_return(response)
     end
 
     it 'calls publish_chart with correct parameters' do
-      expect(mock_client).to receive(:call) do |method, request|
+      expect(mock_client).to receive(:send) do |method, request|
         expect(method).to eq(:publish_chart)
         expect(request.chart.name).to eq('test-service')
         expect(request.chart.version).to eq(project_version.version)
@@ -97,7 +97,7 @@ RSpec.describe ProjectService do
     end
 
     it 'includes correct helm repo name in request' do
-      expect(mock_client).to receive(:call) do |_, request|
+      expect(mock_client).to receive(:send) do |_, request|
         expect(request.repository_directory).to eq(helm_repo.name)
         response
       end

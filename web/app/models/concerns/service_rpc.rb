@@ -5,7 +5,7 @@ module ServiceRPC
 
   def validate_chart
     req = Sidecar::ValidateChartRequest.new(chart: rpc_chart)
-    resp = rpc_client.call(:validate_chart, req)
+    resp = rpc_client.send(:validate_chart, req)
 
     errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
     Rails.logger.info(errors) unless resp.valid
@@ -17,7 +17,7 @@ module ServiceRPC
     # this only lives here ftm. Eventually the project_version will handle all publishing
     repository_directory = helm_repo.name
     req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory:)
-    rpc_client.call(:publish_chart, req)
+    rpc_client.send(:publish_chart, req)
   end
 
   private
