@@ -26,11 +26,15 @@ module ServiceRPC
     Sidecar::ChartParams.new(
       name: name,
       version: project_version.version,
-      replica_count: 1,
-      image: rpc_image,
-      resources: rpc_resources,
-      environment_config: rpc_environment_config,
-      services: rpc_services
+      services: [
+        Sidecar::ServiceParams.new(
+          replica_count: 1,
+          image: rpc_image,
+          resources: rpc_resources,
+          environment_config: rpc_environment_config,
+          endpoints: rpc_endpoints
+        )
+      ]
       )
   end
 
@@ -47,8 +51,8 @@ module ServiceRPC
     Sidecar::Image.new(name: image_without_tag, tag: image_tag)
   end
 
-  def rpc_services
-    ports.map(&:to_i).map { |port| Sidecar::Service.new(port:) }
+  def rpc_endpoints
+    ports.map(&:to_i).map { |port| Sidecar::Endpoint.new(port:) }
   end
 
   def rpc_environment_config
