@@ -71,5 +71,21 @@ RSpec.describe "Dependencies", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context 'when adding multiple dependencies of the same name' do
+      subject do
+        2.times do
+          post version_dependencies_path(version), params: { dependency: {
+            name: dependency_object.name,
+            version: dependency_object.variants.sample.version,
+            repo_url: dependency_object.repository
+          } }
+        end
+      end
+
+      it 'only creates 1 dependency' do
+        expect { subject }.to change(version.dependencies, :count).by(1)
+      end
+    end
   end
 end
