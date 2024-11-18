@@ -1,11 +1,16 @@
 class DependenciesController < ApplicationController
   before_action :set_app
   def new
-    @dependencies = Chart::Dependency.all
+    @dependencies = @version.eligible_dependencies
     @dependency = @version.dependencies.build
   end
 
   def create
+    if @version.dependencies.exists?(name: dependency_params[:name])
+      flash[:error] = "Dependency #{dependency_params[:name]} already exists"
+      return redirect_to version_path(@version)
+    end
+
     @version.dependencies.create!(**dependency_params)
     redirect_to version_path(@version)
   end
