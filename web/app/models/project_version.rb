@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectVersion < ApplicationRecord
+  include ::VersionRPC
+
   belongs_to :project
   has_many :services, dependent: :destroy, class_name: "ProjectService"
   has_one :helm_repo, through: :project
@@ -28,7 +30,8 @@ class ProjectVersion < ApplicationRecord
 
   def publish!
     building!
-    services.each(&:publish_chart!)
+    publisher = ChartPublisher.new(rpc_chart, self)
+    publisher.publish_chart!
     published!
   end
 
