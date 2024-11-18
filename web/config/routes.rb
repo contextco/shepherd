@@ -30,6 +30,7 @@ Rails.application.routes.draw do
     resources :version, only: [ :new, :create, :destroy, :show, :update, :edit ], controller: "project/version", shallow: true do
       post :publish, on: :member
       post :unpublish, on: :member
+      get "/client_values_yaml", to: "project/version#client_values_yaml", on: :member, as: :client_values_yaml
 
       resources :services, only: [ :create, :new, :show, :destroy, :update, :edit ],
                 controller: "project/service",

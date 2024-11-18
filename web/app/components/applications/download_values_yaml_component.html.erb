@@ -1,0 +1,6 @@
+<%= link_to client_values_yaml_version_path(version, service_id: version.services.first.id),
+            class: 'px-2 py-1 border rounded-md text-sm flex gap-1 items-center',
+            data: { turbo: false } do %>
+  <%= heroicon 'arrow-down-tray', class: 'w-4 h-4' %>
+  Values
+<% end %>
