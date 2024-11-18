@@ -3,41 +3,18 @@
 module ServiceRPC
   extend ActiveSupport::Concern
 
-  def validate_chart
-    req = Sidecar::ValidateChartRequest.new(chart: rpc_chart)
-    resp = rpc_client.send(:validate_chart, req)
-
-    errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
-    Rails.logger.info(errors) unless resp.valid
-
-    resp.valid
-  end
-
-  def publish_chart!
-    # this only lives here ftm. Eventually the project_version will handle all publishing
-    repository_directory = helm_repo.name
-    req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory:)
-    rpc_client.send(:publish_chart, req)
+  def rpc_service
+    Sidecar::ServiceParams.new(
+      name:,
+      replica_count: 1,
+      image: rpc_image,
+      resources: rpc_resources,
+      environment_config: rpc_environment_config,
+      endpoints: rpc_endpoints
+    )
   end
 
   private
-
-  def rpc_chart
-    Sidecar::ChartParams.new(
-      name: name,
-      version: project_version.version,
-      services: [
-        Sidecar::ServiceParams.new(
-          name: name,
-          replica_count: 1,
-          image: rpc_image,
-          resources: rpc_resources,
-          environment_config: rpc_environment_config,
-          endpoints: rpc_endpoints
-        )
-      ]
-      )
-  end
 
   def rpc_resources
     Sidecar::Resources.new(
@@ -73,10 +50,6 @@ module ServiceRPC
     end
 
     Sidecar::EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
-  end
-
-  def rpc_client
-    @rpc_client ||= SidecarClient.client
   end
 
   def env_to_k8s_secret_name(env_name)
