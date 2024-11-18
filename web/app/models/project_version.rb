@@ -45,4 +45,8 @@ class ProjectVersion < ApplicationRecord
       new_version
     end
   end
+
+  def client_yaml_filename
+    "values-#{version}.yaml"
+  end
 end
