@@ -22,8 +22,4 @@ class ProjectService < ApplicationRecord
   def image_without_tag
     DockerImageUrlParser.new(image).to_s(with_tag: false)
   end
-
-  def client_values_yaml_path
-    "#{project.name}/#{name}-#{project_version.version}-values.yaml"
-  end
 end

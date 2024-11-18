@@ -217,4 +217,39 @@ RSpec.describe Project::VersionController, type: :controller do
       end
     end
   end
+
+  describe 'GET #client_values_yaml' do
+    subject { get :client_values_yaml, params: { id: project_version.id } }
+
+    let(:mock_file) { double('file') }
+    let(:response_body) { 'client values yaml' }
+
+    before do
+      allow_any_instance_of(HelmRepo).to receive(:client_values_yaml).and_return(mock_file)
+    end
+
+    it_behaves_like 'requires authentication'
+
+    context 'when the file is present' do
+      before do
+        allow(mock_file).to receive(:download).and_return(mock_file)
+        allow(mock_file).to receive(:string).and_return(response_body)
+      end
+
+      it 'returns the client values yaml file' do
+        subject
+        expect(response.body).to eq(response_body)
+      end
+    end
+
+    context 'when the file is not present' do
+      let(:mock_file) { nil }
+
+      it 'redirects to the project version page' do
+        subject
+        expect(flash[:error]).to eq('File not found')
+        expect(response).to redirect_to(version_path(project_version))
+      end
+    end
+  end
 end

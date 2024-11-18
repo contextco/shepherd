@@ -52,4 +52,8 @@ class ProjectVersion < ApplicationRecord
   def client_yaml_filename
     "values-#{version}.yaml"
   end
+
+  def client_values_yaml_path
+    "#{project.name}/#{project.name}-#{version}-values.yaml"
+  end
 end
