@@ -23,7 +23,7 @@ RSpec.describe HelmRepo do
 
   describe '#install_chart_command' do
     it 'returns the correct command' do
-      expect(helm_repo.install_chart_command(service:)).to eq("helm install test-service test-repo/test-service --version #{project_version.version}")
+      expect(helm_repo.install_chart_command(service:)).to eq("helm install -f values-#{project_version.version}.yaml test-service test-repo/test-service --version #{project_version.version}")
     end
   end
 end

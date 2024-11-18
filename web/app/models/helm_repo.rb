@@ -20,7 +20,9 @@ class HelmRepo < ApplicationRecord
   end
 
   def install_chart_command(service:)
-    "helm install #{service.name} #{name}/#{service.name} --version #{service.project_version.version}"
+    version = service.project_version
+    version_version = service.project_version.version
+    "helm install -f #{version.client_yaml_filename} #{service.name} #{name}/#{service.name} --version #{version_version}"
   end
 
   def valid_credentials?(name, password)
@@ -29,6 +31,10 @@ class HelmRepo < ApplicationRecord
 
   def index_yaml
     bucket.file("#{name}/index.yaml")
+  end
+
+  def client_values_yaml(service:)
+    bucket.file(service.client_values_yaml_path)
   end
 
   def file_yaml(filename)

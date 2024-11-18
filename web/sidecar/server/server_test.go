@@ -63,6 +63,34 @@ func TestServer_PublishChart(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "valid chart with external dependency",
+			req: &sidecar_pb.PublishChartRequest{
+				Chart: &sidecar_pb.ChartParams{
+					Name:    "test-chart",
+					Version: "1.0.0",
+					Dependencies: []*sidecar_pb.DependencyParams{
+						{
+							Name:          "postgresql",
+							Version:       "15.x.x",
+							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
+						},
+					},
+					Services: []*sidecar_pb.ServiceParams{
+						{
+							Name: "test-service",
+							Image: &sidecar_pb.Image{
+								Name: "nginx",
+								Tag:  "latest",
+							},
+							ReplicaCount: 1,
+						},
+					},
+				},
+				RepositoryDirectory: "test-repo",
+			},
+			wantErr: false,
+		},
+		{
 			name: "valid chart with multiple services",
 			req: &sidecar_pb.PublishChartRequest{
 				RepositoryDirectory: "test-repo",
@@ -143,6 +171,7 @@ func TestServer_PublishChart(t *testing.T) {
 			if err := c.Install(ctx); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
+			defer c.Uninstall()
 
 			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
 				return strings.Contains(pod.Name, "test-service") && pod.Status.Phase == corev1.PodRunning
