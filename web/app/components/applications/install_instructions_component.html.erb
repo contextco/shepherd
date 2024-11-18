@@ -1,0 +1,30 @@
+<div class="flex flex-col gap-6">
+  <div class="font-semibold">Install instructions</div>
+  <div class="flex flex-col gap-4 border border-stone-300 p-4 rounded-md">
+    <div class="flex gap-4">
+      <%= render Applications::CircleTextComponent.new(text: '1') %>
+      <div class="flex gap-1 font-medium text-sm mt-1.5">
+        <span>Download</span>
+        <%= link_to client_values_yaml_version_path(version, format: :yaml), data: { turbo: false }, class: 'underline font-bold' do %>
+          <%= version.client_yaml_filename %>
+        <% end %>
+        <span> and set appropriate values</span>
+      </div>
+    </div>
+
+    <div class="flex gap-4 w-full max-w-full">
+      <%= render Applications::CircleTextComponent.new(text: '2') %>
+      <%# getting weird bug where the code snippet is growing to the width of its parent as if the circle component was not there, for now introducing some fake padding.... %>
+      <div class="mt-1.5 w-full pr-12">
+        <%= render CommandSnippetComponent.new(title: "Add Helm repository", snippet: project.helm_repo.add_repo_command ) %>
+      </div>
+    </div>
+
+    <div class="flex gap-4 w-full">
+      <%= render Applications::CircleTextComponent.new(text: '3') %>
+      <div class="mt-1.5 w-full">
+        <%= render CommandSnippetComponent.new(title: "Install Chart", snippet: project.helm_repo.install_chart_command(version:) ) %>
+      </div>
+    </div>
+  </div>
+</div>
