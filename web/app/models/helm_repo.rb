@@ -33,8 +33,8 @@ class HelmRepo < ApplicationRecord
     bucket.file("#{name}/index.yaml")
   end
 
-  def client_values_yaml(service:)
-    bucket.file(service.client_values_yaml_path)
+  def client_values_yaml(version:)
+    bucket.file(version.client_values_yaml_path)
   end
 
   def file_yaml(filename)
