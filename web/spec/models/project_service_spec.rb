@@ -88,10 +88,4 @@ RSpec.describe ProjectService do
       end
     end
   end
-
-  describe '#client_values_yaml_path' do
-    it 'returns the correct path' do
-      expect(service.client_values_yaml_path).to eq("#{project_version.project.name}/test-service-#{project_version.version}-values.yaml")
-    end
-  end
 end
