@@ -1,9 +1,26 @@
 <li class="grid items-stretch">
-  <%= link_to version_path(project.latest_project_version), class: 'w-full border border-solid border-stone-400 p-4 text-primary cursor-pointer duration-200 outline-2' do %>
-    <h6 class="text-primary type-body-02-semi-bold mb-6 [container-type:inline-size]">
-      <span class="block truncate w-[100cqi] font-medium"><%= project.name %></span>
-    </h6>
+  <%= link_to version_path(project.latest_project_version), class: 'cursor-pointer hover:bg-stone-50 w-full border border-solid border-stone-400 p-4 duration-200 flex flex-col gap-4' do %>
+    <div class="flex justify-between items-center">
+      <h6 class="">
+        <%= project.name %>
+      </h6>
+      <div class="font-mono text-xs flex items-center gap-2">
+        <%= project.project_versions.order(created_at: :desc).first.version %>
+      </div>
+    </div>
     <div class="flex items-center gap-2 h-7">
+      <div class="p-1 bg-stone-100 border rounded-md pr-2 pl-1 font-mono text-xs flex items-center">
+        <div class="flex items-center gap-1">
+          <%= heroicon 'tag', class: 'h-4' %>
+          <%= project.published_versions.count %>
+        </div>
+        <span class="text-stone-400 pl-2 pr-1">|</span>
+        <div class="flex items-center gap-1">
+          <%= heroicon 'rocket-launch', class: 'h-4' %>
+          <%# TODO: add number of deployments %>
+          0
+        </div>
+      </div>
     </div>
   <% end %>
 </li>
