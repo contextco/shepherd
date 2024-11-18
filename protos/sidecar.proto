@@ -27,14 +27,25 @@ message ValidateChartResponse {
     repeated string errors = 2;
 }
 
-// Next ID: 7
+// Next ID: 9
 message ChartParams {
     string name = 1;
     string version = 2;
 
     repeated ServiceParams services = 7;
 
+    repeated DependencyParams dependencies = 8;
+
     reserved 3 to 6;
+}
+
+// Next ID: 4
+message DependencyParams {
+    string name = 1;
+
+    string version = 2;
+
+    string repository_url = 3;
 }
 
 // Next ID: 7

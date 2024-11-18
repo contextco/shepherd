@@ -24,8 +24,15 @@ type Chart struct {
 	template *Template
 	params   *Params
 
-	parent       *Chart
-	dependencies []*Chart
+	parent               *Chart
+	localDependencies    []*Chart
+	externalDependencies []*ExternalChart
+}
+
+type ExternalChart struct {
+	Name    string
+	Version string
+	URL     string
 }
 
 type ChartArchive struct {
@@ -49,12 +56,25 @@ func LoadFromArchive(archive *ChartArchive, params *Params) (*Chart, error) {
 }
 
 func (c *Chart) AddService(service *Chart) {
-	c.dependencies = append(c.dependencies, service)
+	c.localDependencies = append(c.localDependencies, service)
 	service.parent = c
 	c.template.chart.AddDependency(service.template.chart)
 	c.template.chart.Metadata.Dependencies = append(c.template.chart.Metadata.Dependencies, &chart.Dependency{
 		Name:    service.template.chart.Metadata.Name,
 		Version: service.template.chart.Metadata.Version,
+	})
+}
+
+func (c *Chart) AddExternalDependency(name, version, repositoryURL string) {
+	c.externalDependencies = append(c.externalDependencies, &ExternalChart{
+		Name:    name,
+		Version: version,
+		URL:     repositoryURL,
+	})
+	c.template.chart.Metadata.Dependencies = append(c.template.chart.Metadata.Dependencies, &chart.Dependency{
+		Name:       name,
+		Version:    version,
+		Repository: repositoryURL,
 	})
 }
 
@@ -64,7 +84,7 @@ func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
 	}
 
 	vs := values.Empty()
-	for _, dep := range c.dependencies {
+	for _, dep := range c.localDependencies {
 		if _, ok := vs.Values[dep.Name()]; ok {
 			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
 		}
@@ -122,7 +142,7 @@ func (c *Chart) Values() (*values.File, error) {
 		return nil, fmt.Errorf("failed to convert params to helm values: %w", err)
 	}
 
-	for _, dep := range c.dependencies {
+	for _, dep := range c.localDependencies {
 		if _, ok := vs.Values[dep.template.chart.Name()]; ok {
 			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
 		}
