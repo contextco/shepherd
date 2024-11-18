@@ -172,14 +172,23 @@ RSpec.describe Project::VersionController, type: :controller do
     context 'when there is an attached service' do
       let!(:project_service) { create(:project_service, project_version:) }
 
+      let(:chart_publisher) { instance_double(ChartPublisher) }
+
       before do
-        allow_any_instance_of(ProjectService).to receive(:publish_chart!)
+        allow(ChartPublisher).to receive(:new).and_return(chart_publisher)
+        allow(chart_publisher).to receive(:publish_chart!)
       end
 
       it 'publishes the version' do
         expect { subject }
           .to change { project_version.reload.published? }
                 .from(false).to(true)
+      end
+
+      it 'calls the ChartPublisher' do
+        expect(ChartPublisher).to receive(:new).with(project_version.rpc_chart, project_version)
+        expect(chart_publisher).to receive(:publish_chart!)
+        subject
       end
 
       it 'sets a success flash message' do
