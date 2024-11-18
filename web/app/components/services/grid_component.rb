@@ -7,6 +7,10 @@ class Services::GridComponent < ApplicationComponent
     project_version&.services || []
   end
 
+  def dependencies
+    project_version&.dependencies
+  end
+
   def enabled_add_service_button?
     services.count < 1
   end

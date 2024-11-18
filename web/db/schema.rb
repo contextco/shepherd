@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_15_141050) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_18_114507) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_15_141050) do
     t.string "lifecycle_id", null: false
     t.integer "status", default: 0
     t.index ["deployment_id"], name: "index_containers_on_deployment_id"
+  end
+
+  create_table "dependencies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "version", null: false
+    t.string "repo_url", null: false
+    t.uuid "project_version_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_version_id"], name: "index_dependencies_on_project_version_id"
   end
 
   create_table "deployment_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -157,6 +167,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_15_141050) do
   end
 
   add_foreign_key "containers", "deployments"
+  add_foreign_key "dependencies", "project_versions"
   add_foreign_key "deployment_tokens", "deployments"
   add_foreign_key "deployments", "teams"
   add_foreign_key "event_logs", "containers"

@@ -38,6 +38,8 @@ Rails.application.routes.draw do
                 controller: "project/service",
                 shallow: true,
                 as: :project_services
+
+      resources :dependencies, only: [ :new, :create, :destroy ], shallow: true
     end
   end
 
