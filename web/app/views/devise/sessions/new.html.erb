@@ -1,0 +1,7 @@
+<div class="flex flex-col gap-4 text-stone-600">
+  <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
+                class: 'flex items-center p-4 py-3 border border-stone-300 gap-4 shadow-sm w-full justify-center hover:bg-slate-50' do %>
+    <%= image_tag 'google.png', class: 'h-4' %>
+    Continue with Google
+  <% end %>
+</div>
