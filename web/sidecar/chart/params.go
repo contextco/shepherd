@@ -219,6 +219,10 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*Chart, 
 		parentChart.AddService(c)
 	}
 
+	for _, dep := range proto.GetDependencies() {
+		parentChart.AddExternalDependency(dep.GetName(), dep.GetVersion(), dep.GetRepositoryUrl())
+	}
+
 	return parentChart, nil
 }
 
