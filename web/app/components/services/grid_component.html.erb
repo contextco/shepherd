@@ -1,30 +1,61 @@
-<div class="relative z-10">
+<div class="relative z-10 flex flex-col gap-6">
   <div class="flex flex-col gap-1">
     <div class="flex items-center space-x-2 justify-between">
       <div class="">
         <div class="font-semibold">Services</div>
       </div>
 
-      <% if enabled_add_service_button? %>
-        <div class="flex items-center">
-          <%= link_to new_version_project_service_path(project_version) do %>
-            <div class="rounded-md p-2 cursor-pointer">
+      <div class="flex items-center gap-1">
+        <% if enabled_add_service_button? %>
+          <div class="flex items-center">
+            <%= link_to new_version_project_service_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
               <%= heroicon 'plus', class: 'size-4' %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
+              Add Service
+            <% end %>
+          </div>
+        <% end %>
+        <% if Flipper.enabled?(:dependencies) || true %>
+          <div class="flex items-center">
+            <%= link_to new_version_dependency_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
+              <%= heroicon 'squares-plus', class: 'size-4' %>
+              Add Dependency
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
   <% if services.empty? %>
-    <div class="flex items-center justify-center h-48 border border-stone-300 mt-6">
+    <div class="flex items-center justify-center h-48 border border-stone-300">
       <div class="text-stone-500">Services will be visible here when created.</div>
     </div>
   <% else %>
-    <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
+    <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)]">
       <% services.each do |service| %>
         <%= render Services::ElementComponent.new(service:, version: project_version) %>
       <% end %>
     </ul>
   <% end %>
+
 </div>
+
+<div class="relative z-10 flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <div class="flex items-center space-x-2 justify-between">
+      <div class="font-semibold">Dependencies</div>
+    </div>
+  </div>
+  <% if dependencies.present? %>
+    <ul class="flex flex-col gap-4">
+      <% dependencies.each do |dep| %>
+        <li class="border p-4 font-medium flex items-center gap-2">
+          <%= heroicon dep.icon, class: 'w-4' %>
+          <span class="capitalize">
+          <%= dep.human_visible_name %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
+
