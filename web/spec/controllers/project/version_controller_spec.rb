@@ -172,14 +172,23 @@ RSpec.describe Project::VersionController, type: :controller do
     context 'when there is an attached service' do
       let!(:project_service) { create(:project_service, project_version:) }
 
+      let(:chart_publisher) { instance_double(ChartPublisher) }
+
       before do
-        allow_any_instance_of(ProjectService).to receive(:publish_chart!)
+        allow(ChartPublisher).to receive(:new).and_return(chart_publisher)
+        allow(chart_publisher).to receive(:publish_chart!)
       end
 
       it 'publishes the version' do
         expect { subject }
           .to change { project_version.reload.published? }
                 .from(false).to(true)
+      end
+
+      it 'calls the ChartPublisher' do
+        expect(ChartPublisher).to receive(:new).with(project_version.rpc_chart, project_version)
+        expect(chart_publisher).to receive(:publish_chart!)
+        subject
       end
 
       it 'sets a success flash message' do
@@ -205,6 +214,41 @@ RSpec.describe Project::VersionController, type: :controller do
       it 'sets a success flash message' do
         subject
         expect(flash[:notice]).to eq('Application version unpublished')
+      end
+    end
+  end
+
+  describe 'GET #client_values_yaml' do
+    subject { get :client_values_yaml, params: { id: project_version.id } }
+
+    let(:mock_file) { double('file') }
+    let(:response_body) { 'client values yaml' }
+
+    before do
+      allow_any_instance_of(HelmRepo).to receive(:client_values_yaml).and_return(mock_file)
+    end
+
+    it_behaves_like 'requires authentication'
+
+    context 'when the file is present' do
+      before do
+        allow(mock_file).to receive(:download).and_return(mock_file)
+        allow(mock_file).to receive(:string).and_return(response_body)
+      end
+
+      it 'returns the client values yaml file' do
+        subject
+        expect(response.body).to eq(response_body)
+      end
+    end
+
+    context 'when the file is not present' do
+      let(:mock_file) { nil }
+
+      it 'redirects to the project version page' do
+        subject
+        expect(flash[:error]).to eq('File not found')
+        expect(response).to redirect_to(version_path(project_version))
       end
     end
   end

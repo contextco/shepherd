@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class ProjectVersion < ApplicationRecord
+  include ::VersionRPC
+
   belongs_to :project
   has_many :services, dependent: :destroy, class_name: "ProjectService"
+  has_many :dependencies, dependent: :destroy
+
   has_one :helm_repo, through: :project
   has_one :helm_chart, dependent: :destroy, as: :owner
 
@@ -28,7 +32,8 @@ class ProjectVersion < ApplicationRecord
 
   def publish!
     building!
-    services.each(&:publish_chart!)
+    publisher = ChartPublisher.new(rpc_chart, self)
+    publisher.publish_chart!
     published!
   end
 
@@ -48,5 +53,9 @@ class ProjectVersion < ApplicationRecord
 
   def client_yaml_filename
     "values-#{version}.yaml"
+  end
+
+  def client_values_yaml_path
+    "#{project.name}/#{project.name}-#{version}-values.yaml"
   end
 end

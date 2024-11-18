@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  resources :deployment, only: [ :create, :index, :show, :destroy ] do
+  root "project/project#index"
+
+  resources :deployment, only: [ :create, :show, :destroy ] do
     get :settings, on: :member
     resources :token, only: [ :create, :destroy, :index ], controller: :deployment_token
   end
@@ -26,7 +28,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :application, only: [ :new, :create, :destroy, :edit ], controller: "project/project", as: :project do
+  resources :application, only: [ :new, :create, :destroy, :edit, :index ], controller: "project/project", as: :project do
     resources :version, only: [ :new, :create, :destroy, :show, :update, :edit ], controller: "project/version", shallow: true do
       post :publish, on: :member
       post :unpublish, on: :member
@@ -36,6 +38,8 @@ Rails.application.routes.draw do
                 controller: "project/service",
                 shallow: true,
                 as: :project_services
+
+      resources :dependencies, only: [ :new, :create, :destroy ], shallow: true
     end
   end
 
@@ -50,8 +54,6 @@ Rails.application.routes.draw do
   namespace :api, path: "api/v1", defaults: { format: :json } do
     post :heartbeat, to: "ingress#heartbeat"
   end
-
-  root "deployment#index"
 
   devise_for :users,
              controllers: { omniauth_callbacks: "users/omniauth_callbacks" },

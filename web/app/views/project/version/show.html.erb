@@ -22,7 +22,7 @@
     <div class="flex flex-col gap-4 border border-stone-300 p-4 rounded-md">
       <div class="flex gap-1 font-medium text-sm">
         <span>Download</span>
-        <%= link_to client_values_yaml_version_path(@version, service_id: @version.services.first.id), data: { turbo: false }, class: 'underline font-bold' do %>
+        <%= link_to client_values_yaml_version_path(@version, format: :yaml), data: { turbo: false }, class: 'underline font-bold' do %>
           <%= @version.client_yaml_filename %>
         <% end %>
         <span> and set appropriate values</span>

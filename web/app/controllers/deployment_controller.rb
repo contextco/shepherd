@@ -1,8 +1,5 @@
 
 class DeploymentController < ApplicationController
-  def index
-  end
-
   def show
     @deployment = current_team.deployments.find(params[:id])
   end

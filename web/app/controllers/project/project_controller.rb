@@ -3,6 +3,8 @@
 class Project::ProjectController < ApplicationController
   before_action :fetch_application, only: %i[edit destroy]
 
+  def index; end
+
   def destroy
     @app.destroy!
 

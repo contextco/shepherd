@@ -9,4 +9,12 @@ class Project < ApplicationRecord
   has_one :helm_repo, dependent: :destroy
 
   scope :in_version_order, -> { order(created_at: :desc) }
+
+  def published_versions
+    project_versions.filter(&:published?)
+  end
+
+  def draft_versions
+    project_versions.filter(&:draft?)
+  end
 end
