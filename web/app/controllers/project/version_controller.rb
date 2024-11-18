@@ -4,6 +4,8 @@ class Project::VersionController < ApplicationController
   before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish]
   before_action :fetch_previous_version, only: %i[new create]
 
+  class NotFoundError < StandardError; end
+
   def show; end
 
   def destroy
@@ -60,23 +62,23 @@ class Project::VersionController < ApplicationController
   end
 
   def client_values_yaml
-    # this will use the parent chart only and not per service as per here when available
     version = current_team.project_versions.find(params[:id])
-    service = version.services.find(params[:service_id])
-    helm_repo = service.helm_repo
-
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["Content-Disposition"] = "attachment; filename=#{version.client_yaml_filename}"
 
     begin
-      file = helm_repo.client_values_yaml(service:)
-      raise "File not found" if file.nil?
+      file = version.helm_repo.client_values_yaml(version:)
+      raise NotFoundError, "File not found" if file.nil? unless file.present?
 
       yaml = file.download.string
+
+      response.headers["Cache-Control"] = "no-cache"
+      response.headers["Content-Disposition"] = "attachment; filename=#{version.client_yaml_filename}"
+
       render plain: yaml, content_type: "application/x-yaml", layout: false
-    rescue StandardError => e
+    rescue NotFoundError => e
       Rails.logger.error("Error loading client_values.yaml: #{e.message}")
-      render json: { error: "Could not load client_values.yaml" }, status: :internal_server_error, layout: false
+
+      flash[:error] = "File not found"
+      redirect_to version_path(version)
     end
   end
 
