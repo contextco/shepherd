@@ -59,6 +59,27 @@ class Project::VersionController < ApplicationController
     redirect_to version_path(@version)
   end
 
+  def client_values_yaml
+    # this will use the parent chart only and not per service as per here when available
+    version = current_team.project_versions.find(params[:id])
+    service = version.services.find(params[:service_id])
+    helm_repo = service.helm_repo
+
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Content-Disposition"] = "attachment; filename=#{version.client_yaml_filename}"
+
+    begin
+      file = helm_repo.client_values_yaml(service:)
+      raise "File not found" if file.nil?
+
+      yaml = file.download.string
+      render plain: yaml, content_type: "application/x-yaml", layout: false
+    rescue StandardError => e
+      Rails.logger.error("Error loading client_values.yaml: #{e.message}")
+      render json: { error: "Could not load client_values.yaml" }, status: :internal_server_error, layout: false
+    end
+  end
+
   private
 
   def version_params

@@ -28,6 +28,7 @@ module ServiceRPC
       version: project_version.version,
       services: [
         Sidecar::ServiceParams.new(
+          name: name,
           replica_count: 1,
           image: rpc_image,
           resources: rpc_resources,

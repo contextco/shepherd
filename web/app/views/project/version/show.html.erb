@@ -9,6 +9,8 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <%= render Applications::DownloadValuesYamlComponent.new(version: @version) %>
+
         <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
         <%= render Applications::EditVersionComponent.new(version: @version) %>
@@ -19,6 +21,18 @@
   <% if @version.published? %>
     <div class="flex flex-col gap-4">
       <%= render CommandSnippetComponent.new(title: "Add Helm repository", snippet: @app.helm_repo.add_repo_command ) %>
+
+      <div class="flex flex-col gap-1 text-sm">
+        <span class="font-medium">
+          Download values.yaml and store it in your project directory.
+        </span>
+        <%= link_to client_values_yaml_version_path(@version, service_id: @version.services.first.id),
+                    class: 'font-medium underline w-fit',
+                    data: { turbo: false } do %>
+          <%= @version.client_yaml_filename %>
+        <% end %>
+      </div>
+
       <%= render CommandSnippetComponent.new(title: "Install Chart", snippet: @app.helm_repo.install_chart_command(service: @version.services.first) ) %>
     </div>
   <% end %>
