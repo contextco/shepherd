@@ -1,6 +1,9 @@
 <%= render layout: 'layouts/project' do %>
   <div class="text-lg">Add a dependency</div>
   <div class="flex flex-col gap-4">
+    <% if @dependencies.blank? %>
+      <div class="text-md">No dependencies eligible to be added.</div>
+    <% end %>
     <% @dependencies.each do |dep| %>
       <%= form_with model: @dependency, url: version_dependencies_path, class: 'border p-8 rounded-md flex flex-col gap-4' do |form| %>
         <div class="flex items-baseline gap-4">

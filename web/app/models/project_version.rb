@@ -23,6 +23,10 @@ class ProjectVersion < ApplicationRecord
     versions[versions.find_index(self) - 1]
   end
 
+  def eligible_dependencies
+    Chart::Dependency.all - dependencies.map(&:info)
+  end
+
   def previous_version
     versions = project.project_versions.order(created_at: :desc)
     return nil if versions.last == self
