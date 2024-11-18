@@ -1,17 +1,23 @@
 <%= content_for :content do %>
-  <% unless user_signed_in? %>
-    <div class="flex items-center justify-end gap-4 whitespace-nowrap p-6">
-      <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
-                    class: 'px-2 py-1 flex items-center gap-1 hover:bg-stone-100 rounded-md duration-200' do %>
-        Sign in
-      <% end %>
-      <%= button_to user_google_oauth2_omniauth_authorize_path, data: { turbo: "false" },
-                    class: 'border rounded-md px-2 py-1 flex items-center gap-1 hover:bg-stone-100 duration-200 border-stone-400' do %>
-        Create account
-        <%= heroicon 'arrow-right', class: 'size-4' %>
-      <% end %>
+  <div class="min-h-screen w-full bg-white">
+    <div class="flex justify-center pt-32 pb-12 basis-0">
+      <div class="p-12 bg-white flex flex-col gap-20 items-center">
+        <div class="flex flex-col gap-1">
+          <header class="flex items-center gap-1 font-medium text-6xl">
+            <%= image_tag 'icon.png', class: 'h-16' %>
+            Shepard
+          </header>
+
+          <span class="ml-3 text-stone-400 font-medium text-xl">
+            Self-hosting, made easy.
+          </span>
+        </div>
+
+        <%= yield %>
+      </div>
     </div>
-  <% end %>
+  </div>
+
 <% end %>
 
 <%= render template: 'layouts/application' %>
