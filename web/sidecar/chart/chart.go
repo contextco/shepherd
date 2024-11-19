@@ -39,15 +39,6 @@ type ParentChart struct {
 	externalDeps []*ExternalChart
 }
 
-func (pc *ParentChart) ApplyParams(params *Params) (*ParentChart, error) {
-	chart, err := pc.Chart.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to apply params to chart: %w", err)
-	}
-
-	return &ParentChart{Chart: chart}, nil
-}
-
 func (pc *ParentChart) AddService(service *ServiceChart) {
 	pc.services = append(pc.services, service)
 	service.parent = pc
@@ -61,15 +52,6 @@ func (pc *ParentChart) AddService(service *ServiceChart) {
 type ServiceChart struct {
 	*Chart
 	parent *ParentChart
-}
-
-func (sc *ServiceChart) ApplyParams(params *Params) (*ServiceChart, error) {
-	chart, err := sc.Chart.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to apply params to chart: %w", err)
-	}
-
-	return &ServiceChart{Chart: chart}, nil
 }
 
 func LoadFromArchive(archive *ChartArchive, params *Params) (*ParentChart, error) {
@@ -202,15 +184,9 @@ func (c *Chart) KubeChart() *chart.Chart {
 	return c.template.chart
 }
 
-func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
-	chart, err := c.template.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to apply params: %w", err)
-	}
-
-	chart.params = params
-
-	return chart, nil
+func (c *Chart) ApplyParams(params *Params) error {
+	c.params = params
+	return c.template.ApplyParams(params)
 }
 
 func New(template *Template, params *Params) *Chart {
