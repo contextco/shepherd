@@ -1,0 +1,72 @@
+<%= form_with model: dependency_instance, url: version_dependencies_path, class: 'flex flex-col gap-6' do |form| %>
+  <%= form.hidden_field :name, value: dependency_info.name %>
+  <%= form.hidden_field :repo_url, value: dependency_info.repository %>
+
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1 max-w-96">
+      <%= form.label :version, class: 'font-medium text-stone-800 flex-none' %>
+      <span class="text-stone-600 text-sm">
+        Version of the dependency to use
+      </span>
+    </div>
+
+    <%= form.collection_select :version,
+                               dependency_info.variants.sort_by(&:version).reverse,
+                               :version,
+                               -> (v) { "Version #{v.human_visible_version}" },
+                               {},
+                        class: 'w-1/2 p-2 rounded-md' %>
+  </div>
+
+  <%= form.fields_for :configs do |config_form| %>
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= config_form.label :db_name, "Database", class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+          PostgreSQL database dbname, random if not provided
+        </span>
+      </div>
+
+      <%= config_form.text_field :db_name,
+                          value: dependency_instance.configs.fetch(:db_name, nil),
+                          'data-1p-ignore': true,
+                          'data-lpignore': true,
+                          class: 'w-1/2 p-2 rounded-md' %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= config_form.label :db_user, "User", class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+          PostgreSQL database user, random if not provided
+        </span>
+      </div>
+
+      <%= config_form.text_field :db_user,
+                          value: dependency_instance.configs.fetch(:db_user, nil),
+                          'data-1p-ignore': true,
+                          'data-lpignore': true,
+                          class: 'w-1/2 p-2 rounded-md' %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= config_form.label :disk, "Disk Space", class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+          Storage space in GB
+        </span>
+      </div>
+
+      <%= config_form.number_field :disk,
+                                   class: 'w-1/2 p-2 rounded-md',
+                                   placeholder: 'Disk size in GB',
+                                   required: true,
+                                   max: 10_000,
+                                   min: 1 %>
+    </div>
+
+
+  <% end %>
+
+  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+<% end %>

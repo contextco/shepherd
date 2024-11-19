@@ -29,5 +29,5 @@ class Dependency < ApplicationRecord
     info.human_visible_version(version)
   end
 
-  delegate :human_visible_name, :icon, to: :info
+  delegate :human_visible_name, :icon, :form_component, to: :info
 end
