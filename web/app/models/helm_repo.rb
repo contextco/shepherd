@@ -3,20 +3,24 @@
 class HelmRepo < ApplicationRecord
   belongs_to :project
 
-  has_many :helm_users, dependent: :destroy
+  has_one :helm_user, dependent: :destroy
   validates :name, presence: true
+
+  def repo_name
+    # name is not necessarily unique so we need to include the user name which is SecureRandom
+    "#{name}-#{helm_user.name}"
+  end
 
   def add_repo_command
     # helm command to add repo
-    command = "helm repo add #{name} #{base_url}/repo/#{name} --username #{helm_users.first.name} --password #{helm_users.first.password}"
+    command = "helm repo add #{name} #{base_url}/repo/#{name} --username #{helm_user.name} --password #{helm_user.password}"
     command = "#{command} --insecure-skip-tls-verify" if Rails.env.development? || Rails.env.test?
 
     command
   end
 
-  def pull_chart_command(service:)
-    # eventually this will only expose the main chart and not individual chart but for now we can expose any service
-    "helm pull #{name}/#{service.name} --untar"
+  def pull_chart_command
+    "helm pull #{name}/#{project.name} --untar"
   end
 
   def install_chart_command(version:)
@@ -26,11 +30,11 @@ class HelmRepo < ApplicationRecord
   end
 
   def valid_credentials?(name, password)
-    helm_users.exists?(name:, password:)
+    helm_user.name == name && helm_user.password == password
   end
 
   def index_yaml
-    bucket.file("#{name}/index.yaml")
+    bucket.file("#{repo_name}/index.yaml")
   end
 
   def client_values_yaml(version:)
@@ -38,7 +42,7 @@ class HelmRepo < ApplicationRecord
   end
 
   def file_yaml(filename)
-    bucket.file("#{name}/#{filename}")
+    bucket.file("#{repo_name}/#{filename}")
   end
 
   private
