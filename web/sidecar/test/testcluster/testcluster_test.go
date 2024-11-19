@@ -26,7 +26,7 @@ func TestClusterOperations(t *testing.T) {
 	}
 
 	// Test create
-	if err := cluster.create(ctx); err != nil {
+	if err := cluster.impl.create(ctx); err != nil {
 		t.Fatalf("failed to create cluster: %v", err)
 	}
 
