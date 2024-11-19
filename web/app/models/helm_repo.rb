@@ -14,9 +14,9 @@ class HelmRepo < ApplicationRecord
     command
   end
 
-  def pull_chart_command(service:)
+  def pull_chart_command
     # eventually this will only expose the main chart and not individual chart but for now we can expose any service
-    "helm pull #{name}/#{service.name} --untar"
+    "helm pull #{name}/#{project.name} --untar"
   end
 
   def install_chart_command(version:)

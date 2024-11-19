@@ -17,7 +17,7 @@ RSpec.describe HelmRepo do
 
   describe '#pull_chart_command' do
     it 'returns the correct command' do
-      expect(helm_repo.pull_chart_command(service:)).to eq("helm pull test-repo/test-service --untar")
+      expect(helm_repo.pull_chart_command).to eq("helm pull test-repo/another-one --untar")
     end
   end
 
