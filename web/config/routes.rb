@@ -39,7 +39,7 @@ Rails.application.routes.draw do
                 shallow: true,
                 as: :project_services
 
-      resources :dependencies, only: [ :new, :create, :destroy, :edit, :update ], shallow: true
+      resources :dependencies, only: [ :index, :new, :create, :destroy, :edit, :update ], shallow: true
     end
   end
 

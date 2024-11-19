@@ -1,0 +1,43 @@
+<%= render layout: 'layouts/project' do %>
+  <div class="text-lg">Add a dependency</div>
+  <div class="flex flex-col gap-4">
+    <% if @dependencies.blank? %>
+      <div class="text-md">No dependencies eligible to be added.</div>
+    <% end %>
+    <% @dependencies.each do |dep| %>
+      <%= form_with model: @dependency, url: version_dependencies_path, class: 'border p-8 rounded-md flex flex-col gap-4' do |form| %>
+        <div class="flex items-baseline gap-4">
+          <div class="size-5 text-stone-600"><%= heroicon dep.icon, class: 'w-full' %></div>
+          <div class="flex flex-col gap-1 grow">
+            <div class="text-lg font-semibold capitalize"><%= dep.human_visible_name %></div>
+            <div class="text-stone-600 mb-2"><%= dep.description %></div>
+            <div class="flex justify-between items-center">
+              <div class="left text-sm">
+                <% if dep.variants.size > 1 %>
+                  <%= form.collection_select :version,
+                                             dep.variants.sort_by(&:version).reverse,
+                                             :version,
+                                             -> (v) { "Version #{v.human_visible_version}" },
+                                             {},
+                                             class: 'rounded-md py-1 pr-8 text-sm' %>
+                <% else %>
+                  <%= form.hidden_field :version, value: dep.variants.first.version  %>
+                  <div class="font-medium">
+                    Version <%= dep.variants.first.human_visible_version %>
+                  </div>
+                <% end %>
+              </div>
+              <div class="">
+                <%= form.hidden_field :name, value: dep.name %>
+                <%= form.hidden_field :repo_url, value: dep.repository %>
+                <%= form.button :submit, class: 'border rounded-md shadow-sm text-sm px-2 py-1 border-stone-400' do %>
+                  Add ->
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
