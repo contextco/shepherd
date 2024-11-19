@@ -12,22 +12,22 @@ import (
 //go:embed all:templates
 var template embed.FS
 
-func NewServiceChart() (*Chart, error) {
+func NewServiceChart() (*ServiceChart, error) {
 	template, err := loadTemplate("templates/service")
 	if err != nil {
 		return nil, fmt.Errorf("error getting canonical template: %w", err)
 	}
 
-	return New(template, &Params{}), nil
+	return &ServiceChart{Chart: &Chart{template: template, params: &Params{}}}, nil
 }
 
-func NewParentChart() (*Chart, error) {
+func NewParentChart() (*ParentChart, error) {
 	template, err := loadTemplate("templates/parent")
 	if err != nil {
 		return nil, fmt.Errorf("error getting canonical template: %w", err)
 	}
 
-	return New(template, &Params{}), nil
+	return &ParentChart{Chart: &Chart{template: template, params: &Params{}}}, nil
 }
 
 func loadTemplate(dir string) (*Template, error) {

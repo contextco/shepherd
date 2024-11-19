@@ -19,10 +19,6 @@ var ValidationError = errors.New("chart validation error")
 type Chart struct {
 	template *Template
 	params   *Params
-
-	parent               *Chart
-	localDependencies    []*Chart
-	externalDependencies []*ExternalChart
 }
 
 type ExternalChart struct {
@@ -36,33 +32,45 @@ type ChartArchive struct {
 	Data []byte
 }
 
-func LoadFromArchive(archive *ChartArchive, params *Params) (*Chart, error) {
-	chart, err := loader.LoadArchive(bytes.NewReader(archive.Data))
-	if err != nil {
-		return nil, fmt.Errorf("failed to load chart from archive: %w", err)
-	}
+type ParentChart struct {
+	*Chart
 
-	parent := &Chart{template: &Template{chart: chart}, params: params}
-
-	for _, dep := range chart.Dependencies() {
-		parent.AddService(&Chart{template: &Template{chart: dep}, params: &Params{}})
-	}
-
-	return parent, nil
+	services     []*ServiceChart
+	externalDeps []*ExternalChart
 }
 
-func (c *Chart) AddService(service *Chart) {
-	c.localDependencies = append(c.localDependencies, service)
-	service.parent = c
-	c.template.chart.AddDependency(service.template.chart)
-	c.template.chart.Metadata.Dependencies = append(c.template.chart.Metadata.Dependencies, &chart.Dependency{
+func (pc *ParentChart) AddService(service *ServiceChart) {
+	pc.services = append(pc.services, service)
+	service.parent = pc
+	pc.template.chart.AddDependency(service.template.chart)
+	pc.template.chart.Metadata.Dependencies = append(pc.template.chart.Metadata.Dependencies, &chart.Dependency{
 		Name:    service.template.chart.Metadata.Name,
 		Version: service.template.chart.Metadata.Version,
 	})
 }
 
-func (c *Chart) AddExternalDependency(name, version, repositoryURL string) {
-	c.externalDependencies = append(c.externalDependencies, &ExternalChart{
+type ServiceChart struct {
+	*Chart
+	parent *ParentChart
+}
+
+func LoadFromArchive(archive *ChartArchive, params *Params) (*ParentChart, error) {
+	chart, err := loader.LoadArchive(bytes.NewReader(archive.Data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load chart from archive: %w", err)
+	}
+
+	parent := &ParentChart{Chart: &Chart{template: &Template{chart: chart}, params: params}}
+
+	for _, dep := range chart.Dependencies() {
+		parent.AddService(&ServiceChart{Chart: &Chart{template: &Template{chart: dep}, params: &Params{}}})
+	}
+
+	return parent, nil
+}
+
+func (c *ParentChart) AddExternalDependency(name, version, repositoryURL string) {
+	c.externalDeps = append(c.externalDeps, &ExternalChart{
 		Name:    name,
 		Version: version,
 		URL:     repositoryURL,
@@ -74,13 +82,9 @@ func (c *Chart) AddExternalDependency(name, version, repositoryURL string) {
 	})
 }
 
-func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
-	if c.parent != nil {
-		return c.params.ClientFacingValuesFile()
-	}
-
+func (c *ParentChart) ClientFacingValuesFile() (*values.File, error) {
 	vs := values.Empty()
-	for _, dep := range c.localDependencies {
+	for _, dep := range c.services {
 		if _, ok := vs.Values[dep.Name()]; ok {
 			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
 		}
@@ -94,6 +98,10 @@ func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
 	}
 
 	return vs, nil
+}
+
+func (sc *ServiceChart) ClientFacingValuesFile() (*values.File, error) {
+	return sc.params.ClientFacingValuesFile()
 }
 
 func (c *Chart) ReleaseName() string {
@@ -132,13 +140,9 @@ func (c *Chart) Archive() (*ChartArchive, error) {
 	return &ChartArchive{Name: filepath.Base(archivePath), Data: archive}, nil
 }
 
-func (c *Chart) Values() (*values.File, error) {
-	vs, err := c.params.toValues()
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert params to helm values: %w", err)
-	}
-
-	for _, dep := range c.localDependencies {
+func (c *ParentChart) Values() (*values.File, error) {
+	vs := values.Empty()
+	for _, dep := range c.services {
 		if _, ok := vs.Values[dep.template.chart.Name()]; ok {
 			return nil, fmt.Errorf("dependency %s already has values", dep.template.chart.Name())
 		}
@@ -149,13 +153,27 @@ func (c *Chart) Values() (*values.File, error) {
 	return vs, nil
 }
 
-func (c *Chart) Validate() error {
+func (sc *ServiceChart) Values() (*values.File, error) {
+	return sc.params.toValues()
+}
+
+func (c *ParentChart) Validate() error {
 	vs, err := c.Values()
 	if err != nil {
-		return fmt.Errorf("failed to convert params to helm values: %w", err)
+		return fmt.Errorf("failed to get values: %w", err)
 	}
 
-	if err := chartutil.ValidateAgainstSchema(c.template.chart, vs.Values); err != nil {
+	for _, dep := range c.services {
+		if err := dep.Validate(vs); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Chart) Validate(values *values.File) error {
+	if err := chartutil.ValidateAgainstSchema(c.template.chart, values.Values); err != nil {
 		return fmt.Errorf("%w: %s", ValidationError, err.Error())
 	}
 
@@ -166,15 +184,9 @@ func (c *Chart) KubeChart() *chart.Chart {
 	return c.template.chart
 }
 
-func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
-	chart, err := c.template.ApplyParams(params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to apply params: %w", err)
-	}
-
-	chart.params = params
-
-	return chart, nil
+func (c *Chart) ApplyParams(params *Params) error {
+	c.params = params
+	return c.template.ApplyParams(params)
 }
 
 func New(template *Template, params *Params) *Chart {

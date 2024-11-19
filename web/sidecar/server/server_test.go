@@ -168,10 +168,10 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			if err := cluster.Install(ctx, c); err != nil {
+			if err := cluster.Install(ctx, c.Chart); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
-			defer cluster.Uninstall(ctx, c)
+			defer cluster.Uninstall(ctx, c.Chart)
 
 			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
 				return strings.Contains(pod.Name, "test-service") && pod.Status.Phase == corev1.PodRunning

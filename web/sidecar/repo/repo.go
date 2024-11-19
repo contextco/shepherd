@@ -22,7 +22,7 @@ type Client struct {
 	store   RepoStore
 }
 
-func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error {
+func (c *Client) Add(ctx context.Context, chart *chart.ParentChart, repo string) error {
 	chartArchive, err := c.upload(ctx, chart, repo)
 	if err != nil {
 		return fmt.Errorf("failed to upload chart: %w", err)
@@ -39,7 +39,7 @@ func (c *Client) Add(ctx context.Context, chart *chart.Chart, repo string) error
 	return nil
 }
 
-func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, objectName string, chart *chart.Chart) error {
+func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, objectName string, chart *chart.ParentChart) error {
 	valuesFile, err := chart.ClientFacingValuesFile()
 	if err != nil {
 		return fmt.Errorf("failed to get client facing values file: %w", err)
@@ -59,7 +59,7 @@ func (c *Client) ensureClientFacingValuesFile(ctx context.Context, repo string, 
 	return nil
 }
 
-func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Chart, archive *ChartArchive) error {
+func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.ParentChart, archive *ChartArchive) error {
 	repoExists, err := c.store.Exists(ctx, filepath.Join(repo, indexFileName))
 	if err != nil {
 		return fmt.Errorf("failed to check if index file exists: %w", err)
@@ -73,7 +73,7 @@ func (c *Client) ensureIndex(ctx context.Context, repo string, chart *chart.Char
 		}
 	}
 
-	indexFile.Add(chart, archive)
+	indexFile.Add(chart.Chart, archive)
 
 	indexFileBytes, err := indexFile.Bytes()
 	if err != nil {
@@ -97,7 +97,7 @@ func (c *Client) loadIndexFile(ctx context.Context, repo string) (*indexFile, er
 	return indexFile, nil
 }
 
-func (c *Client) upload(ctx context.Context, chart *chart.Chart, repo string) (*ChartArchive, error) {
+func (c *Client) upload(ctx context.Context, chart *chart.ParentChart, repo string) (*ChartArchive, error) {
 	archive, err := chart.Archive()
 	if err != nil {
 		return nil, fmt.Errorf("failed to archive chart: %w", err)
