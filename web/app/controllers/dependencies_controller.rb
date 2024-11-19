@@ -1,10 +1,12 @@
 class DependenciesController < ApplicationController
   before_action :set_app
-  def new; end
+  def new
+    @dependency_info = Chart::Dependency.from_name!(params[:name])
+    @dependency_instance = @version.dependencies.build
+  end
 
   def index
     @dependencies = @version.eligible_dependencies
-    @dependency = @version.dependencies.build
   end
 
   def create
@@ -29,7 +31,7 @@ class DependenciesController < ApplicationController
   private
 
   def dependency_params
-    params.require(:dependency).permit(:name, :version, :repo_url)
+    params.require(:dependency).permit(:name, :version, :repo_url, configs: {})
   end
 
   def set_app

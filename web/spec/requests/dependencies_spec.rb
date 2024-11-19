@@ -6,8 +6,8 @@ RSpec.describe "Dependencies", type: :request do
 
   before { sign_in user }
 
-  describe "GET /new" do
-    subject { get new_version_dependency_path(version) }
+  describe "GET /index" do
+    subject { get version_dependencies_path(version) }
 
     it "returns http success" do
       subject
