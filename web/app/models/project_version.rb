@@ -60,6 +60,6 @@ class ProjectVersion < ApplicationRecord
   end
 
   def client_values_yaml_path
-    "#{project.name}/#{project.name}-#{version}-values.yaml"
+    "#{helm_repo.repo_name}/#{project.name}-#{version}-values.yaml"
   end
 end
