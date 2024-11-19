@@ -1,29 +1,40 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "86e784c6ba5872a4c4482bbb2c10afa24d913e8e1b79070026ea8337ae9fe75d",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/helm/repo_controller.rb",
-      "line": 24,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).signed_url(:version => :v4, :expires => 300, :query => ({ \"response-content-disposition\" => (\"attachment; filename=#{sanitize_filename(params[:filename])}\"), \"response-content-type\" => \"application/x-tar\" })), :allow_other_host => true, :status => :temporary_redirect)",
-      "render_path": null,
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "e8f1ffbd84fbf7850f86c2954b9813b9894840200236a7cf4280b42c3d1586f0",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/dependencies/new.html.erb",
+      "line": 9,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(action => Chart::Dependency.from_name!(params[:name]).form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.build, :dependency_info => Chart::Dependency.from_name!(params[:name])), {})",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "DependenciesController",
+          "method": "new",
+          "line": 6,
+          "file": "app/controllers/dependencies_controller.rb",
+          "rendered": {
+            "name": "dependencies/new",
+            "file": "app/views/dependencies/new.html.erb"
+          }
+        }
+      ],
       "location": {
-        "type": "method",
-        "class": "Helm::RepoController",
-        "method": "download"
+        "type": "template",
+        "template": "dependencies/new"
       },
-      "user_input": "HelmRepo.find_by(:name => params[:repo_name]).file_yaml(sanitize_filename(params[:filename])).signed_url(:version => :v4, :expires => 300, :query => ({ \"response-content-disposition\" => (\"attachment; filename=#{sanitize_filename(params[:filename])}\"), \"response-content-type\" => \"application/x-tar\" }))",
+      "user_input": "params[:name]",
       "confidence": "Weak",
       "cwe_id": [
-        601
+        22
       ],
       "note": ""
     }
   ],
-  "updated": "2024-11-12 11:46:29 +0000",
+  "updated": "2024-11-19 17:53:12 +0000",
   "brakeman_version": "6.2.2"
 }

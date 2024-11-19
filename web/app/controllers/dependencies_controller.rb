@@ -1,7 +1,7 @@
 class DependenciesController < ApplicationController
   before_action :set_app
   def new
-    @dependency_info = Chart::Dependency.from_name(params[:name])
+    @dependency_info = Chart::Dependency.from_name!(params[:name])
     @dependency_instance = @version.dependencies.build
   end
 
