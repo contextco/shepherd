@@ -15,6 +15,15 @@ class DependenciesController < ApplicationController
     redirect_to version_path(@version)
   end
 
+  def edit
+    @dependency = @version.dependencies.find(params[:id])
+  end
+
+  def destroy
+    @version.dependencies.find(params[:id]).destroy
+    redirect_to version_path(@version)
+  end
+
   private
 
   def dependency_params
@@ -22,7 +31,9 @@ class DependenciesController < ApplicationController
   end
 
   def set_app
-    @version = current_team.project_versions.find(params[:version_id])
+    @version = current_team.project_versions.find(params[:version_id]) if params[:version_id].present?
+    @dependency = current_team.dependencies.find(params[:id]) if params[:id].present?
+    @version ||= @dependency&.project_version
     @app = @version.project
   end
 end
