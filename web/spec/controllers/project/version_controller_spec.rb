@@ -172,10 +172,10 @@ RSpec.describe Project::VersionController, type: :controller do
     context 'when there is an attached service' do
       let!(:project_service) { create(:project_service, project_version:) }
 
-      let(:chart_publisher) { instance_double(ChartPublisher) }
+      let(:chart_publisher) { instance_double(Chart::Publisher) }
 
       before do
-        allow(ChartPublisher).to receive(:new).and_return(chart_publisher)
+        allow(Chart::Publisher).to receive(:new).and_return(chart_publisher)
         allow(chart_publisher).to receive(:publish_chart!)
       end
 
@@ -185,8 +185,8 @@ RSpec.describe Project::VersionController, type: :controller do
                 .from(false).to(true)
       end
 
-      it 'calls the ChartPublisher' do
-        expect(ChartPublisher).to receive(:new).with(project_version.rpc_chart, project_version)
+      it 'calls the Chart::Publisher' do
+        expect(Chart::Publisher).to receive(:new).with(project_version.rpc_chart, project_version)
         expect(chart_publisher).to receive(:publish_chart!)
         subject
       end
