@@ -27,12 +27,12 @@ func TestAdd_indexFileIsCreated(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
-	chart, err := parent.ApplyParams(&chart.Params{ChartName: "test-chart", ChartVersion: "1.0.0"})
+	parent, err = parent.ApplyParams(&chart.Params{ChartName: "test-chart", ChartVersion: "1.0.0"})
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
 
-	addChartToRepo(t, ctx, store, chart, "test-repo")
+	addChartToRepo(t, ctx, store, parent, "test-repo")
 
 	// Verify index file was created
 	indexExists, err := store.Exists(ctx, "test-repo/index.yaml")
@@ -92,7 +92,7 @@ func TestAdd_valuesFile(t *testing.T) {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			parent.ApplyParams(&chart.Params{
+			parent, err = parent.ApplyParams(&chart.Params{
 				ChartName:    "test-chart",
 				ChartVersion: "1.0.0",
 			})
@@ -176,7 +176,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			parent.ApplyParams(&chart.Params{
+			parent, err = parent.ApplyParams(&chart.Params{
 				ChartName:    "test-chart",
 				ChartVersion: "1.0.0",
 			})
@@ -210,7 +210,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 	}
 }
 
-func addChartToRepo(t *testing.T, ctx context.Context, store *store.MemoryStore, chart *chart.Chart, repo string) {
+func addChartToRepo(t *testing.T, ctx context.Context, store *store.MemoryStore, chart *chart.ParentChart, repo string) {
 	t.Helper()
 
 	client, err := NewClient(ctx, store, &url.URL{})
@@ -259,7 +259,7 @@ entries:
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
-	chart, err := parent.ApplyParams(&chart.Params{
+	parent, err = parent.ApplyParams(&chart.Params{
 		ChartName:    "test-chart",
 		ChartVersion: "1.0.0",
 	})
@@ -267,7 +267,7 @@ entries:
 		t.Fatalf("Failed to apply params to chart: %v", err)
 	}
 
-	if err := client.Add(ctx, chart, "test-repo"); err != nil {
+	if err := client.Add(ctx, parent, "test-repo"); err != nil {
 		t.Fatalf("Failed to add chart: %v", err)
 	}
 
