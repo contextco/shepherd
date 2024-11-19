@@ -15,8 +15,8 @@ RSpec.describe Helm::RepoController, type: :controller do
 
   before do
     allow(GCSClient).to receive(:onprem_bucket).and_return(mock_bucket)
-    allow(mock_bucket).to receive(:file).with("sidecar/index.yaml").and_return(mock_file)
-    allow(mock_bucket).to receive(:file).with("sidecar/test-0.0.1.tgz").and_return(mock_file)
+    allow(mock_bucket).to receive(:file).with("sidecar-test_user/index.yaml").and_return(mock_file)
+    allow(mock_bucket).to receive(:file).with("sidecar-test_user/test-0.0.1.tgz").and_return(mock_file)
     allow(mock_file).to receive_message_chain(:download, :string).and_return(file_content)
 
     allow(mock_file).to receive(:signed_url).with(
@@ -56,7 +56,7 @@ RSpec.describe Helm::RepoController, type: :controller do
     end
 
     it 'returns not found for invalid file' do
-      allow(mock_bucket).to receive(:file).with("sidecar/nonexistent.tgz").and_return(nil)
+      allow(mock_bucket).to receive(:file).with("sidecar-test_user/nonexistent.tgz").and_return(nil)
       get :download, params: { repo_name: "sidecar", filename: "nonexistent.tgz" }
       expect(response).to have_http_status(:not_found)
     end

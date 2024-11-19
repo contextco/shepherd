@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ChartPublisher
+class Chart::Publisher
   class ChartValidationError < StandardError; end
 
   def initialize(rpc_chart, project_version)
@@ -16,7 +16,7 @@ class ChartPublisher
     errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
     Rails.logger.info(errors) unless resp.valid
 
-    raise ChartPublisher::ChartValidationError, errors unless resp.valid
+    raise Chart::Publisher::ChartValidationError, errors unless resp.valid
   end
 
   def publish_chart!
@@ -27,6 +27,6 @@ class ChartPublisher
   private
 
   def repository_directory
-    @repository_directory ||= @project_version.helm_repo.name
+    @repository_directory ||= @project_version.helm_repo.repo_name
   end
 end
