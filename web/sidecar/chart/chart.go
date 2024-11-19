@@ -2,25 +2,16 @@ package chart
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sidecar/values"
 	"strings"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/discovery/cached/memory"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/restmapper"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var ValidationError = errors.New("chart validation error")
@@ -105,7 +96,7 @@ func (c *Chart) ClientFacingValuesFile() (*values.File, error) {
 	return vs, nil
 }
 
-func (c *Chart) releaseName() string {
+func (c *Chart) ReleaseName() string {
 	return fmt.Sprintf("%s-%s", c.params.ChartName, strings.ReplaceAll(c.params.ChartVersion, ".", "-"))
 }
 
@@ -171,47 +162,8 @@ func (c *Chart) Validate() error {
 	return nil
 }
 
-// TODO: Install + Uninstall should really be methods on cluster.
-func (c *Chart) Install(ctx context.Context, kubeConfig []byte) error {
-	if err := c.Validate(); err != nil {
-		return fmt.Errorf("failed to validate chart: %w", err)
-	}
-
-	actionConfig, err := actionConfig(kubeConfig)
-	if err != nil {
-		return fmt.Errorf("failed to initialize helm configuration: %w", err)
-	}
-
-	client := action.NewInstall(actionConfig)
-	client.Namespace = "default"
-	client.ReleaseName = c.releaseName()
-	client.Replace = true
-
-	rel, err := client.RunWithContext(ctx, c.template.chart, nil)
-	if err != nil {
-		return fmt.Errorf("failed to install chart: %w", err)
-	}
-
-	log.Printf("Successfully installed release %s", rel.Name)
-	return nil
-}
-
-func (c *Chart) Uninstall(kubeConfig []byte) error {
-	actionConfig, err := actionConfig(kubeConfig)
-	if err != nil {
-		return fmt.Errorf("failed to initialize helm configuration: %w", err)
-	}
-
-	client := action.NewUninstall(actionConfig)
-	client.IgnoreNotFound = true
-
-	_, err = client.Run(c.releaseName())
-	if err != nil {
-		return fmt.Errorf("failed to uninstall chart: %w", err)
-	}
-
-	log.Printf("Successfully uninstalled release %s", c.releaseName())
-	return nil
+func (c *Chart) KubeChart() *chart.Chart {
+	return c.template.chart
 }
 
 func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
@@ -227,86 +179,4 @@ func (c *Chart) ApplyParams(params *Params) (*Chart, error) {
 
 func New(template *Template, params *Params) *Chart {
 	return &Chart{template: template, params: params}
-}
-
-func actionConfig(kubeConfig []byte) (*action.Configuration, error) {
-	rcg, err := newRestClientGetter(kubeConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create rest client getter: %w", err)
-	}
-
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(rcg, "default", os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
-		return nil, fmt.Errorf("failed to initialize helm configuration: %w", err)
-	}
-
-	return actionConfig, nil
-}
-
-type restClientGetter struct {
-	clientConfig clientcmd.ClientConfig
-}
-
-func (r *restClientGetter) ToRESTConfig() (*rest.Config, error) {
-	return r.clientConfig.ClientConfig()
-}
-
-func (r *restClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
-	dc, err := r.ToDiscoveryClient()
-	if err != nil {
-		return nil, err
-	}
-	return restmapper.NewDeferredDiscoveryRESTMapper(dc), nil
-}
-
-func (r *restClientGetter) ToRawKubeConfigLoader() clientcmd.ClientConfig {
-	return r.clientConfig
-}
-
-func (r *restClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
-	restConfig, err := r.clientConfig.ClientConfig()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create discovery client: %w", err)
-	}
-
-	dc, err := discovery.NewDiscoveryClientForConfig(restConfig)
-	if err != nil {
-		return nil, err
-	}
-	return memory.NewMemCacheClient(dc), nil
-}
-
-func newRestClientGetter(kubeConfig []byte) (*restClientGetter, error) {
-	clientconfig, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	rawconfig, err := clientconfig.RawConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	clientconfig = clientcmd.NewDefaultClientConfig(rawconfig, &clientcmd.ConfigOverrides{})
-
-	return &restClientGetter{clientConfig: clientconfig}, nil
-}
-
-func Capabilities(kubeConfig []byte) ([]string, error) {
-	rcg, err := newRestClientGetter(kubeConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create rest client getter: %w", err)
-	}
-
-	dc, err := rcg.ToDiscoveryClient()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create discovery client: %w", err)
-	}
-
-	versions, err := action.GetVersionSet(dc)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get version set: %w", err)
-	}
-
-	return versions, nil
 }
