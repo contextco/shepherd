@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "generated/sidecar_pb";
 
+import "google/protobuf/struct.proto";
+
 package sidecar;
 
 service Sidecar {
@@ -46,6 +48,14 @@ message DependencyParams {
     string version = 2;
 
     string repository_url = 3;
+
+    repeated OverrideParams overrides = 4;
+}
+
+message OverrideParams {
+    string path = 1;
+
+    google.protobuf.Value value = 2;
 }
 
 // Next ID: 7
