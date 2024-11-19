@@ -36,7 +36,7 @@ class ProjectVersion < ApplicationRecord
 
   def publish!
     building!
-    publisher = ChartPublisher.new(rpc_chart, self)
+    publisher = Chart::Publisher.new(rpc_chart, self)
     publisher.publish_chart!
     published!
   end

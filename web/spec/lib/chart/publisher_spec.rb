@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ChartPublisher do
+RSpec.describe Chart::Publisher do
   describe '#validate_chart!' do
     let(:project) { create(:project, name: "my-testing-project") }
     let(:project_version) { create(:project_version, project:) }
@@ -35,19 +35,19 @@ RSpec.describe ChartPublisher do
         resp
       end
 
-      ChartPublisher.new(project_version.rpc_chart, project_version).validate_chart!
+      Chart::Publisher.new(project_version.rpc_chart, project_version).validate_chart!
     end
 
     context 'when chart is invalid' do
       let(:resp) { double('resp', errors: [ 'Invalid configuration' ], valid: false) }
 
       it 'raises ChartValidationError' do
-        expect { ChartPublisher.new(project_version.rpc_chart, project_version).validate_chart! }.to raise_error(ChartPublisher::ChartValidationError)
+        expect { Chart::Publisher.new(project_version.rpc_chart, project_version).validate_chart! }.to raise_error(Chart::Publisher::ChartValidationError)
       end
 
       it 'logs validation errors' do
         expect(Rails.logger).to receive(:info).with("SideCar Validation Error: Invalid configuration")
-        expect { ChartPublisher.new(project_version.rpc_chart, project_version).validate_chart! }.to raise_error(ChartPublisher::ChartValidationError)
+        expect { Chart::Publisher.new(project_version.rpc_chart, project_version).validate_chart! }.to raise_error(Chart::Publisher::ChartValidationError)
       end
     end
   end
