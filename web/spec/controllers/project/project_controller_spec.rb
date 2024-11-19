@@ -31,7 +31,7 @@ RSpec.describe Project::ProjectController, type: :controller do
 
       it 'creates a new helm user' do
         subject
-        expect(Project.last.helm_repo.helm_users.count).to eq(1)
+        expect(Project.last.helm_repo.helm_user).to be_present
       end
     end
 
