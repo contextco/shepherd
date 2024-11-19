@@ -1,6 +1,8 @@
 class DependenciesController < ApplicationController
   before_action :set_app
-  def new
+  def new; end
+
+  def index
     @dependencies = @version.eligible_dependencies
     @dependency = @version.dependencies.build
   end

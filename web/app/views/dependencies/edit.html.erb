@@ -1,0 +1,20 @@
+<div class="w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+  <div class="flex w-full justify-between">
+    <div class="flex flex-col">
+      <span class="text-xs sm:text-sm text-stone-400 font-medium">Edit Dependency</span>
+      <span class="sm:text-2xl font-medium w-fit"><%= @dependency.name %></span>
+    </div>
+  </div>
+
+
+
+  <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
+    <div class="flex flex-col gap-1">
+      <span class="font-medium text-lg">Dependency Deletion</span>
+      <span class="text-stone-400 text-sm">Once you delete a Dependency, it cannot be undone. Please be absolutely certain before proceeding.</span>
+    </div>
+    <%= button_to dependency_path(@dependency), method: :delete, class: 'flex items-center gap-2 bg-red-800 p-2 rounded-md shadow-inner' do %>
+      <span class="text-stone-200 text-sm cursor-pointer">Delete Dependency</span>
+    <% end %>
+  </div>
+</div>
