@@ -34,6 +34,7 @@ type clusterImpl interface {
 	delete(ctx context.Context) error
 	restConfig(ctx context.Context) (*rest.Config, error)
 	getKubeConfig(ctx context.Context) ([]byte, error)
+	isReusable() bool
 }
 
 func (c *Cluster) Install(ctx context.Context, ch *chart.Chart) error {
