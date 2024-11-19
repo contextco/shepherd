@@ -1,10 +1,12 @@
-<div class="w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
-  <div class="flex w-full justify-between">
-    <div class="flex flex-col">
-      <span class="text-sm text-stone-400 font-medium text-stone-100">Service <%= @version.version %></span>
-      <span class="text-2xl font-medium text-stone-700 w-fit">New Service</span>
+<%= render layout: 'layouts/project' do %>
+  <div class="w-full flex flex-col gap-14 pb-8 max-w-6xl mx-auto">
+    <div class="flex w-full justify-between">
+      <div class="flex flex-col">
+        <span class="text-sm text-stone-400 font-medium text-stone-100">Service <%= @version.version %></span>
+        <span class="text-2xl font-medium text-stone-700 w-fit">New Service</span>
+      </div>
     </div>
-  </div>
 
-  <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.empty, version: @version) %>
-</div>
+    <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.empty, version: @version) %>
+  </div>
+<% end %>
