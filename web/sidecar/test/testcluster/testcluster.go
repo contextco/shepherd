@@ -2,64 +2,59 @@ package testcluster
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/clientcmd"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Cluster represents a kind kubernetes test cluster
 type Cluster struct {
-	name       string
-	KubeConfig *os.File
+	impl clusterImpl
+}
+
+type clusterImpl interface {
+	create(ctx context.Context) error
+	delete(ctx context.Context) error
+	restConfig(ctx context.Context) (*rest.Config, error)
+	getKubeConfig(ctx context.Context) ([]byte, error)
 }
 
 // New creates a new test cluster with the given name
 func New(t *testing.T, ctx context.Context) *Cluster {
+	impl := &kindCluster{name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))} // TODO: add gke impl
 
 	cluster := &Cluster{
-		name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-")),
+		impl: impl,
 	}
 
-	_ = cluster.delete(ctx) // ignore error if cluster does not exist
+	_ = cluster.impl.delete(ctx) // ignore error if cluster does not exist
 
-	if err := cluster.create(ctx); err != nil {
+	if err := cluster.impl.create(ctx); err != nil {
 		t.Fatalf("failed to create kind cluster: %v", err)
 	}
 
-	kubeConfigFile, err := cluster.writeTempKubeConfig(ctx)
-	if err != nil {
-		t.Fatalf("failed to write temp kubeconfig: %v", err)
-	}
-
-	os.Setenv("KUBECONFIG", kubeConfigFile.Name())
-
-	cluster.KubeConfig = kubeConfigFile
-
 	t.Cleanup(func() {
-		if err := os.Remove(cluster.KubeConfig.Name()); err != nil {
-			t.Logf("failed to remove kubeconfig file: %v", err)
-		}
-		if err := cluster.delete(context.WithoutCancel(ctx)); err != nil {
+		if err := cluster.impl.delete(context.WithoutCancel(ctx)); err != nil {
 			t.Logf("failed to delete cluster: %v", err)
 		}
-		os.Unsetenv("KUBECONFIG")
 	})
 
 	return cluster
 }
 
+func (c *Cluster) KubeConfig(ctx context.Context) ([]byte, error) {
+	return c.impl.getKubeConfig(ctx)
+}
+
 func (c *Cluster) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
-	clientConfig, err := clientcmd.BuildConfigFromFlags("", c.KubeConfig.Name())
+	clientConfig, err := c.impl.restConfig(ctx)
 	if err != nil {
 		return err
 	}
@@ -95,7 +90,7 @@ func (c *Cluster) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) b
 }
 
 func (c *Cluster) Pods(ctx context.Context, selector string) ([]corev1.Pod, error) {
-	clientConfig, err := clientcmd.BuildConfigFromFlags("", c.KubeConfig.Name())
+	clientConfig, err := c.impl.restConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -111,50 +106,4 @@ func (c *Cluster) Pods(ctx context.Context, selector string) ([]corev1.Pod, erro
 	}
 
 	return pods.Items, nil
-}
-
-// Create creates a new kind cluster
-func (c *Cluster) create(ctx context.Context) error {
-	cmd := exec.CommandContext(ctx, "kind", "create", "cluster", "--name", c.name)
-	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to create kind cluster: %w\nOutput: %s", err, output)
-	}
-
-	return nil
-}
-
-// Delete deletes the kind cluster
-func (c *Cluster) delete(ctx context.Context) error {
-	cmd := exec.CommandContext(ctx, "kind", "delete", "cluster", "--name", c.name)
-	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to delete kind cluster: %w\nOutput: %s", err, output)
-	}
-	return nil
-}
-
-func (c *Cluster) getKubeConfig(ctx context.Context) (string, error) {
-	cmd := exec.CommandContext(ctx, "kind", "get", "kubeconfig", "--name", c.name)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("failed to get kind kubeconfig: %w\nOutput: %s", err, output)
-	}
-	return string(output), nil
-}
-
-func (c *Cluster) writeTempKubeConfig(ctx context.Context) (*os.File, error) {
-	kubeConfig, err := c.getKubeConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpfile, err := os.CreateTemp("", uuid.New().String())
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := tmpfile.WriteString(kubeConfig); err != nil {
-		return nil, err
-	}
-
-	return tmpfile, nil
 }
