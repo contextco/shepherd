@@ -13,6 +13,7 @@ import (
 
 	"sidecar/chart"
 	"sidecar/clock"
+	"sidecar/generated/sidecar_pb"
 	"sidecar/store"
 	"sidecar/test/testfixture"
 )
@@ -23,16 +24,12 @@ func TestAdd_indexFileIsCreated(t *testing.T) {
 	store := store.NewMemoryStore()
 
 	ctx := context.Background()
-	parent, err := chart.NewParentChart()
-	if err != nil {
-		t.Fatalf("Failed to create empty chart: %v", err)
-	}
-	chart, err := parent.ApplyParams(&chart.Params{ChartName: "test-chart", ChartVersion: "1.0.0"})
+	parent, err := chart.NewFromProto("test-chart", "1.0.0", &sidecar_pb.ChartParams{})
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
 
-	addChartToRepo(t, ctx, store, chart, "test-repo")
+	addChartToRepo(t, ctx, store, parent, "test-repo")
 
 	// Verify index file was created
 	indexExists, err := store.Exists(ctx, "test-repo/index.yaml")
@@ -87,23 +84,14 @@ func TestAdd_valuesFile(t *testing.T) {
 
 			store := store.NewMemoryStore()
 
-			parent, err := chart.NewParentChart()
+			parent, err := chart.NewFromProto("test-chart", "1.0.0", &sidecar_pb.ChartParams{})
 			if err != nil {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			parent.ApplyParams(&chart.Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
-			})
-
-			service, err := chart.NewServiceChart()
+			service, err := chart.NewServiceChartFromParams(tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create service chart: %v", err)
-			}
-			service, err = service.ApplyParams(tc.params)
-			if err != nil {
-				t.Fatalf("Failed to apply params to chart: %v", err)
 			}
 
 			parent.AddService(service)
@@ -171,23 +159,14 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 
 			store := store.NewMemoryStore()
 
-			parent, err := chart.NewParentChart()
+			parent, err := chart.NewFromProto("test-chart", "1.0.0", &sidecar_pb.ChartParams{})
 			if err != nil {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			parent.ApplyParams(&chart.Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
-			})
-
-			service, err := chart.NewServiceChart()
+			service, err := chart.NewServiceChartFromParams(tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create service chart: %v", err)
-			}
-			service, err = service.ApplyParams(tc.params)
-			if err != nil {
-				t.Fatalf("Failed to apply params to chart: %v", err)
 			}
 
 			parent.AddService(service)
@@ -210,7 +189,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 	}
 }
 
-func addChartToRepo(t *testing.T, ctx context.Context, store *store.MemoryStore, chart *chart.Chart, repo string) {
+func addChartToRepo(t *testing.T, ctx context.Context, store *store.MemoryStore, chart *chart.ParentChart, repo string) {
 	t.Helper()
 
 	client, err := NewClient(ctx, store, &url.URL{})
@@ -255,19 +234,12 @@ entries:
 		t.Fatalf("Failed to create client: %v", err)
 	}
 
-	parent, err := chart.NewParentChart()
+	parent, err := chart.NewFromProto("test-chart", "1.0.0", &sidecar_pb.ChartParams{})
 	if err != nil {
 		t.Fatalf("Failed to create empty chart: %v", err)
 	}
-	chart, err := parent.ApplyParams(&chart.Params{
-		ChartName:    "test-chart",
-		ChartVersion: "1.0.0",
-	})
-	if err != nil {
-		t.Fatalf("Failed to apply params to chart: %v", err)
-	}
 
-	if err := client.Add(ctx, chart, "test-repo"); err != nil {
+	if err := client.Add(ctx, parent, "test-repo"); err != nil {
 		t.Fatalf("Failed to add chart: %v", err)
 	}
 
