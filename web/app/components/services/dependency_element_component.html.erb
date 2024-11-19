@@ -1,0 +1,25 @@
+<li class="grid items-stretch">
+  <%= link_to edit_dependency_path(dependency),
+              class: "w-full border border-solid border-stone-400 p-4 duration-200 flex flex-col gap-4 #{enabled? ? 'cursor-pointer hover:bg-stone-50' : 'cursor-not-allowed opacity-70'}",
+              style: enabled? ? nil : 'pointer-events: none' do %>
+    <div class="flex justify-between items-center">
+      <h6 class="flex items-center gap-2">
+        <%= heroicon dependency.icon, class: 'size-4' %>
+        <%= dependency.name %>
+      </h6>
+      <div class="font-mono text-xs">
+        v<%= dependency.human_visible_version %>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 h-7">
+      <div class="p-1 bg-stone-100 border rounded-md px-2 font-mono text-xs flex items-center gap-2">
+        <%= heroicon 'cpu-chip', class: 'size-4' %>
+        <span>
+          <%#= pluralize(service.cpu_cores.to_i, 'core') %>
+          <span class="text-stone-400">|</span>
+          <%#= number_to_human_size(service.memory_bytes) %>
+        </span>
+      </div>
+    </div>
+  <% end %>
+</li>

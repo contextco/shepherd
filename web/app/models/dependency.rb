@@ -1,6 +1,8 @@
 class Dependency < ApplicationRecord
   validate :name_is_known, :version_is_known, :repo_url_is_known
 
+  belongs_to :project_version
+
   def name_is_known
     return if info.present?
 
@@ -21,6 +23,10 @@ class Dependency < ApplicationRecord
 
   def info
     @info ||= Chart::Dependency.from_name(name)
+  end
+
+  def human_visible_version
+    info.human_visible_version(version)
   end
 
   delegate :human_visible_name, :icon, to: :info
