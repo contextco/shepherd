@@ -159,7 +159,11 @@ func NewServiceChartFromParams(params *Params) (*ServiceChart, error) {
 		return nil, fmt.Errorf("error getting service chart: %w", err)
 	}
 
-	return c.ApplyParams(params)
+	if err := c.ApplyParams(params); err != nil {
+		return nil, fmt.Errorf("error applying params to service chart: %w", err)
+	}
+
+	return c, nil
 }
 
 func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentChart, error) {
@@ -168,11 +172,10 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 		return nil, fmt.Errorf("error getting parent chart: %w", err)
 	}
 
-	parentChart, err = parentChart.ApplyParams(&Params{
+	if err := parentChart.ApplyParams(&Params{
 		ChartName:    name,
 		ChartVersion: version,
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, fmt.Errorf("error applying params to parent chart: %w", err)
 	}
 

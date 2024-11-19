@@ -15,7 +15,7 @@ func (t *Template) Validate() error {
 	return t.chart.Validate()
 }
 
-func (t *Template) ApplyParams(params *Params) (*Chart, error) {
+func (t *Template) ApplyParams(params *Params) error {
 	t.chart.Metadata.Name = params.ChartName
 	t.chart.Metadata.Version = params.ChartVersion
 
@@ -23,12 +23,12 @@ func (t *Template) ApplyParams(params *Params) (*Chart, error) {
 		if file.Name == chartutil.ValuesfileName {
 			values, err := params.toYaml()
 			if err != nil {
-				return nil, fmt.Errorf("failed to convert params to helm values: %w", err)
+				return fmt.Errorf("failed to convert params to helm values: %w", err)
 			}
 
 			file.Data = []byte(values)
 		}
 	}
 
-	return &Chart{template: t, params: params}, nil
+	return nil
 }
