@@ -19,10 +19,10 @@ class HelmRepo < ApplicationRecord
     "helm pull #{name}/#{service.name} --untar"
   end
 
-  def install_chart_command(service:)
-    version = service.project_version
-    version_version = service.project_version.version
-    "helm install -f #{version.client_yaml_filename} #{service.name} #{name}/#{service.name} --version #{version_version}"
+  def install_chart_command(version:)
+    version_version = version.version
+    project_name = project.name
+    "helm install -f #{version.client_yaml_filename} #{project_name} #{name}/#{project_name} --version #{version_version}"
   end
 
   def valid_credentials?(name, password)

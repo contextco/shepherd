@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe HelmRepo do
-  let(:project) { helm_repo.project }
+  let(:project) { create(:project, name: 'another-one') }
   let(:project_version) { create(:project_version, project:) }
-  let(:helm_repo) { create(:helm_repo, name: 'test-repo') }
+  let(:helm_repo) { create(:helm_repo, name: 'test-repo', project:) }
   let!(:helm_user) { create(:helm_user, helm_repo:, name: 'test-user', password: 'test-password') }
   let!(:service) { create(:project_service, name: 'test-service', project_version:) }
 
@@ -23,7 +23,7 @@ RSpec.describe HelmRepo do
 
   describe '#install_chart_command' do
     it 'returns the correct command' do
-      expect(helm_repo.install_chart_command(service:)).to eq("helm install -f values-#{project_version.version}.yaml test-service test-repo/test-service --version #{project_version.version}")
+      expect(helm_repo.install_chart_command(version: project_version)).to eq("helm install -f values-#{project_version.version}.yaml another-one test-repo/another-one --version #{project_version.version}")
     end
   end
 end
