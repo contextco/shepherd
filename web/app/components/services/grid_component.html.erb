@@ -12,9 +12,9 @@
             Add Service
           <% end %>
         </div>
-        <% if Flipper.enabled?(:dependencies) && project.eligible_dependencies.present? %>
+        <% if project_version.eligible_dependencies.present? %>
           <div class="flex items-center">
-            <%= link_to new_version_dependency_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
+            <%= link_to version_dependencies_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
               <%= heroicon 'squares-plus', class: 'size-4' %>
               Add Dependency
             <% end %>
@@ -23,7 +23,7 @@
       </div>
     </div>
   </div>
-  <% if services.empty? %>
+  <% if services.empty? && dependencies.empty? %>
     <div class="flex items-center justify-center h-48 border border-stone-300">
       <div class="text-stone-500">Services will be visible here when created.</div>
     </div>
@@ -32,26 +32,9 @@
       <% services.each do |service| %>
         <%= render Services::ElementComponent.new(service:, version: project_version) %>
       <% end %>
-    </ul>
-  <% end %>
 
-</div>
-
-<div class="relative z-10 flex flex-col gap-6">
-  <div class="flex flex-col gap-1">
-    <div class="flex items-center space-x-2 justify-between">
-      <div class="font-semibold">Dependencies</div>
-    </div>
-  </div>
-  <% if dependencies.present? %>
-    <ul class="flex flex-col gap-4">
-      <% dependencies.each do |dep| %>
-        <li class="border p-4 font-medium flex items-center gap-2">
-          <%= heroicon dep.icon, class: 'w-4' %>
-          <span class="capitalize">
-          <%= dep.human_visible_name %>
-          </span>
-        </li>
+      <% dependencies.each do |dependency| %>
+        <%= render Services::DependencyElementComponent.new(dependency:, version: project_version) %>
       <% end %>
     </ul>
   <% end %>

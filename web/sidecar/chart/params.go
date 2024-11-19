@@ -153,7 +153,7 @@ func (p *Params) toValues() (*values.File, error) {
 	}, nil
 }
 
-func NewServiceChartFromParams(params *Params) (*Chart, error) {
+func NewServiceChartFromParams(params *Params) (*ServiceChart, error) {
 	c, err := NewServiceChart()
 	if err != nil {
 		return nil, fmt.Errorf("error getting service chart: %w", err)
@@ -162,7 +162,7 @@ func NewServiceChartFromParams(params *Params) (*Chart, error) {
 	return c.ApplyParams(params)
 }
 
-func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*Chart, error) {
+func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentChart, error) {
 	parentChart, err := NewParentChart()
 	if err != nil {
 		return nil, fmt.Errorf("error getting parent chart: %w", err)

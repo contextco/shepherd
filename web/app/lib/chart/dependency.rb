@@ -15,6 +15,10 @@ class Chart::Dependency
     super || name
   end
 
+  def human_visible_version(version)
+    variants.find { |v| v.version == version }&.human_visible_version || version
+  end
+
   class Variant
     include ActiveModel::Model
     include ActiveModel::Attributes
