@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe ProjectVersion do
   let(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
+  let(:helm_repo) { project.helm_repo }
+  let!(:helm_user) { create(:helm_user, name: 'test-user', password: 'test-password', helm_repo:) }
   let!(:service) do
     create(:project_service,
            project_version:,
@@ -23,15 +25,14 @@ RSpec.describe ProjectVersion do
   let(:mock_client) { double(:sidecar_client) }
 
   before do
+    helm_repo.update!(name: 'test-repo')
     allow(SidecarClient).to receive(:client).and_return(mock_client)
   end
 
   describe '#publish!' do
-    let(:helm_repo) { create(:helm_repo, name: 'test-repo') }
     let(:response) { double('Response') }
 
     before do
-      allow(project_version).to receive(:helm_repo).and_return(helm_repo)
       allow(mock_client).to receive(:send)
         .with(:publish_chart, kind_of(Sidecar::PublishChartRequest))
         .and_return(response)
@@ -43,7 +44,7 @@ RSpec.describe ProjectVersion do
         expect(request.chart.name).to eq('my-testing-project')
         expect(request.chart.version).to eq(project_version.version)
         expect(request.chart.services.first.replica_count).to eq(1)
-        expect(request.repository_directory).to eq('test-repo')
+        expect(request.repository_directory).to eq('test-repo-test-user')
         expect(request.chart.services.first.endpoints).to contain_exactly(
           have_attributes(port: 80),
           have_attributes(port: 443)
@@ -56,7 +57,7 @@ RSpec.describe ProjectVersion do
 
     it 'includes correct helm repo name in request' do
       expect(mock_client).to receive(:send) do |_, request|
-        expect(request.repository_directory).to eq(helm_repo.name)
+        expect(request.repository_directory).to eq(helm_repo.repo_name)
         response
       end
 
@@ -107,7 +108,7 @@ RSpec.describe ProjectVersion do
 
   describe '#client_values_yaml_path' do
     it 'returns the correct path' do
-      expect(project_version.client_values_yaml_path).to eq("my-testing-project/my-testing-project-#{project_version.version}-values.yaml")
+      expect(project_version.client_values_yaml_path).to eq("test-repo-test-user/my-testing-project-#{project_version.version}-values.yaml")
     end
   end
 end

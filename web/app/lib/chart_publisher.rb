@@ -27,6 +27,6 @@ class ChartPublisher
   private
 
   def repository_directory
-    @repository_directory ||= @project_version.helm_repo.name
+    @repository_directory ||= @project_version.helm_repo.repo_name
   end
 end

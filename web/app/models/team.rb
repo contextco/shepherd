@@ -18,9 +18,9 @@ class Team < ApplicationRecord
         state: :draft
       )
       repo = app.create_helm_repo!(name: app.name)
-      repo.helm_users.create!(
-        name: "#{name}-user",
-        password: SecureRandom.hex(16)
+      repo.create_helm_user!(
+        name: SecureRandom.urlsafe_base64(10),
+        password: SecureRandom.urlsafe_base64(16)
       )
 
       version
