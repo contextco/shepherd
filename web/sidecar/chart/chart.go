@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
 	"strings"
 
@@ -22,9 +23,10 @@ type Chart struct {
 }
 
 type ExternalChart struct {
-	Name    string
-	Version string
-	URL     string
+	Name      string
+	Version   string
+	URL       string
+	Overrides []*values.Override
 }
 
 type ChartArchive struct {
@@ -69,16 +71,22 @@ func LoadFromArchive(archive *ChartArchive, params *Params) (*ParentChart, error
 	return parent, nil
 }
 
-func (c *ParentChart) AddExternalDependency(name, version, repositoryURL string) {
+func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.DependencyParams) {
+	overrides := []*values.Override{}
+	for _, o := range proto.GetOverrides() {
+		overrides = append(overrides, &values.Override{Path: o.GetPath(), Value: o.GetValue().AsInterface()})
+	}
+
 	c.externalDeps = append(c.externalDeps, &ExternalChart{
-		Name:    name,
-		Version: version,
-		URL:     repositoryURL,
+		Name:      proto.GetName(),
+		Version:   proto.GetVersion(),
+		URL:       proto.GetRepositoryUrl(),
+		Overrides: overrides,
 	})
 	c.template.chart.Metadata.Dependencies = append(c.template.chart.Metadata.Dependencies, &chart.Dependency{
-		Name:       name,
-		Version:    version,
-		Repository: repositoryURL,
+		Name:       proto.GetName(),
+		Version:    proto.GetVersion(),
+		Repository: proto.GetRepositoryUrl(),
 	})
 }
 
@@ -148,6 +156,14 @@ func (c *ParentChart) Values() (*values.File, error) {
 		}
 
 		vs.Values[dep.template.chart.Name()] = values.Empty().Values
+	}
+
+	for _, dep := range c.externalDeps {
+		for _, o := range dep.Overrides {
+			if err := vs.ApplyOverride(o); err != nil {
+				return nil, fmt.Errorf("failed to apply override %s: %w", o.Path, err)
+			}
+		}
 	}
 
 	return vs, nil
