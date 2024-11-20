@@ -18,8 +18,9 @@ import (
 var ValidationError = errors.New("chart validation error")
 
 type Chart struct {
+	name     string
+	version  string
 	template *Template
-	params   *Params
 }
 
 type ExternalChart struct {
@@ -41,7 +42,7 @@ type ParentChart struct {
 	externalDeps []*ExternalChart
 }
 
-func (pc *ParentChart) AddService(service *ServiceChart) {
+func (pc *ParentChart) AddService(service *ServiceChart) error {
 	pc.services = append(pc.services, service)
 	service.parent = pc
 	pc.template.chart.AddDependency(service.template.chart)
@@ -49,29 +50,38 @@ func (pc *ParentChart) AddService(service *ServiceChart) {
 		Name:    service.template.chart.Metadata.Name,
 		Version: service.template.chart.Metadata.Version,
 	})
+
+	return pc.SyncValues()
 }
 
 type ServiceChart struct {
 	*Chart
 	parent *ParentChart
+	params *Params
 }
 
-func LoadFromArchive(archive *ChartArchive, params *Params) (*ParentChart, error) {
+func LoadFromArchive(archive *ChartArchive) (*ParentChart, error) {
 	chart, err := loader.LoadArchive(bytes.NewReader(archive.Data))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load chart from archive: %w", err)
 	}
 
-	parent := &ParentChart{Chart: &Chart{template: &Template{chart: chart}, params: params}}
+	parent := &ParentChart{Chart: &Chart{name: chart.Metadata.Name, version: chart.Metadata.Version, template: &Template{chart: chart}}}
 
 	for _, dep := range chart.Dependencies() {
-		parent.AddService(&ServiceChart{Chart: &Chart{template: &Template{chart: dep}, params: &Params{}}})
+		s, err := NewServiceChart(dep.Metadata.Name, dep.Metadata.Version, &Params{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create service chart for dependency %s: %w", dep.Metadata.Name, err)
+		}
+		if err := parent.AddService(s); err != nil {
+			return nil, fmt.Errorf("failed to add service chart for dependency %s: %w", dep.Metadata.Name, err)
+		}
 	}
 
 	return parent, nil
 }
 
-func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.DependencyParams) {
+func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.DependencyParams) error {
 	overrides := []*values.Override{}
 	for _, o := range proto.GetOverrides() {
 		overrides = append(overrides, &values.Override{Path: o.GetPath(), Value: o.GetValue().AsInterface()})
@@ -88,6 +98,8 @@ func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.Dependenc
 		Version:    proto.GetVersion(),
 		Repository: proto.GetRepositoryUrl(),
 	})
+
+	return c.SyncValues()
 }
 
 func (c *ParentChart) ClientFacingValuesFile() (*values.File, error) {
@@ -113,22 +125,26 @@ func (sc *ServiceChart) ClientFacingValuesFile() (*values.File, error) {
 }
 
 func (c *Chart) ReleaseName() string {
-	return fmt.Sprintf("%s-%s", c.params.ChartName, strings.ReplaceAll(c.params.ChartVersion, ".", "-"))
+	return fmt.Sprintf("%s-%s", c.name, strings.ReplaceAll(c.version, ".", "-"))
 }
 
 func (c *Chart) Name() string {
-	return c.params.ChartName
+	return c.name
 }
 
 func (c *Chart) Version() string {
-	return c.params.ChartVersion
+	return c.version
 }
 
 func (c *Chart) Metadata() *chart.Metadata {
 	return c.template.chart.Metadata
 }
 
-func (c *Chart) Archive() (*ChartArchive, error) {
+func (c *ParentChart) Archive() (*ChartArchive, error) {
+	if err := c.SyncValues(); err != nil {
+		return nil, fmt.Errorf("failed to sync values: %w", err)
+	}
+
 	dir, err := os.MkdirTemp("", "chart-archive")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create temp dir: %w", err)
@@ -200,11 +216,36 @@ func (c *Chart) KubeChart() *chart.Chart {
 	return c.template.chart
 }
 
-func (c *Chart) ApplyParams(params *Params) error {
-	c.params = params
-	return c.template.ApplyParams(params)
+func (c *ParentChart) SyncValues() error {
+	c.template.chart.Metadata.Name = c.name
+	c.template.chart.Metadata.Version = c.version
+
+	for _, dep := range c.services {
+		if err := dep.SyncValues(); err != nil {
+			return fmt.Errorf("failed to sync values for dependency %s: %w", dep.template.chart.Name(), err)
+		}
+	}
+
+	vals, err := c.Values()
+	if err != nil {
+		return fmt.Errorf("failed to get values: %w", err)
+	}
+
+	return c.template.SetValues(vals)
 }
 
-func New(template *Template, params *Params) *Chart {
-	return &Chart{template: template, params: params}
+func (c *ServiceChart) SyncValues() error {
+	vals, err := c.Values()
+	if err != nil {
+		return fmt.Errorf("failed to get values: %w", err)
+	}
+
+	c.template.chart.Metadata.Name = c.name
+	c.template.chart.Metadata.Version = c.version
+
+	return c.template.SetValues(vals)
+}
+
+func New(name, version string, template *Template) *Chart {
+	return &Chart{name: name, version: version, template: template}
 }
