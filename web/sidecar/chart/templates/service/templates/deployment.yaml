@@ -20,6 +20,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "test.serviceAccountName" . }}
+      {{- if and .Values.initConfig (gt (len .Values.initConfig.initCommands) 0) }}
+      initContainers:
+        {{- range .Values.initConfig.initCommands }}
+        - name: {{ .name }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}"
+          command: {{ .command }}
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

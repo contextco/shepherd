@@ -3,6 +3,7 @@ image:
   tag: latest
 ingress:
   enabled: false
+initConfig: {}
 replicaCount: 1
 resources:
   limits:

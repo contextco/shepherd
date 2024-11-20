@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"sidecar/store"
@@ -35,6 +36,15 @@ func verifyDataAgainstFixture(t *testing.T, gotData []byte, path string) error {
 		if err := os.WriteFile(fixturePath, gotData, 0644); err != nil {
 			return err
 		}
+	}
+
+	override := os.Getenv("UPDATE_FIXTURES")
+	if override == "true" {
+		log.Printf("Updating fixture for %s", path)
+		if err := os.WriteFile(fixturePath, gotData, 0644); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	fixture, err := os.ReadFile(fixturePath)

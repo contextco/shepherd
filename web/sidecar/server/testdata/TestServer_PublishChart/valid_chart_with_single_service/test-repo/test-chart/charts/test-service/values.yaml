@@ -1,8 +1,13 @@
 image:
   repository: nginx
-  tag: latest
+  tag: alpine
 ingress:
   enabled: false
+initConfig:
+  initCommands:
+  - command:
+    - ls
+    name: init-command-0
 replicaCount: 1
 resources:
   limits:
