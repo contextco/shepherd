@@ -1,10 +1,4 @@
 # frozen_string_literal: true
 
-class Dependencies::PostgresqlComponent < ApplicationComponent
-  attribute :dependency_instance
-  attribute :dependency_info
-
-  def update_create_text
-    dependency_instance.new_record? ? "Create" : "Update"
-  end
+class Dependencies::PostgresqlComponent < DependenciesComponent
 end
