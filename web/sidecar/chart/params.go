@@ -9,9 +9,6 @@ import (
 )
 
 type Params struct {
-	ChartName    string
-	ChartVersion string
-
 	Image        Image
 	ReplicaCount int32
 
@@ -76,15 +73,6 @@ func (e Environment) LoadFromProto(proto *sidecar_pb.EnvironmentConfig) {
 
 func (e Environment) toValues() map[string]interface{} {
 	return withInterfaceValues(e)
-}
-
-func (p *Params) Merge(other *Params) *Params {
-	return &Params{
-		ChartName:    firstNonEmpty(other.ChartName, p.ChartName),
-		ChartVersion: firstNonEmpty(other.ChartVersion, p.ChartVersion),
-		Image:        firstNonEmpty(other.Image, p.Image),
-		ReplicaCount: firstNonEmpty(other.ReplicaCount, p.ReplicaCount),
-	}
 }
 
 type Secret struct {
@@ -153,13 +141,13 @@ func (p *Params) toValues() (*values.File, error) {
 	}, nil
 }
 
-func NewServiceChartFromParams(params *Params) (*ServiceChart, error) {
-	c, err := NewServiceChart()
+func NewServiceChartFromParams(name, version string, params *Params) (*ServiceChart, error) {
+	c, err := NewServiceChart(name, version, params)
 	if err != nil {
 		return nil, fmt.Errorf("error getting service chart: %w", err)
 	}
 
-	if err := c.ApplyParams(params); err != nil {
+	if err := c.SyncValues(); err != nil {
 		return nil, fmt.Errorf("error applying params to service chart: %w", err)
 	}
 
@@ -167,15 +155,12 @@ func NewServiceChartFromParams(params *Params) (*ServiceChart, error) {
 }
 
 func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentChart, error) {
-	parentChart, err := NewParentChart()
+	parentChart, err := NewParentChart(name, version)
 	if err != nil {
 		return nil, fmt.Errorf("error getting parent chart: %w", err)
 	}
 
-	if err := parentChart.ApplyParams(&Params{
-		ChartName:    name,
-		ChartVersion: version,
-	}); err != nil {
+	if err := parentChart.SyncValues(); err != nil {
 		return nil, fmt.Errorf("error applying params to parent chart: %w", err)
 	}
 
@@ -197,9 +182,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			services = append(services, &s)
 		}
 
-		c, err := NewServiceChartFromParams(&Params{
-			ChartName:    service.GetName(),
-			ChartVersion: version,
+		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
 				Name: service.GetImage().GetName(),
@@ -220,6 +203,10 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 		}
 
 		parentChart.AddService(c)
+
+		if err := c.SyncValues(); err != nil {
+			return nil, fmt.Errorf("error applying params to service chart: %w", err)
+		}
 	}
 
 	for _, dep := range proto.GetDependencies() {

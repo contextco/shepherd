@@ -122,8 +122,6 @@ func TestParams_toValues(t *testing.T) {
 		{
 			name: "valid params",
 			params: &Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
@@ -180,8 +178,6 @@ func TestParams_toValues(t *testing.T) {
 		{
 			name: "empty environment",
 			params: &Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
@@ -254,8 +250,6 @@ func TestParams_toYaml(t *testing.T) {
 		{
 			name: "valid params",
 			params: &Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
@@ -299,8 +293,6 @@ services:
 		{
 			name: "empty environment",
 			params: &Params{
-				ChartName:    "test-chart",
-				ChartVersion: "1.0.0",
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",

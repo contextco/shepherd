@@ -18,6 +18,7 @@ import (
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -66,13 +67,19 @@ func TestServer_PublishChart(t *testing.T) {
 			name: "valid chart with external dependency",
 			req: &sidecar_pb.PublishChartRequest{
 				Chart: &sidecar_pb.ChartParams{
-					Name:    "test-chart",
+					Name:    "test-chart-external",
 					Version: "1.0.0",
 					Dependencies: []*sidecar_pb.DependencyParams{
 						{
 							Name:          "postgresql",
 							Version:       "15.x.x",
 							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
+							Overrides: []*sidecar_pb.OverrideParams{
+								{
+									Path:  "postgresql.primary.storage.size",
+									Value: structpb.NewStringValue("10Gi"),
+								},
+							},
 						},
 					},
 					Services: []*sidecar_pb.ServiceParams{
