@@ -1,0 +1,14 @@
+<div class="flex items-center gap-2 h-7">
+  <div class="p-1 bg-stone-100 border rounded-md px-2 font-mono text-xs flex items-center gap-1">
+    <%= heroicon 'cpu-chip', class: 'size-4' %>
+    <%= pluralize(cpu_cores, 'core') %>
+    <span class="text-stone-400 px-1">|</span>
+    <div class="size-4 mr-0.5"><%= render Icons::MemoryStickComponent.new %></div>
+    <%= number_to_human_size(memory_bytes) %>
+    <% if disk_bytes %>
+      <span class="text-stone-400 px-1">|</span>
+      <div class="size-4 mr-0.5"><%= render Icons::HardDriveComponent.new %></div>
+      <%= number_to_human_size(disk_bytes) %>
+    <% end %>
+  </div>
+</div>
