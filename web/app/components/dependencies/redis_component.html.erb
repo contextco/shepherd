@@ -1,0 +1,45 @@
+<%= form_with model: dependency_instance, url: version_dependencies_path, class: 'flex flex-col gap-6' do |form| %>
+  <%= form.hidden_field :name, value: dependency_info.name %>
+  <%= form.hidden_field :repo_url, value: dependency_info.repository %>
+  <%= form.hidden_field :version, value: dependency_info.variants.first.version %>
+
+  <%= form.fields_for :configs do |config_form| %>
+
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= config_form.label :max_memory_policy, class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
+        Version of the dependency to use
+      </span>
+      </div>
+
+      <%= config_form.collection_select :max_memory_policy,
+                                        max_memory_policy_options,
+                                        :first,
+                                        :last,
+                                        {},
+                                        class: 'w-1/2 p-2 rounded-md' %>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <span class="font-medium">Resources</span>
+      <div class="flex flex-col gap-8 rounded-md p-8 pt-10 border border-stone-400 w-full items-start px-8">
+        <div class="flex items-start grow w-full gap-8">
+          <span class="font-medium w-16">CPU</span>
+          <%= render Services::CPUSliderComponent.new(form: config_form) %>
+        </div>
+        <div class="flex items-start grow w-full gap-8">
+          <span class="font-medium w-16">RAM</span>
+          <%= render Services::MemorySliderComponent.new(form: config_form) %>
+        </div>
+
+        <div class="flex items-start grow w-full gap-8">
+          <span class="font-medium w-16">Disk</span>
+          <%= render Services::DiskSliderComponent.new(form: config_form) %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+<% end %>
