@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Dependencies::RedisComponent < DependenciesComponent
-
   def max_memory_policy_options
     [
       [ "allkeys-lru", "allkeys-lru (typical for caches)" ],
