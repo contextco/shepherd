@@ -21,7 +21,8 @@ module Chart::Dependency::Data
           human_visible_version: "17"
         }
       ],
-      repository: "oci://registry-1.docker.io/bitnamicharts/postgresql"
+      repository: "oci://registry-1.docker.io/bitnamicharts/postgresql",
+      form_component: Dependencies::PostgresqlComponent
     },
     {
       name: "redis",
@@ -33,7 +34,8 @@ module Chart::Dependency::Data
         }
       ],
       repository: "oci://registry-1.docker.io/bitnamicharts/redis",
-      description: "An open-source, in-memory key-value store, useful for caching or as a lightweight database."
+      description: "An open-source, in-memory key-value store, useful for caching or as a lightweight database.",
+      form_component: Dependencies::RedisComponent
     }
 
   ]

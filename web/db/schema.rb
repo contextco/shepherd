@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_18_114507) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_19_165912) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -31,6 +31,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_18_114507) do
     t.uuid "project_version_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "configs", default: {}, null: false
     t.index ["project_version_id"], name: "index_dependencies_on_project_version_id"
   end
 
