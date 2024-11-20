@@ -42,7 +42,7 @@ func verifyDataAgainstFixture(t *testing.T, gotData []byte, path string) error {
 		return err
 	}
 	if diff := cmp.Diff(string(gotData), string(fixture)); diff != "" {
-		return fmt.Errorf("fixture for %s does not match: %s", path, diff)
+		return fmt.Errorf("fixture for %s does not match (-want +got):\n%s", path, diff)
 	}
 	return nil
 }

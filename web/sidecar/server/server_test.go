@@ -18,6 +18,7 @@ import (
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -66,13 +67,19 @@ func TestServer_PublishChart(t *testing.T) {
 			name: "valid chart with external dependency",
 			req: &sidecar_pb.PublishChartRequest{
 				Chart: &sidecar_pb.ChartParams{
-					Name:    "test-chart",
+					Name:    "test-chart-external",
 					Version: "1.0.0",
 					Dependencies: []*sidecar_pb.DependencyParams{
 						{
 							Name:          "postgresql",
 							Version:       "15.x.x",
 							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
+							Overrides: []*sidecar_pb.OverrideParams{
+								{
+									Path:  "postgresql.primary.storage.size",
+									Value: structpb.NewStringValue("10Gi"),
+								},
+							},
 						},
 					},
 					Services: []*sidecar_pb.ServiceParams{
@@ -150,9 +157,9 @@ func TestServer_PublishChart(t *testing.T) {
 				if tt.wantErr {
 					return
 				}
-				t.Errorf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
 			} else if tt.wantErr {
-				t.Errorf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if err := verifyChartFiles(t, ctx, store, tt.req.Chart); err != nil {
@@ -163,7 +170,7 @@ func TestServer_PublishChart(t *testing.T) {
 			c, err := chart.LoadFromArchive(&chart.ChartArchive{
 				Name: chartName,
 				Data: store.Files[fmt.Sprintf("test-repo/%s.tgz", chartName)],
-			}, &chart.Params{ChartName: tt.req.Chart.Name, ChartVersion: tt.req.Chart.Version})
+			})
 			if err != nil {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
