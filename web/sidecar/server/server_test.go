@@ -53,9 +53,12 @@ func TestServer_PublishChart(t *testing.T) {
 							Name: "test-service",
 							Image: &sidecar_pb.Image{
 								Name: "nginx",
-								Tag:  "latest",
+								Tag:  "alpine",
 							},
 							ReplicaCount: 1,
+							InitConfig: &sidecar_pb.InitConfig{
+								InitCommands: []string{"ls"},
+							},
 						},
 					},
 				},
