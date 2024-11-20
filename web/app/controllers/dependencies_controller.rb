@@ -16,9 +16,14 @@ class DependenciesController < ApplicationController
       return redirect_to version_path(@version)
     end
 
+    if dependency_info.nil?
+      flash[:error] = "Dependency #{dependency_params[:name]} not found"
+      return redirect_to new_version_dependency_path(@version), status: :unprocessable_entity
+    end
+
     if form.invalid?
       flash[:error] = form.errors.full_messages.first
-      return redirect_to new_version_dependency_path(@version, name: dependency_params[:name])
+      return redirect_to new_version_dependency_path(@version), status: :unprocessable_entity
     end
 
     form.create_dependency(@version)
@@ -39,12 +44,15 @@ class DependenciesController < ApplicationController
   def form
     return @form if defined?(@form)
 
-    dependency_info = Chart::Dependency.from_name!(dependency_params[:name])
     @form = dependency_info.form.new(dependency_params)
   end
 
   def dependency_params
     params.require(:dependency).permit(:name, :version, :repo_url, configs: {})
+  end
+
+  def dependency_info
+    @dependency_info ||= Chart::Dependency.from_name(dependency_params[:name])
   end
 
   def set_app

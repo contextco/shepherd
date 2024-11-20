@@ -4,7 +4,7 @@ RSpec.describe "Dependencies", type: :request do
   let(:user) { create(:user) }
   let(:version) { create(:project_version, team: user.team) }
 
-  before { sign_in user }
+  before { login_as user }
 
   describe "GET /index" do
     subject { get version_dependencies_path(version) }
@@ -21,7 +21,12 @@ RSpec.describe "Dependencies", type: :request do
     subject { post version_dependencies_path(version), params: { dependency: {
       name: dependency_object.name,
       version: dependency_object.variants.sample.version,
-      repo_url: dependency_object.repository
+      repo_url: dependency_object.repository,
+      configs: {
+        cpu_cores: '1',
+        memory_bytes: 1.gigabyte.to_s,
+        disk_bytes: 1.gigabyte.to_s
+      }
     } } }
 
     it "creates a new dependency" do
@@ -78,7 +83,12 @@ RSpec.describe "Dependencies", type: :request do
           post version_dependencies_path(version), params: { dependency: {
             name: dependency_object.name,
             version: dependency_object.variants.sample.version,
-            repo_url: dependency_object.repository
+            repo_url: dependency_object.repository,
+            configs: {
+              cpu_cores: '1',
+              memory_bytes: 1.gigabyte.to_s,
+              disk_bytes: 1.gigabyte.to_s
+            }
           } }
         end
       end
