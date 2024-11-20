@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
-class Dependencies::RedisComponent < ApplicationComponent
-  # TODO: inheritance for all these values as they are common for all the components
-  attribute :dependency_instance
-  attribute :dependency_info
-
-  def update_create_text
-    dependency_instance.new_record? ? "Create" : "Update"
-  end
+class Dependencies::RedisComponent < DependenciesComponent
 
   def max_memory_policy_options
     [
