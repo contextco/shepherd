@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
+	"strings"
 
 	"helm.sh/helm/v3/pkg/chartutil"
 )
@@ -17,7 +18,25 @@ type Params struct {
 	Environment Environment
 	Secrets     []*Secret
 
-	Services []*Service
+	Services   []*Service
+	InitConfig InitConfig
+}
+
+type InitConfig struct {
+	InitCommands []string
+}
+
+func (i InitConfig) toValues() map[string]interface{} {
+	m := []map[string]interface{}{}
+	for i, v := range i.InitCommands {
+		m = append(m, map[string]interface{}{
+			"name":    fmt.Sprintf("init-command-%d", i),
+			"command": strings.Split(v, " "),
+		})
+	}
+	return map[string]interface{}{
+		"initCommands": m,
+	}
 }
 
 type Service struct {
@@ -130,6 +149,7 @@ func (p *Params) toValues() (*values.File, error) {
 			"environment":  p.Environment.toValues(),
 			"secrets":      sliceToValues(p.Secrets),
 			"resources":    p.Resources.toValues(),
+			"initConfig":   p.InitConfig.toValues(),
 			"ingress": map[string]any{
 				"enabled": false,
 			},
@@ -182,6 +202,11 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			services = append(services, &s)
 		}
 
+		initConfig := InitConfig{}
+		for _, v := range service.GetInitConfig().GetInitCommands() {
+			initConfig.InitCommands = append(initConfig.InitCommands, v)
+		}
+
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
@@ -197,6 +222,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			Environment: env,
 			Secrets:     secrets,
 			Services:    services,
+			InitConfig:  initConfig,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("error applying params to service chart: %w", err)
