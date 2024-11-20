@@ -58,7 +58,7 @@ message OverrideParams {
     google.protobuf.Value value = 2;
 }
 
-// Next ID: 7
+// Next ID: 8
 message ServiceParams {
     string name = 6;
 
@@ -70,7 +70,13 @@ message ServiceParams {
 
     EnvironmentConfig environment_config = 4;
 
-    repeated Endpoint endpoints = 5; // Currently only one service is supported.
+    repeated Endpoint endpoints = 5;
+
+    InitConfig init_config = 7;
+}
+
+message InitConfig {
+    repeated string init_commands = 1;
 }
 
 message Endpoint {
