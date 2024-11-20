@@ -5,7 +5,7 @@ import (
 )
 
 func TestCanonical(t *testing.T) {
-	_, err := NewServiceChart()
+	_, err := NewServiceChart("test", "0.0.1", &Params{})
 	if err != nil {
 		t.Fatalf("error getting canonical chart: %v", err)
 	}

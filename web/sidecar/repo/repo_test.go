@@ -58,8 +58,6 @@ func TestAdd_valuesFile(t *testing.T) {
 		{
 			name: "values file is created",
 			params: &chart.Params{
-				ChartName:    "test-service",
-				ChartVersion: "1.0.0",
 				ReplicaCount: 1,
 				Environment: map[string]string{
 					"FOO": "bar",
@@ -89,7 +87,7 @@ func TestAdd_valuesFile(t *testing.T) {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			service, err := chart.NewServiceChartFromParams(tc.params)
+			service, err := chart.NewServiceChartFromParams("test-service", "1.0.0", tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create service chart: %v", err)
 			}
@@ -129,8 +127,6 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 		{
 			name: "values file is created",
 			params: &chart.Params{
-				ChartName:    "test-service",
-				ChartVersion: "1.0.0",
 				ReplicaCount: 1,
 				Environment: map[string]string{
 					"FOO": "bar",
@@ -164,7 +160,7 @@ func TestAdd_clientFacingValuesFile(t *testing.T) {
 				t.Fatalf("Failed to create empty chart: %v", err)
 			}
 
-			service, err := chart.NewServiceChartFromParams(tc.params)
+			service, err := chart.NewServiceChartFromParams("test-service", "1.0.0", tc.params)
 			if err != nil {
 				t.Fatalf("Failed to create service chart: %v", err)
 			}
