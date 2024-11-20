@@ -12,7 +12,7 @@
       <div class="rounded-md text-xs flex items-center bg-white rounded">
         <% if project.published_versions.count.zero? %>
           <div class="text-stone-500">No published versions</div>
-          <% else %>
+        <% else %>
           <%= pluralize(project.published_versions.count, 'published version') %>
         <% end %>
       </div>
