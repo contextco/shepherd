@@ -1,5 +1,6 @@
 class DependenciesController < ApplicationController
   before_action :set_app
+
   def new
     @dependency_info = Chart::Dependency.from_name!(params[:name])
     @dependency_instance = @version.dependencies.build
@@ -15,7 +16,12 @@ class DependenciesController < ApplicationController
       return redirect_to version_path(@version)
     end
 
-    @version.dependencies.create!(**dependency_params)
+    if form.invalid?
+      flash[:error] = form.errors.full_messages.first
+      return redirect_to new_version_dependency_path(@version, name: dependency_params[:name])
+    end
+
+    form.create_dependency(@version)
     redirect_to version_path(@version)
   end
 
@@ -30,8 +36,14 @@ class DependenciesController < ApplicationController
 
   private
 
+  def form
+    return @form if defined?(@form)
+
+    dependency_info = Chart::Dependency.from_name!(dependency_params[:name])
+    @form = dependency_info.form.new(dependency_params)
+  end
+
   def dependency_params
-    # TODO: make this into a form
     params.require(:dependency).permit(:name, :version, :repo_url, configs: {})
   end
 
