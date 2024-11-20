@@ -9,9 +9,8 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <%= render Applications::PublishButtonComponent.new(version: @version) %>
-
         <%= render Applications::EditVersionComponent.new(version: @version) %>
+        <%= render Applications::PublishButtonComponent.new(version: @version) %>
       </div>
     </div>
   </div>
