@@ -7,14 +7,16 @@
 
       <div class="flex items-center gap-1">
         <div class="flex items-center">
-          <%= link_to new_version_project_service_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
-            <%= heroicon 'plus', class: 'size-4' %>
-            Add Service
+          <% if !project_version.published? %>
+            <%= link_to new_version_project_service_path(project_version), class: 'button flex gap-1 items-center' do %>
+              <%= heroicon 'plus', class: 'size-4' %>
+              Add Service
+            <% end %>
           <% end %>
         </div>
-        <% if project_version.eligible_dependencies.present? && Flipper.enabled?(:dependencies, current_user) %>
+        <% if !project_version.published? && project_version.eligible_dependencies.present? && Flipper.enabled?(:dependencies, current_user) %>
           <div class="flex items-center">
-            <%= link_to version_dependencies_path(project_version), class: 'cursor-pointer flex items-center gap-1 text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm' do %>
+            <%= link_to version_dependencies_path(project_version), class: 'button flex gap-1 items-center' do %>
               <%= heroicon 'squares-plus', class: 'size-4' %>
               Add Dependency
             <% end %>
