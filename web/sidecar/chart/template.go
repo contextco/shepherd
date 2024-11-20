@@ -2,6 +2,7 @@ package chart
 
 import (
 	"fmt"
+	"sidecar/values"
 
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chartutil"
@@ -15,20 +16,15 @@ func (t *Template) Validate() error {
 	return t.chart.Validate()
 }
 
-func (t *Template) ApplyParams(params *Params) error {
-	t.chart.Metadata.Name = params.ChartName
-	t.chart.Metadata.Version = params.ChartVersion
-
+func (t *Template) SetValues(values *values.File) error {
 	for _, file := range t.chart.Raw {
 		if file.Name == chartutil.ValuesfileName {
-			values, err := params.toYaml()
+			yaml, err := values.Bytes()
 			if err != nil {
-				return fmt.Errorf("failed to convert params to helm values: %w", err)
+				return fmt.Errorf("failed to marshal values: %w", err)
 			}
-
-			file.Data = []byte(values)
+			file.Data = yaml
 		}
 	}
-
 	return nil
 }

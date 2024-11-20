@@ -3,7 +3,6 @@ package testcluster
 import (
 	"context"
 	"fmt"
-	"log"
 	"os/exec"
 
 	"k8s.io/client-go/rest"
@@ -48,8 +47,6 @@ func (c *kindCluster) restConfig(ctx context.Context) (*rest.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	log.Printf("kubeConfig for %s: %s", c.name, string(kubeConfig))
 
 	clientConfig, err := clientcmd.RESTConfigFromKubeConfig(kubeConfig)
 	if err != nil {

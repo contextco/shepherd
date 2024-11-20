@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_19_165912) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_20_094121) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "containers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "deployment_id", null: false
@@ -32,6 +32,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_19_165912) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "configs", default: {}, null: false
+    t.float "cpu_cores"
+    t.bigint "memory_bytes"
+    t.bigint "disk_bytes"
     t.index ["project_version_id"], name: "index_dependencies_on_project_version_id"
   end
 

@@ -31,7 +31,8 @@ class DependenciesController < ApplicationController
   private
 
   def dependency_params
-    params.require(:dependency).permit(:name, :version, :repo_url, configs: {})
+    # TODO: make this into a form
+    params.require(:dependency).permit(:name, :version, :repo_url, :cpu_cores, :memory_bytes, :disk_bytes, configs: {})
   end
 
   def set_app
