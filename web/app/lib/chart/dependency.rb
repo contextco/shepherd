@@ -11,6 +11,7 @@ class Chart::Dependency
   attribute :icon
   attribute :description
   attribute :form_component
+  attribute :form
 
   def human_visible_name
     super || name
@@ -64,7 +65,8 @@ class Chart::Dependency
         variants: attrs.fetch(:variants)&.map do |version|
           Chart::Dependency::Variant.new(version)
         end,
-        form_component: attrs.fetch(:form_component)
+        form_component: attrs.fetch(:form_component),
+        form: attrs.fetch(:form)
       )
     end
   end
