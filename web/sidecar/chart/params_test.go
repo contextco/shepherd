@@ -29,6 +29,9 @@ func TestParams_toValues(t *testing.T) {
 				Services: []*Service{
 					{Port: 8000},
 				},
+				InitConfig: InitConfig{
+					InitCommands: []string{"ls"},
+				},
 				Resources: Resources{
 					CPUCoresRequested:    1,
 					CPUCoresLimit:        2,
@@ -45,6 +48,14 @@ func TestParams_toValues(t *testing.T) {
 				"environment": map[string]interface{}{
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
+				},
+				"initConfig": map[string]interface{}{
+					"initCommands": []map[string]interface{}{
+						{
+							"name":    "init-command-0",
+							"command": []string{"ls"},
+						},
+					},
 				},
 				"resources": map[string]interface{}{
 					"limits": map[string]interface{}{
@@ -95,6 +106,7 @@ func TestParams_toValues(t *testing.T) {
 					"tag":        "latest",
 				},
 				"replicaCount": int32(3),
+				"initConfig":   map[string]any{},
 				"resources": map[string]interface{}{
 					"limits": map[string]interface{}{
 						"cpu":    "2000m",
@@ -155,6 +167,9 @@ func TestParams_toYaml(t *testing.T) {
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
 				},
+				InitConfig: InitConfig{
+					InitCommands: []string{"ls"},
+				},
 				Resources: Resources{
 					CPUCoresRequested:    1,
 					CPUCoresLimit:        2,
@@ -170,6 +185,11 @@ image:
   tag: latest
 ingress:
   enabled: false
+initConfig:
+  initCommands:
+  - command:
+    - ls
+    name: init-command-0
 replicaCount: 3
 resources:
   limits:
@@ -207,6 +227,7 @@ services:
   tag: latest
 ingress:
   enabled: false
+initConfig: {}
 replicaCount: 3
 resources:
   limits:

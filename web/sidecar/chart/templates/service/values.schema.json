@@ -225,6 +225,16 @@
         }
       }
     },
+    "initConfig": {
+      "type": "object",
+      "description": "Init container configuration",
+      "properties": {
+        "initCommands": {
+          "type": "array",
+          "description": "Init commands"
+        }
+      }
+    },
     "global": {
       "type": "object",
       "description": "Global values"
