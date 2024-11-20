@@ -1,15 +1,2 @@
-image:
-  repository: ""
-  tag: ""
-ingress:
-  enabled: false
-replicaCount: 0
-resources:
-  limits:
-    cpu: 0m
-    memory: "0"
-  requests:
-    cpu: 0m
-    memory: "0"
-serviceAccount:
-  create: false
+test-service-1: {}
+test-service-2: {}
