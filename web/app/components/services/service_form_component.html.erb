@@ -26,19 +26,7 @@
       <% end %>
     <% end %>
 
-    <div class="flex flex-col gap-4">
-      <span class="font-medium">Resources</span>
-      <div class="flex flex-col gap-8 rounded-md p-8 pt-10 border border-stone-400 w-full items-start px-8">
-        <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium w-16">CPU</span>
-          <%= render Services::CPUSliderComponent.new(form: ) %>
-        </div>
-        <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium w-16">RAM</span>
-          <%= render Services::MemorySliderComponent.new(form: ) %>
-        </div>
-      </div>
-    </div>
+    <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory]) %>
 
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Environment Variables',
