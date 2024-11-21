@@ -84,7 +84,10 @@ func LoadFromArchive(archive *ChartArchive) (*ParentChart, error) {
 func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.DependencyParams) error {
 	overrides := []*values.Override{}
 	for _, o := range proto.GetOverrides() {
-		overrides = append(overrides, &values.Override{Path: o.GetPath(), Value: o.GetValue().AsInterface()})
+		overrides = append(overrides, &values.Override{
+			Path:  strings.Join([]string{proto.GetName(), o.GetPath()}, "."),
+			Value: o.GetValue().AsInterface(),
+		})
 	}
 
 	c.externalDeps = append(c.externalDeps, &ExternalChart{
