@@ -20,6 +20,22 @@ type Params struct {
 
 	Services   []*Service
 	InitConfig InitConfig
+
+	PersistentVolumeClaims []*PersistentVolumeClaim
+}
+
+type PersistentVolumeClaim struct {
+	Name      string
+	SizeBytes int64
+	Path      string
+}
+
+func (p *PersistentVolumeClaim) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"name": p.Name,
+		"size": p.SizeBytes,
+		"path": p.Path,
+	}
 }
 
 type InitConfig struct {
@@ -144,12 +160,13 @@ func (p *Params) toYaml() (string, error) {
 func (p *Params) toValues() (*values.File, error) {
 	return &values.File{
 		Values: compactMap(map[string]any{
-			"replicaCount": p.ReplicaCount,
-			"image":        p.Image.toValues(),
-			"environment":  p.Environment.toValues(),
-			"secrets":      sliceToValues(p.Secrets),
-			"resources":    p.Resources.toValues(),
-			"initConfig":   p.InitConfig.toValues(),
+			"replicaCount":           p.ReplicaCount,
+			"image":                  p.Image.toValues(),
+			"environment":            p.Environment.toValues(),
+			"secrets":                sliceToValues(p.Secrets),
+			"resources":              p.Resources.toValues(),
+			"initConfig":             p.InitConfig.toValues(),
+			"persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
 			"ingress": map[string]any{
 				"enabled": false,
 			},
@@ -207,6 +224,16 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			initConfig.InitCommands = append(initConfig.InitCommands, v)
 		}
 
+		persistentVolumeClaims := []*PersistentVolumeClaim{}
+		for _, v := range service.GetPersistentVolumeClaims() {
+			p := &PersistentVolumeClaim{
+				Name:      v.GetName(),
+				SizeBytes: v.GetSizeBytes(),
+				Path:      v.GetPath(),
+			}
+			persistentVolumeClaims = append(persistentVolumeClaims, p)
+		}
+
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
@@ -219,10 +246,11 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				MemoryBytesRequested: service.GetResources().GetMemoryBytesRequested(),
 				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
 			},
-			Environment: env,
-			Secrets:     secrets,
-			Services:    services,
-			InitConfig:  initConfig,
+			Environment:            env,
+			Secrets:                secrets,
+			Services:               services,
+			InitConfig:             initConfig,
+			PersistentVolumeClaims: persistentVolumeClaims,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("error applying params to service chart: %w", err)

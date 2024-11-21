@@ -1,12 +1,13 @@
-{{- if not .Values.persistentVolumeClaims }}
+{{- if .Values.persistentVolumeClaims }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "test.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "test.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "test.fullname" . }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
@@ -56,12 +57,27 @@ spec:
                   name: {{ $.Release.Name }}-{{ $.Chart.Name }}-secrets
                   key: {{ $value.environmentKey }}
             {{- end }}
-          {{- with .Values.volumeMounts }}
+          {{- if .Values.persistentVolumeClaims }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
+            {{- range .Values.persistentVolumeClaims }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+            {{- end }}
           {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- if .Values.persistentVolumeClaims }}
+  volumeClaimTemplates:
+    {{- range .Values.persistentVolumeClaims }}
+    - metadata:
+        name: {{ .name }}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .size }}Gi
+    {{- end }}
+  {{- end }}
 {{- end }}
