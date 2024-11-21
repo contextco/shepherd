@@ -15,8 +15,8 @@ module DependencyRPC
   private
 
   def rpc_overrides
-    mapper = info.override_builder.new(configs:)
+    override_builder = info.override_builder.new(configs:)
 
-    mapper.create
+    override_builder.create
   end
 end
