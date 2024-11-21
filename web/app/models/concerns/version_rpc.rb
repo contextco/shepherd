@@ -7,15 +7,18 @@ module VersionRPC
     Sidecar::ChartParams.new(
       name: project.name,
       version:,
-      services: rpc_services
+      services: rpc_services,
+      dependencies: rpc_dependencies
     )
   end
 
   private
 
   def rpc_services
-    services.map do |service|
-      service.rpc_service
-    end
+    services.map(&:rpc_service)
+  end
+
+  def rpc_dependencies
+    dependencies.map(&:rpc_dependency)
   end
 end
