@@ -1,21 +1,23 @@
 <%= render layout: 'layouts/project' do %>
-  <div class="flex flex-col gap-4">
-    <div class="flex w-full justify-between items-center">
-      <div class="flex flex-col">
-        <span class="text-xs sm:text-sm text-stone-400 font-medium">Version</span>
-        <div class="flex gap-2 items-center sm:text-2xl">
-          <span class="font-medium text-stone-600 w-fit font-mono"><%= @version.version %></span>
+  <div class="overflow-y-scroll h-full scrollbar-hide flex flex-col gap-10">
+    <div class="flex flex-col gap-4">
+      <div class="flex w-full justify-between items-center">
+        <div class="flex flex-col">
+          <span class="text-xs sm:text-sm text-stone-400 font-medium">Version</span>
+          <div class="flex gap-2 items-center sm:text-2xl">
+            <span class="font-medium text-stone-600 w-fit font-mono"><%= @version.version %></span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <%= render Applications::EditVersionComponent.new(version: @version) %>
+          <%= render Applications::PublishButtonComponent.new(version: @version) %>
         </div>
       </div>
-
-      <div class="flex items-center gap-2">
-        <%= render Applications::EditVersionComponent.new(version: @version) %>
-        <%= render Applications::PublishButtonComponent.new(version: @version) %>
-      </div>
     </div>
+
+    <%= render Applications::InstallInstructionsComponent.new(version: @version, project: @app) if @version.published? %>
+
+    <%= render Services::GridComponent.new(project_version: @version) %>
   </div>
-
-  <%= render Applications::InstallInstructionsComponent.new(version: @version, project: @app) if @version.published? %>
-
-  <%= render Services::GridComponent.new(project_version: @version) %>
 <% end %>

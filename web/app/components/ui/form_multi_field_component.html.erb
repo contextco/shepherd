@@ -1,0 +1,33 @@
+<div class="flex items-start justify-between gap-24">
+  <div class="flex flex-col gap-1 shrink-0 w-64">
+    <span class="font-medium text-stone-800 flex-none"><%= title %></span>
+    <span class="text-stone-600 text-sm">
+      <%= label %>
+    </span>
+  </div>
+
+  <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-7/12">
+    <%= render UI::DynamicNestedForm::FormComponent.new(
+      form:,
+      id: unique_id,
+      association_name:,
+      model_class:,
+      wrapper_classes: 'flex flex-col gap-2',
+      maximum_subforms: 10,
+      ) do |component| %>
+      <% component.with_subform_content do |secret_form| %>
+        <%= render child_component.new(form: secret_form) %>
+      <% end %>
+    <% end %>
+
+    <%= render UI::DynamicNestedForm::AddButtonComponent.new(
+      for_id: unique_id,
+      ) do |component| %>
+      <% component.with_button do %>
+        <div class="text-sm rounded-md cursor-pointer w-fit">
+          + Add
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
