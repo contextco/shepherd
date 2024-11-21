@@ -21,6 +21,8 @@ RSpec.describe ProjectVersion do
            ports: %w[80 443]
     )
   end
+  let!(:dependency_redis) { create(:dependency, project_version:, name: 'redis') }
+  let!(:dependency_postgresql) { create(:dependency, project_version:, name: 'postgresql', version: '17.x.x', repo_url: 'oci://registry-1.docker.io/bitnamicharts/postgresql', configs: { cpu_cores: 32, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'test_db', db_user: 'test_user' }) }
 
   let(:mock_client) { double(:sidecar_client) }
 
@@ -49,6 +51,31 @@ RSpec.describe ProjectVersion do
           have_attributes(port: 80),
           have_attributes(port: 443)
         )
+        expect(request.chart.dependencies.first.name).to eq(dependency_redis.name)
+        expect(request.chart.dependencies.first.version).to eq(dependency_redis.version)
+        expect(request.chart.dependencies.first.repository_url).to eq(dependency_redis.repo_url)
+        expect(request.chart.dependencies.first.overrides).to contain_exactly(
+          Sidecar::OverrideParams.new(path: 'master.resources.requests.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
+          Sidecar::OverrideParams.new(path: 'master.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
+          Sidecar::OverrideParams.new(path: 'master.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+          Sidecar::OverrideParams.new(path: 'master.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+          Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+          Sidecar::OverrideParams.new(path: 'master.maxmemory-policy', value: Google::Protobuf::Value.new(string_value: 'volatile-lru'))
+        )
+
+        expect(request.chart.dependencies[1].name).to eq(dependency_postgresql.name)
+        expect(request.chart.dependencies[1].version).to eq(dependency_postgresql.version)
+        expect(request.chart.dependencies[1].repository_url).to eq(dependency_postgresql.repo_url)
+        expect(request.chart.dependencies[1].overrides).to contain_exactly(
+          Sidecar::OverrideParams.new(path: 'primary.resources.requests.cpu', value: Google::Protobuf::Value.new(number_value: 32.0)),
+          Sidecar::OverrideParams.new(path: 'primary.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 32.0)),
+          Sidecar::OverrideParams.new(path: 'primary.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+          Sidecar::OverrideParams.new(path: 'primary.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+          Sidecar::OverrideParams.new(path: 'primary.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+          Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
+          Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user'))
+        )
+
         response
       end
 
@@ -103,6 +130,43 @@ RSpec.describe ProjectVersion do
                             have_attributes(port: 80),
                             have_attributes(port: 443)
                           )
+    end
+
+    it 'includes correct redis dependency' do
+      expect(chart.dependencies.first).to have_attributes(
+        name: dependency_redis.name,
+        version: dependency_redis.version,
+        repository_url: dependency_redis.repo_url
+      )
+
+      overrides = chart.dependencies.first.overrides
+      expect(overrides).to contain_exactly(
+        Sidecar::OverrideParams.new(path: 'master.resources.requests.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
+        Sidecar::OverrideParams.new(path: 'master.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
+        Sidecar::OverrideParams.new(path: 'master.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+        Sidecar::OverrideParams.new(path: 'master.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+        Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+        Sidecar::OverrideParams.new(path: 'master.maxmemory-policy', value: Google::Protobuf::Value.new(string_value: 'volatile-lru'))
+      )
+    end
+
+    it 'includes correct postgresql dependency' do
+      expect(chart.dependencies[1]).to have_attributes(
+        name: dependency_postgresql.name,
+        version: dependency_postgresql.version,
+        repository_url: dependency_postgresql.repo_url
+      )
+
+      overrides = chart.dependencies[1].overrides
+      expect(overrides).to contain_exactly(
+        Sidecar::OverrideParams.new(path: 'primary.resources.requests.cpu', value: Google::Protobuf::Value.new(number_value: 32.0)),
+        Sidecar::OverrideParams.new(path: 'primary.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 32.0)),
+        Sidecar::OverrideParams.new(path: 'primary.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+        Sidecar::OverrideParams.new(path: 'primary.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
+        Sidecar::OverrideParams.new(path: 'primary.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+        Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
+        Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user'))
+      )
     end
   end
 
