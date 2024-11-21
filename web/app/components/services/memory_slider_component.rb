@@ -3,7 +3,9 @@
 class Services::MemorySliderComponent < ApplicationComponent
   attribute :form
 
-  OPTIONS = [
+  DEFAULT_OPTIONS = [
     1, 2, 4, 8, 16, 32, 64
   ].map(&:gigabytes).freeze
+
+  attribute :options, default: DEFAULT_OPTIONS
 end

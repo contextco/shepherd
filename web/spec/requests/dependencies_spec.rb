@@ -44,9 +44,9 @@ RSpec.describe "Dependencies", type: :request do
       version: dependency_object.variants.sample.version,
       repo_url: dependency_object.repository,
       configs: {
-        cpu_cores: '1',
-        memory_bytes: 1.gigabyte.to_s,
-        disk_bytes: 1.gigabyte.to_s
+        cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
+        memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
+        disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s
       }
     } } }
 
@@ -106,9 +106,9 @@ RSpec.describe "Dependencies", type: :request do
             version: dependency_object.variants.sample.version,
             repo_url: dependency_object.repository,
             configs: {
-              cpu_cores: '1',
-              memory_bytes: 1.gigabyte.to_s,
-              disk_bytes: 1.gigabyte.to_s
+              cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
+              memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
+              disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s
             }
           } }
         end

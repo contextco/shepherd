@@ -1,6 +1,6 @@
 <%= render UI::StepSliderComponent.new(
   form:,
-  steps: OPTIONS,
-  labels: OPTIONS.map { |m| number_to_human_size(m) },
+  steps: options,
+  labels: options.map { |m| number_to_human_size(m) },
   name: :disk_bytes
 ) %>
