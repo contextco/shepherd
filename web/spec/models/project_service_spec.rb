@@ -59,6 +59,17 @@ RSpec.describe ProjectService do
         }
       )
     end
+
+    context 'with predeploy command' do
+      before do
+        service.update!(predeploy_command: 'echo "predeploy"')
+      end
+
+      it 'sets the init_config attribute' do
+        expect(service.rpc_service.init_config).to be_a(Sidecar::InitConfig)
+        expect(service.rpc_service.init_config.init_commands).to eq([ 'echo "predeploy"' ])
+      end
+    end
   end
 
   describe '#env_to_k8s_secret_name' do

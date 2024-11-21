@@ -10,7 +10,8 @@ module ServiceRPC
       image: rpc_image,
       resources: rpc_resources,
       environment_config: rpc_environment_config,
-      endpoints: rpc_endpoints
+      endpoints: rpc_endpoints,
+      init_config: rpc_init_configs
     )
   end
 
@@ -50,6 +51,10 @@ module ServiceRPC
     end
 
     Sidecar::EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
+  end
+
+  def rpc_init_configs
+    Sidecar::InitConfig.new(init_commands: [ predeploy_command ]) if predeploy_command.present?
   end
 
   def env_to_k8s_secret_name(env_name)
