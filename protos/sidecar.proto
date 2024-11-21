@@ -73,6 +73,14 @@ message ServiceParams {
     repeated Endpoint endpoints = 5;
 
     InitConfig init_config = 7;
+
+    repeated PersistentVolumeClaimParams persistent_volume_claims = 8;
+}
+
+message PersistentVolumeClaimParams {
+    string name = 1;
+    int64 size_bytes = 2;
+    string path = 3;
 }
 
 message InitConfig {
