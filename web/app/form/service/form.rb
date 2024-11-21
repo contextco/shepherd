@@ -10,6 +10,8 @@ class Service::Form
   attribute :cpu_cores, default: 1
   attribute :memory_bytes, default: 1.gigabyte
 
+  attribute :predeploy_command
+
   attribute :environment_variables, multiple: true do
     attribute :templated, default: false
     attribute :name
@@ -70,6 +72,7 @@ class Service::Form
       image: service.image,
       cpu_cores: service.cpu_cores,
       memory_bytes: service.memory_bytes,
+      predeploy_command: service.predeploy_command,
       environment_variables: service.environment_variables.map do |env|
         { name: env[:name], value: env[:value], templated: env[:templated] }
       end,
@@ -100,6 +103,7 @@ class Service::Form
       image:,
       cpu_cores: cpu_cores.to_i,
       memory_bytes: memory_bytes.to_i,
+      predeploy_command: predeploy_command.presence,
       environment_variables: environment_variables_object,
       secrets: secrets_object,
       ports: ports_object
