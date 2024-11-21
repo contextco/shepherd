@@ -8,4 +8,8 @@ class Services::CPUSliderComponent < ApplicationComponent
   ].freeze
 
   attribute :options, default: DEFAULT_OPTIONS
+
+  def options_value
+    options || DEFAULT_OPTIONS
+  end
 end
