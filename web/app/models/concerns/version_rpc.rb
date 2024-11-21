@@ -15,14 +15,10 @@ module VersionRPC
   private
 
   def rpc_services
-    services.map do |service|
-      service.rpc_service
-    end
+    services.map(&:rpc_service)
   end
 
   def rpc_dependencies
-    dependencies.map do |dependency|
-      dependency.rpc_dependency
-    end
+    dependencies.map(&:rpc_dependency)
   end
 end
