@@ -12,6 +12,7 @@ class Chart::Dependency
   attribute :description
   attribute :form_component
   attribute :form
+  attribute :override_builder
 
   def human_visible_name
     super || name
@@ -66,7 +67,8 @@ class Chart::Dependency
           Chart::Dependency::Variant.new(version)
         end,
         form_component: attrs.fetch(:form_component),
-        form: attrs.fetch(:form)
+        form: attrs.fetch(:form),
+        override_builder: attrs.fetch(:override_builder)
       )
     end
   end
