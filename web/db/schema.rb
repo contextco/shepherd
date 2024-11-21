@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_20_112135) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_21_153207) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_20_112135) do
     t.float "cpu_cores"
     t.bigint "memory_bytes"
     t.jsonb "ports", default: []
+    t.string "predeploy_command"
     t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
   end
 
