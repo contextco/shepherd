@@ -235,6 +235,27 @@
         }
       }
     },
+    "persistentVolumeClaims": {
+      "type": "array",
+      "description": "List of persistent volume claims",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the persistent volume claim"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of the persistent volume claim"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path of the persistent volume claim"
+          }
+        }
+      }
+    },
     "global": {
       "type": "object",
       "description": "Global values"
