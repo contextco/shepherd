@@ -143,6 +143,33 @@ func TestServer_PublishChart(t *testing.T) {
 			},
 		},
 		{
+			name: "valid chart with stateful service",
+			req: &sidecar_pb.PublishChartRequest{
+				RepositoryDirectory: "test-repo",
+				Chart: &sidecar_pb.ChartParams{
+					Name:    "test-chart-stateful",
+					Version: "1.0.0",
+					Services: []*sidecar_pb.ServiceParams{
+						{
+							Name: "test-service",
+							Image: &sidecar_pb.Image{
+								Name: "nginx",
+								Tag:  "latest",
+							},
+							ReplicaCount: 1,
+							PersistentVolumeClaims: []*sidecar_pb.PersistentVolumeClaimParams{
+								{
+									Name:      "test-volume-claim",
+									SizeBytes: 1024,
+									Path:      "/data",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "missing chart",
 			req: &sidecar_pb.PublishChartRequest{
 				RepositoryDirectory: "test-repo",
@@ -183,9 +210,7 @@ func TestServer_PublishChart(t *testing.T) {
 			}
 			defer cluster.Uninstall(ctx, c.Chart)
 
-			if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
-				return strings.Contains(pod.Name, "test-service") && pod.Status.Phase == corev1.PodRunning
-			}); err != nil {
+			if err := waitForPods(t, ctx, cluster, tt.req.Chart); err != nil {
 				t.Fatalf("failed to wait for pods: %v", err)
 			}
 		})
@@ -235,4 +260,18 @@ func stripIndexDigests(t *testing.T, indexData []byte) []byte {
 		}
 	}
 	return bytes.Join(filteredLines, []byte("\n"))
+}
+
+func waitForPods(t *testing.T, ctx context.Context, cluster *testcluster.Cluster, chartParams *sidecar_pb.ChartParams) error {
+	t.Helper()
+
+	for _, service := range chartParams.Services {
+		if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
+			return strings.Contains(pod.Name, service.Name) && pod.Status.Phase == corev1.PodRunning
+		}); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
