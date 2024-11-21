@@ -79,7 +79,7 @@ func TestServer_PublishChart(t *testing.T) {
 							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
 							Overrides: []*sidecar_pb.OverrideParams{
 								{
-									Path:  "postgresql.primary.storage.size",
+									Path:  "primary.storage.size",
 									Value: structpb.NewStringValue("10Gi"),
 								},
 							},
