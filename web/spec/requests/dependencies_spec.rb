@@ -15,6 +15,27 @@ RSpec.describe "Dependencies", type: :request do
     end
   end
 
+  describe "GET /new" do
+    subject { get new_version_dependency_path(version, name: 'redis') }
+
+    it "returns http success" do
+      subject
+      expect(response).to have_http_status(:success)
+    end
+
+    it "assigns the dependency info" do
+      subject
+      expect(assigns(:dependency_info)).to be_a(Chart::Dependency)
+      expect(assigns(:dependency_info).name).to eq('redis')
+    end
+
+    it "assigns a new dependency instance" do
+      subject
+      expect(assigns(:dependency_instance)).to be_a(Dependency)
+      expect(assigns(:dependency_instance)).to be_new_record
+    end
+  end
+
   describe "POST /create" do
     let(:dependency_object) { Chart::Dependency.from_name!('postgresql') }
 
@@ -96,6 +117,21 @@ RSpec.describe "Dependencies", type: :request do
       it 'only creates 1 dependency' do
         expect { subject }.to change(version.dependencies, :count).by(1)
       end
+    end
+  end
+
+  describe "DELETE /destroy" do
+    let!(:dependency) { create(:dependency, project_version: version) }
+
+    subject { delete dependency_path(dependency) }
+
+    it "deletes the dependency" do
+      expect { subject }.to change { version.reload.dependencies.count }.by(-1)
+    end
+
+    it "redirects to the version page" do
+      subject
+      expect(response).to redirect_to(version_path(version))
     end
   end
 end
