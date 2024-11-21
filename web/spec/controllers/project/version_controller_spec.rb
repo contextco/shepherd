@@ -119,6 +119,18 @@ RSpec.describe Project::VersionController, type: :controller do
           expect { subject }.to change { ProjectService.where(name: service.name).count }.by(1)
         end
       end
+
+      context 'when the previous version has dependencies' do
+        let!(:dependency) { create(:dependency, project_version:) }
+
+        it 'creates a new version with the same dependencies' do
+          expect { subject }.to change { Dependency.count }.by(1)
+        end
+
+        it 'creates a new version with the same dependency attributes' do
+          expect { subject }.to change { Dependency.where(name: dependency.name).count }.by(1)
+        end
+      end
     end
   end
 
@@ -169,8 +181,9 @@ RSpec.describe Project::VersionController, type: :controller do
 
     it_behaves_like 'requires authentication'
 
-    context 'when there is an attached service' do
+    context 'when there is an attached service and dependency' do
       let!(:project_service) { create(:project_service, project_version:) }
+      let!(:dependency) { create(:dependency, project_version:) }
 
       let(:chart_publisher) { instance_double(Chart::Publisher) }
 

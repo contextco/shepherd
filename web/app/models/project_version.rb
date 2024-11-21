@@ -51,6 +51,12 @@ class ProjectVersion < ApplicationRecord
         service.save!
       end
 
+      dependencies.each do |dependency|
+        dependency = dependency.dup
+        dependency.project_version = new_version
+        dependency.save!
+      end
+
       new_version
     end
   end
