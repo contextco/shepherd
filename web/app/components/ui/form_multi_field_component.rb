@@ -11,6 +11,7 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   renders_one :label
 
   def unique_id
-    @unique_id ||= SecureRandom.alphanumeric(10)
+    # random id to be used for html element
+    @unique_id ||= "unique-#{SecureRandom.hex(5)}"
   end
 end
