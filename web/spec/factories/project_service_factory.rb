@@ -6,6 +6,9 @@ FactoryBot.define do
     secrets { [ 'my-secret' ] }
     cpu_cores { 1 }
     memory_bytes { 2.gigabytes }
+    pvc_size_bytes { nil }
+    pvc_mount_path { nil }
+    pvc_name { 'standard-pvc-name' }
 
     transient do
       team { nil }
