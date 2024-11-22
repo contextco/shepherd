@@ -40,6 +40,8 @@ RSpec.describe Project::ServiceController, type: :controller do
         image: 'image:1.2.1',
         cpu_cores: 1,
         memory_bytes: 2.gigabytes,
+        pvc_mount_path: '/data',
+        pvc_size_bytes: 10.gigabytes,
         environment_variables: [ { name: 'MY_ENV', value: 'value', templated: false } ],
         secrets: [ { name: 'MY_SECRET' } ],
         ports: [ { port: 80 }, { port: 443 } ]
@@ -73,6 +75,13 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(service.environment_variables.first['value']).to eq('value')
         expect(service.secrets.first).to eq('MY_SECRET')
         expect(service.ports).to eq(%w[80 443])
+      end
+
+      it 'creates a service with the correct PVC attributes' do
+        subject
+        service = ProjectService.order(:created_at).last
+        expect(service.pvc_mount_path).to eq('/data')
+        expect(service.pvc_size_bytes).to eq(10.gigabytes)
       end
     end
 
@@ -181,6 +190,16 @@ RSpec.describe Project::ServiceController, type: :controller do
         subject
         service = ProjectService.order(:created_at).last
         expect(service.ports).to eq([])
+      end
+    end
+
+    context 'with no PVC mount path or size' do
+      subject { post :create, params: no_pvc_valid_params }
+
+      let(:no_pvc_valid_params) { valid_params.deep_merge(service_form: { pvc_mount_path: nil, pvc_size_bytes: nil }) }
+
+      it 'creates a new service' do
+        expect { subject }.to change { ProjectService.count }.by(1)
       end
     end
   end
