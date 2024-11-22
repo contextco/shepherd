@@ -111,12 +111,21 @@ RSpec.describe Project::VersionController, type: :controller do
       context 'when the previous version has services' do
         let!(:service) { create(:project_service, project_version:) }
 
+        before do
+          service.update!(pvc_name: 'known-pvc-name')
+        end
+
         it 'creates a new version with the same services' do
           expect { subject }.to change { ProjectService.count }.by(1)
         end
 
         it 'creates a new version with the same service attributes' do
           expect { subject }.to change { ProjectService.where(name: service.name).count }.by(1)
+        end
+
+        it 'preserves the pvc_name' do
+          subject
+          expect(ProjectService.order(:created_at).last.pvc_name).to eq('known-pvc-name')
         end
       end
 
