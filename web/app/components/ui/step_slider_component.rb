@@ -5,6 +5,8 @@ class UI::StepSliderComponent < ApplicationComponent
   attribute :steps
   attribute :labels
   attribute :name
+  attribute :disabled, default: false
+  attribute :form_attributes, default: {}
 
   attribute :disabled_steps, default: []
 
