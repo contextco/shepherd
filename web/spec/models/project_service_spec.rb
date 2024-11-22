@@ -16,7 +16,10 @@ RSpec.describe ProjectService do
              { 'name' => 'ENV_VAR2', 'value' => 'value2' }
            ],
            secrets: [ 'TEST_SECRET' ],
-           ports: %w[80 443]
+           ports: %w[80 443],
+           pvc_name: 'test-pvc',
+           pvc_size_bytes: 10.gigabytes,
+           pvc_mount_path: '/data'
     )
   end
 
@@ -56,7 +59,14 @@ RSpec.describe ProjectService do
         image: {
           name: 'registry.example.com/org/app',
           tag: 'v1.2.3'
-        }
+        },
+        persistent_volume_claims: [
+          {
+            path: '/data',
+            name: 'test-pvc',
+            size_bytes: 10.gigabytes
+          }
+        ]
       )
     end
 
