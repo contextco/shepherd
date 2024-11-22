@@ -3,6 +3,10 @@
 class Service::Form
   include FormObject
 
+  MOUNT_DISK_OPTIONS = [
+    10.gigabytes, 20.gigabytes, 40.gigabytes, 80.gigabytes, 160.gigabytes, 320.gigabytes
+  ].freeze
+
   attribute :service_id
   attribute :name
   attribute :image
@@ -11,6 +15,9 @@ class Service::Form
   attribute :memory_bytes, default: 1.gigabyte
 
   attribute :predeploy_command
+
+  attribute :pvc_size_bytes, :integer
+  attribute :pvc_mount_path
 
   attribute :environment_variables, multiple: true do
     attribute :templated, default: false
@@ -50,6 +57,8 @@ class Service::Form
 
   validates :name, presence: true
   validates :image, presence: true
+  validates :pvc_size_bytes, inclusion: { in: MOUNT_DISK_OPTIONS }, allow_nil: true
+  validates :pvc_mount_path, presence: true, format: { with: %r{\/(?!\/$)(?!\/+)[\w.-]+(?:\/[\w.-]+)*\/?} }, if: -> { pvc_size_bytes.present? }
   validate :image_format
   validate :name_format
   validate :unique_environment_variable_secret_names
@@ -73,6 +82,8 @@ class Service::Form
       cpu_cores: service.cpu_cores,
       memory_bytes: service.memory_bytes,
       predeploy_command: service.predeploy_command,
+      pvc_size_bytes: service.pvc_size_bytes,
+      pvc_mount_path: service.pvc_mount_path,
       environment_variables: service.environment_variables.map do |env|
         { name: env[:name], value: env[:value], templated: env[:templated] }
       end,
@@ -104,6 +115,8 @@ class Service::Form
       cpu_cores: cpu_cores.to_i,
       memory_bytes: memory_bytes.to_i,
       predeploy_command: predeploy_command.presence,
+      pvc_size_bytes: pvc_size_bytes&.to_i,
+      pvc_mount_path: pvc_mount_path.presence,
       environment_variables: environment_variables_object,
       secrets: secrets_object,
       ports: ports_object
