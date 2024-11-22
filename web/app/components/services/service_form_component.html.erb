@@ -66,6 +66,12 @@
       <% end %>
     <% end %>
 
+    <hr class="border-stone-300 my-2">
+
+    <%= render Services::FormDiskComponent.new(form:, options: Service::Form::MOUNT_DISK_OPTIONS) %>
+
+    <hr class="border-stone-300 my-2">
+
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Open Ports',
       form:,
