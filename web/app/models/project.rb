@@ -12,10 +12,10 @@ class Project < ApplicationRecord
   scope :in_version_order, -> { order(created_at: :desc) }
 
   def published_versions
-    project_versions.filter(&:published?)
+    project_versions.order(created_at: :desc).filter(&:published?)
   end
 
   def draft_versions
-    project_versions.filter(&:draft?)
+    project_versions.order(created_at: :desc).filter(&:draft?)
   end
 end
