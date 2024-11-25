@@ -29,7 +29,7 @@ func TestServer_PublishChart(t *testing.T) {
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 
 	ctx := context.Background()
-	cluster := testcluster.New(t, ctx)
+	clusters := testcluster.All(t, ctx)
 
 	tests := []struct {
 		name    string
@@ -242,13 +242,12 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			if err := cluster.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
+			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
-
 			}
-			defer cluster.Uninstall(ctx, c.Chart)
+			defer clusters.Uninstall(ctx, c.Chart)
 
-			if err := waitForPods(t, ctx, cluster, tt.req.Chart); err != nil {
+			if err := waitForPods(t, ctx, clusters, tt.req.Chart); err != nil {
 				t.Fatalf("failed to wait for pods: %v", err)
 			}
 		})
@@ -304,11 +303,11 @@ func stripIndexDigests(t *testing.T, indexData []byte) []byte {
 	return bytes.Join(filteredLines, []byte("\n"))
 }
 
-func waitForPods(t *testing.T, ctx context.Context, cluster *testcluster.Cluster, chartParams *sidecar_pb.ChartParams) error {
+func waitForPods(t *testing.T, ctx context.Context, clusters *testcluster.ClusterSet, chartParams *sidecar_pb.ChartParams) error {
 	t.Helper()
 
 	for _, service := range chartParams.Services {
-		if err := cluster.WaitForPods(ctx, func(pod *corev1.Pod) bool {
+		if err := clusters.WaitForPods(ctx, func(pod *corev1.Pod) bool {
 			return strings.Contains(pod.Name, service.Name) && pod.Status.Phase == corev1.PodRunning
 		}); err != nil {
 			return err

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/sync/errgroup"
 	"helm.sh/helm/v3/pkg/action"
 	"k8s.io/client-go/discovery"
 	memory "k8s.io/client-go/discovery/cached"
@@ -23,6 +24,63 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+type ClusterSet struct {
+	clusters []*Cluster
+}
+
+func All(t *testing.T, ctx context.Context) *ClusterSet {
+	name := strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))
+
+	impls := []clusterImpl{
+		&kindCluster{name: name},
+		&gkeCluster{name: name},
+	}
+
+	clusters := make([]*Cluster, len(impls))
+	for i, impl := range impls {
+		clusters[i] = New(t, ctx, impl)
+	}
+
+	return &ClusterSet{clusters: clusters}
+}
+
+func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
+	var errgroup errgroup.Group
+	for _, cluster := range c.clusters {
+		cluster := cluster
+		errgroup.Go(func() error {
+			_ = cluster.Uninstall(ctx, ch)
+			return cluster.Install(ctx, ch, namespace)
+		})
+	}
+
+	return errgroup.Wait()
+}
+
+func (c *ClusterSet) Uninstall(ctx context.Context, ch *chart.Chart) error {
+	var errgroup errgroup.Group
+	for _, cluster := range c.clusters {
+		cluster := cluster
+		errgroup.Go(func() error {
+			return cluster.Uninstall(ctx, ch)
+		})
+	}
+
+	return errgroup.Wait()
+}
+
+func (c *ClusterSet) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
+	var errgroup errgroup.Group
+	for _, cluster := range c.clusters {
+		cluster := cluster
+		errgroup.Go(func() error {
+			return cluster.WaitForPods(ctx, matchFunc)
+		})
+	}
+
+	return errgroup.Wait()
+}
 
 // Cluster represents a kind kubernetes test cluster
 type Cluster struct {
@@ -151,13 +209,8 @@ func newRestClientGetter(kubeConfig []byte) (*restClientGetter, error) {
 }
 
 // New creates a new test cluster with the given name
-func New(t *testing.T, ctx context.Context) *Cluster {
-	impl := &kindCluster{name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))} // TODO: add gke impl
-	// impl := &gkeCluster{name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))}
-
-	cluster := &Cluster{
-		impl: impl,
-	}
+func New(t *testing.T, ctx context.Context, impl clusterImpl) *Cluster {
+	cluster := &Cluster{impl: impl}
 
 	_ = cluster.impl.delete(ctx) // ignore error if cluster does not exist
 
