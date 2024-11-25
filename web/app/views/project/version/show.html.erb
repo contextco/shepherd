@@ -16,8 +16,6 @@
       </div>
     </div>
 
-    <%= render Applications::InstallInstructionsComponent.new(version: @version, project: @app) if @version.published? %>
-
     <%= render Services::GridComponent.new(project_version: @version) %>
   </div>
 <% end %>

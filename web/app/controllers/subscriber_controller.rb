@@ -6,6 +6,7 @@ class SubscriberController < ApplicationController
 
   def show
     @subscriber = current_team.project_subscribers.find(params[:id])
+    @most_recent_published_version = @subscriber.project.published_versions.first
   end
 
   def new; end
