@@ -1,14 +1,14 @@
-externalIngress: {}
+externalIngress:
+  configs:
+  - host: test-host
+    port: 80
+    service: test-service
 image:
   repository: nginx
   tag: latest
 ingress:
   enabled: false
 initConfig: {}
-persistentVolumeClaims:
-- name: test-volume-claim
-  path: /data
-  size: 1024
 replicaCount: 1
 resources:
   limits:
@@ -19,3 +19,5 @@ resources:
     memory: "0"
 serviceAccount:
   create: false
+services:
+- port: 80

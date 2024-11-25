@@ -1,5 +1,6 @@
 environment:
   TEST_ENV: test-env-value
+externalIngress: {}
 image:
   repository: nginx
   tag: latest
