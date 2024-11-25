@@ -6,7 +6,6 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"testing"
 	"time"
@@ -104,11 +103,6 @@ func TestAdd_valuesFile(t *testing.T) {
 			if !valuesExists {
 				t.Error("Values file was not created")
 			}
-
-			dir := t.TempDir()
-			store.Dump(dir)
-
-			log.Println(dir)
 
 			if err := testfixture.VerifyWithinArchive(t, ctx, store, "test-repo/test-chart-1.0.0.tgz", "test-chart/charts/test-service/values.yaml"); err != nil {
 				t.Fatalf("Failed to verify fixtures: %v", err)
