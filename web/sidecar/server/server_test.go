@@ -242,7 +242,7 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			if err := cluster.Install(ctx, c.Chart); err != nil {
+			if err := cluster.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 
 			}
