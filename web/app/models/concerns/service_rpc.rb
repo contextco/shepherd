@@ -10,7 +10,9 @@ module ServiceRPC
       image: rpc_image,
       resources: rpc_resources,
       environment_config: rpc_environment_config,
-      endpoints: rpc_endpoints
+      endpoints: rpc_endpoints,
+      init_config: rpc_init_configs,
+      persistent_volume_claims: rpc_persistent_volume_claims
     )
   end
 
@@ -50,6 +52,22 @@ module ServiceRPC
     end
 
     Sidecar::EnvironmentConfig.new(environment_variables: env_vars, secrets: secret_vars)
+  end
+
+  def rpc_init_configs
+    Sidecar::InitConfig.new(init_commands: [ predeploy_command ]) if predeploy_command.present?
+  end
+
+  def rpc_persistent_volume_claims
+    return nil if pvc_size_bytes.nil?
+
+    [
+      Sidecar::PersistentVolumeClaimParams.new(
+        name: pvc_name,
+        size_bytes: pvc_size_bytes,
+        path: pvc_mount_path
+      )
+    ]
   end
 
   def env_to_k8s_secret_name(env_name)

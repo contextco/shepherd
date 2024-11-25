@@ -1,149 +1,88 @@
 <%= form_with model: service_object, url:, method: form_method do |form| %>
   <%= form.hidden_field :service_id, value: service_object.service_id  %>
   <div class="flex flex-col gap-6">
-    <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
-        <%= form.label :name, class: 'font-medium text-stone-800 flex-none' %>
-        <span class="text-stone-600 text-sm">
-          Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces.
-        </span>
-      </div>
+    <%= render UI::FormTextFieldComponent.new(title: 'Name') do |component| %>
+      <%= component.with_label do %>
+        Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces.
+      <% end %>
+      <%= component.with_field do %>
+        <%= form.text_field :name,
+                            required: true,
+                            'data-1p-ignore': true,
+                            'data-lpignore': true,
+                            class: 'w-full !p-0 border-0 focus:ring-0' %>
+      <% end %>
+    <% end %>
 
-      <%= form.text_field :name,
-                          required: true,
-                          'data-1p-ignore': true,
-                          'data-lpignore': true,
-                          class: 'w-1/2 text-input' %>
-    </div>
+    <%= render UI::FormTextFieldComponent.new(title: 'Image') do |component| %>
+      <%= component.with_label do %>
+        Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
+      <% end %>
+      <%= component.with_field do %>
+        <%= form.text_field :image,
+                            required: true,
+                            placeholder: 'docker.io/library/nginx:1.24.0-alpine3.17',
+                            class: 'w-full !p-0 border-0 focus:ring-0' %>
+      <% end %>
+    <% end %>
 
-    <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
-        <%= form.label :image, class: 'font-medium text-stone-800 flex-none' %>
-        <span class="text-stone-600 text-sm">
-          Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
-        </span>
-      </div>
+    <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory]) %>
 
-      <%= form.text_field :image,
-                          required: true,
-                          placeholder: 'docker.io/library/nginx:1.24.0-alpine3.17',
-                          class: 'w-1/2 text-input' %>
-    </div>
+    <%= render UI::FormMultiFieldComponent.new(
+      title: 'Environment Variables',
+      form:,
+      association_name: :environment_variables,
+      model_class: Service::Form::EnvironmentVariableForm,
+      child_component: Services::EnvironmentVariableComponent,
+      ) do |component| %>
+      <%= component.with_label do %>
+        Do not put sensitive values here. Sensitive values should be stored in secrets.
+      <% end %>
+    <% end %>
 
-    <div class="flex flex-col gap-4">
-      <span class="font-medium">Resources</span>
-      <div class="flex flex-col gap-8 rounded-md p-8 pt-10 border border-stone-400 w-full items-start px-8">
-        <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium w-16">CPU</span>
-          <%= render Services::CPUSliderComponent.new(form: ) %>
+    <%= render UI::FormMultiFieldComponent.new(
+      title: 'Secrets',
+      form:,
+      association_name: :secrets,
+      model_class: Service::Form::SecretForm,
+      child_component: Services::SecretComponent,
+    ) do |component| %>
+      <%= component.with_label do %>
+        Client provided secrets. Use for sensitive values like API keys, passwords, etc.
+      <% end %>
+    <% end %>
+
+    <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command') do |component| %>
+      <%= component.with_label do %>
+        Command to run before deploying the service. For example, database migrations.
+      <% end %>
+      <%= component.with_field do %>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">$</span>
+          <%= form.text_field :predeploy_command,
+                              placeholder: 'rake db:migrate',
+                              class: 'w-full !p-0 border-0 focus:ring-0' %>
         </div>
-        <div class="flex items-start grow w-full gap-8">
-          <span class="font-medium w-16">RAM</span>
-          <%= render Services::MemorySliderComponent.new(form: ) %>
-        </div>
-      </div>
-    </div>
+      <% end %>
+    <% end %>
 
-    <div class="flex items-start justify-between gap-24">
-      <div class="flex flex-col gap-1 shrink-0 w-64">
-        <span class="font-medium text-stone-800 flex-none">Environment Variables</span>
-        <span class="text-stone-600 text-sm">
-          Do not put sensitive values here. Sensitive values should be stored in secrets.
-        </span>
-      </div>
-      <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-full max-w-xl">
-        <%= render UI::DynamicNestedForm::FormComponent.new(
-          form:,
-          id: :environment_variable_form,
-          association_name: :environment_variables,
-          model_class: Service::Form::EnvironmentVariableForm,
-          wrapper_classes: 'flex flex-col gap-2',
-          maximum_subforms: 10,
-          ) do |component| %>
-          <% component.with_subform_content do |env_var_form| %>
-            <%= render Services::EnvironmentVariableComponent.new(form: env_var_form) %>
-          <% end %>
-        <% end %>
+    <hr class="border-stone-300 my-2">
 
-        <%= render UI::DynamicNestedForm::AddButtonComponent.new(
-          for_id: :environment_variable_form,
-          ) do |component| %>
-          <% component.with_button do %>
-            <div class="text-sm rounded-md cursor-pointer w-fit">
-              + Add
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
+    <%= render Services::FormDiskComponent.new(form:, options: Service::Form::MOUNT_DISK_OPTIONS) %>
 
-    <div class="flex items-start justify-between gap-24">
-      <div class="flex flex-col gap-1 shrink-0 w-64">
-        <span class="font-medium text-stone-800 flex-none">Secrets</span>
-        <span class="text-stone-600 text-sm">
-          Client provided secrets. Use for sensitive values like API keys, passwords, etc.
-        </span>
-      </div>
+    <hr class="border-stone-300 my-2">
 
-      <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-full max-w-xl">
-        <%= render UI::DynamicNestedForm::FormComponent.new(
-          form:,
-          id: :secret_form,
-          association_name: :secrets,
-          model_class: Service::Form::SecretForm,
-          wrapper_classes: 'flex flex-col gap-2',
-          maximum_subforms: 10,
-          ) do |component| %>
-          <% component.with_subform_content do |secret_form| %>
-            <%= render Services::SecretComponent.new(form: secret_form) %>
-          <% end %>
-        <% end %>
-
-        <%= render UI::DynamicNestedForm::AddButtonComponent.new(
-          for_id: :secret_form,
-        ) do |component| %>
-          <% component.with_button do %>
-            <div class="text-sm rounded-md cursor-pointer w-fit">
-              + Add
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-
-    <div class="flex items-start justify-between gap-24">
-      <div class="flex flex-col gap-1 w-64 shrink-0">
-        <span class="font-medium text-stone-800 flex-none">Open Ports</span>
-        <span class="text-stone-600 text-sm">
-          Optional open ports for the service. Leave empty if not needed.
-        </span>
-      </div>
-
-      <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-full max-w-xl">
-        <%= render UI::DynamicNestedForm::FormComponent.new(
-          form:,
-          id: :port_form,
-          association_name: :ports,
-          model_class: Service::Form::PortForm,
-          wrapper_classes: 'flex flex-col gap-2',
-          maximum_subforms: 10,
-          ) do |component| %>
-          <% component.with_subform_content do |port_form| %>
-            <%= render Services::PortComponent.new(form: port_form) %>
-          <% end %>
-        <% end %>
-
-        <%= render UI::DynamicNestedForm::AddButtonComponent.new(
-          for_id: :port_form,
-          ) do |component| %>
-          <% component.with_button do %>
-            <div class="text-sm rounded-md cursor-pointer w-fit">
-              + Add
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
+    <%= render UI::FormMultiFieldComponent.new(
+      title: 'Open Ports',
+      form:,
+      association_name: :ports,
+      model_class: Service::Form::PortForm,
+      child_component: Services::PortComponent,
+      ) do |component| %>
+      <%= component.with_label do %>
+        Optional open ports for the service. Leave empty if not needed.
+      <% end %>
+    <% end %>
 
     <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
   </div>

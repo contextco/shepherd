@@ -256,6 +256,27 @@
         }
       }
     },
+    "externalIngressConfigs": {
+      "type": "array",
+      "description": "List of external ingress configurations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string",
+            "description": "Service name"
+          },
+          "port": {
+            "type": "integer",
+            "description": "Port the service will listen on"
+          },
+          "host": {
+            "type": "string",
+            "description": "Host for the ingress rule"
+          }
+        }
+      }
+    },
     "global": {
       "type": "object",
       "description": "Global values"
