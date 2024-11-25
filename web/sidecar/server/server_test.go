@@ -30,15 +30,6 @@ func TestServer_PublishChart(t *testing.T) {
 
 	ctx := context.Background()
 	cluster := testcluster.New(t, ctx)
-	store := store.NewMemoryStore()
-	repoClient, err := repo.NewClient(ctx, store, &url.URL{})
-	if err != nil {
-		t.Fatalf("Failed to create repo client: %v", err)
-	}
-
-	s := &Server{
-		repoClient: repoClient,
-	}
 
 	tests := []struct {
 		name    string
@@ -217,7 +208,16 @@ func TestServer_PublishChart(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer store.Clear()
+			t.Parallel()
+			store := store.NewMemoryStore()
+			repoClient, err := repo.NewClient(ctx, store, &url.URL{})
+			if err != nil {
+				t.Fatalf("Failed to create repo client: %v", err)
+			}
+
+			s := &Server{
+				repoClient: repoClient,
+			}
 
 			_, err = s.PublishChart(ctx, tt.req)
 			if err != nil {
