@@ -1,5 +1,6 @@
 {{- if .Capabilities.APIVersions.Has "networking.gke.io/v1" }}
 {{- range .Values.externalIngress.configs }}
+apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   name: {{ .service }}-{{ .port }}-external-ingress-cert
