@@ -10,7 +10,7 @@ func TestNew(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	cluster := New(t, ctx)
+	cluster := New(t, ctx, &kindCluster{name: "test-new-cluster"})
 	if cluster == nil {
 		t.Fatal("expected cluster to not be nil")
 	}
