@@ -1,5 +1,5 @@
 <div class="flex h-full">
-  <div class="w-96 border-r min-h-full flex flex-col gap-2">
+  <div class="w-96 border-r min-h-full flex flex-col">
     <div class="flex w-full justify-between p-4">
       <div class="flex flex-col">
         <span class="text-xs sm:text-sm text-stone-400 font-medium">Application</span>
@@ -10,11 +10,6 @@
 
       <div class="flex flex-col justify-center">
         <div class="flex gap-2 items-center">
-
-          <%= link_to new_project_version_path(@app), class: 'px-2 py-1 text-sm flex gap-1 items-center rounded-md hover:bg-stone-100 duration-200' do %>
-            <%= heroicon 'plus', variant: :outline, class: 'size-4' %>
-            New Version
-          <% end %>
           <%= link_to edit_project_path(@app), class: 'p-2' do %>
             <%= heroicon 'cog', variant: :outline, class: 'size-5' %>
           <% end %>
@@ -23,6 +18,11 @@
     </div>
 
     <div class="flex flex-col gap-2 overflow-y-auto px-4 pb-8" id="<%= dom_id(@app, :version_list) %>" data-preserve-scroll>
+      <%= link_to new_project_version_path(@app), class: 'font-medium p-2 flex text-sm justify-center items-center min-h-[70px] gap-2 duration-200 hover:bg-stone-100 border-transparent border' do %>
+        <%= heroicon 'plus', variant: :outline, class: 'size-4 stroke-2' %>
+        New Version
+      <% end %>
+
       <% @app.project_versions.order(created_at: :desc).each do |version| %>
         <%= link_to version_path(version), class: ["p-2 flex flex-col gap-2 duration-200", {
           'bg-stone-100 border border-stone-400': version == @version,
