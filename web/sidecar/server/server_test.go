@@ -14,6 +14,7 @@ import (
 	"sidecar/repo"
 	"sidecar/store"
 	"sidecar/test/testcluster"
+	"sidecar/test/testenv"
 	"sidecar/test/testfixture"
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
@@ -23,6 +24,8 @@ import (
 )
 
 func TestServer_PublishChart(t *testing.T) {
+	testenv.Load(t)
+
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 
 	ctx := context.Background()
@@ -194,7 +197,7 @@ func TestServer_PublishChart(t *testing.T) {
 									{
 										Service: "test-service",
 										Port:    80,
-										Host:    "test-host",
+										Host:    "context.ai",
 									},
 								},
 							},

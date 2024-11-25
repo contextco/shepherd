@@ -152,6 +152,7 @@ func newRestClientGetter(kubeConfig []byte) (*restClientGetter, error) {
 // New creates a new test cluster with the given name
 func New(t *testing.T, ctx context.Context) *Cluster {
 	impl := &kindCluster{name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))} // TODO: add gke impl
+	// impl := &gkeCluster{name: strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))}
 
 	cluster := &Cluster{
 		impl: impl,
