@@ -22,6 +22,26 @@ type Params struct {
 	InitConfig InitConfig
 
 	PersistentVolumeClaims []*PersistentVolumeClaim
+
+	IngressConfig IngressConfig
+}
+
+type IngressConfig struct {
+	External []*ExternalIngressConfig
+}
+
+type ExternalIngressConfig struct {
+	Service string
+	Port    int
+	Host    string
+}
+
+func (e ExternalIngressConfig) toValues() map[string]interface{} {
+	return map[string]interface{}{
+		"service": e.Service,
+		"port":    e.Port,
+		"host":    e.Host,
+	}
 }
 
 type PersistentVolumeClaim struct {
@@ -167,6 +187,9 @@ func (p *Params) toValues() (*values.File, error) {
 			"resources":              p.Resources.toValues(),
 			"initConfig":             p.InitConfig.toValues(),
 			"persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
+			"externalIngress": map[string]any{
+				"configs": sliceToValues(p.IngressConfig.External),
+			},
 			"ingress": map[string]any{
 				"enabled": false,
 			},
@@ -234,6 +257,16 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			persistentVolumeClaims = append(persistentVolumeClaims, p)
 		}
 
+		externalIngressConfigs := []*ExternalIngressConfig{}
+		for _, v := range service.GetIngressConfig().GetExternal() {
+			e := &ExternalIngressConfig{
+				Service: v.GetService(),
+				Port:    int(v.GetPort()),
+				Host:    v.GetHost(),
+			}
+			externalIngressConfigs = append(externalIngressConfigs, e)
+		}
+
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
@@ -245,6 +278,9 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				CPUCoresLimit:        int(service.GetResources().GetCpuCoresLimit()),
 				MemoryBytesRequested: service.GetResources().GetMemoryBytesRequested(),
 				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
+			},
+			IngressConfig: IngressConfig{
+				External: externalIngressConfigs,
 			},
 			Environment:            env,
 			Secrets:                secrets,

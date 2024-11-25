@@ -49,6 +49,7 @@ func TestParams_toValues(t *testing.T) {
 					"ENV_VAR1": "value1",
 					"ENV_VAR2": "value2",
 				},
+				"externalIngress": map[string]any{},
 				"initConfig": map[string]interface{}{
 					"initCommands": []map[string]interface{}{
 						{
@@ -105,8 +106,9 @@ func TestParams_toValues(t *testing.T) {
 					"repository": "test-image",
 					"tag":        "latest",
 				},
-				"replicaCount": int32(3),
-				"initConfig":   map[string]any{},
+				"externalIngress": map[string]any{},
+				"replicaCount":    int32(3),
+				"initConfig":      map[string]any{},
 				"resources": map[string]interface{}{
 					"limits": map[string]interface{}{
 						"cpu":    "2000m",
@@ -180,6 +182,7 @@ func TestParams_toYaml(t *testing.T) {
 			want: `environment:
   ENV_VAR1: value1
   ENV_VAR2: value2
+externalIngress: {}
 image:
   repository: test-image
   tag: latest
@@ -222,7 +225,8 @@ services:
 					MemoryBytesLimit:     2048,
 				},
 			},
-			want: `image:
+			want: `externalIngress: {}
+image:
   repository: test-image
   tag: latest
 ingress:
