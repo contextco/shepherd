@@ -37,7 +37,7 @@ type clusterImpl interface {
 	isReusable() bool
 }
 
-func (c *Cluster) Install(ctx context.Context, ch *chart.Chart) error {
+func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
 	kubeConfig, err := c.impl.getKubeConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get kubeconfig: %w", err)
@@ -49,9 +49,10 @@ func (c *Cluster) Install(ctx context.Context, ch *chart.Chart) error {
 	}
 
 	client := action.NewInstall(actionConfig)
-	client.Namespace = "default"
+	client.Namespace = namespace
 	client.ReleaseName = ch.ReleaseName()
 	client.Replace = true
+	client.CreateNamespace = true
 
 	rel, err := client.RunWithContext(ctx, ch.KubeChart(), nil)
 	if err != nil {
