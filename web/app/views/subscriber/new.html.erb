@@ -1,0 +1,38 @@
+<div class="flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+  <span class="font-medium w-fit text-stone-500">New Customer Deployment</span>
+
+  <%= form_for ProjectSubscriber.new, url: project_subscriber_index_path, method: :post do |form| %>
+    <div class='flex flex-col gap-6'>
+
+      <%= render UI::FormTextFieldComponent.new(title: 'Organization Name') do |component| %>
+        <%= component.with_label do %>
+          Name of the organization that will be deploying this application.
+        <% end %>
+        <%= component.with_field do %>
+          <%= form.text_field :name, required: true, class: 'w-full !p-0 border-0 focus:ring-0' %>
+        <% end %>
+      <% end %>
+
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1 max-w-96">
+          <span class="font-medium text-stone-800 flex-none">Application</span>
+          <span class="text-stone-600 text-sm">
+            Select the application you want to deploy.
+          </span>
+        </div>
+
+        <%= form.collection_select :project_id,
+                                    current_user.team.projects,
+                                    :id,
+                                    :name,
+                                    {
+                                     prompt: 'Select an application',
+                                     required: true,
+                                   },
+                                    class: 'w-7/12 p-2 rounded-md border-stone-400' %>
+      </div>
+
+      <%= form.submit "Create", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+    </div>
+  <% end %>
+</div>
