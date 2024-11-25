@@ -58,7 +58,7 @@ message OverrideParams {
     google.protobuf.Value value = 2;
 }
 
-// Next ID: 8
+// Next ID: 9
 message ServiceParams {
     string name = 6;
 
@@ -75,6 +75,18 @@ message ServiceParams {
     InitConfig init_config = 7;
 
     repeated PersistentVolumeClaimParams persistent_volume_claims = 8;
+
+    IngressParams ingress_config = 9;
+}
+
+message IngressParams {
+    repeated ExternalIngressParams external = 1;
+}
+
+message ExternalIngressParams {
+    string service = 1;
+    int32 port = 2;
+    string host = 3;
 }
 
 message PersistentVolumeClaimParams {

@@ -1,42 +1,17 @@
-{{- if .Values.ingress.enabled -}}
+{{- range .Values.externalIngress.configs }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "test.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  {{- with .Values.ingress.annotations }}
+  name: {{ .service }}-{{ .port }}-external-ingress
+  namespace: {{ $.Release.Namespace }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    kubernetes.io/ingress.global-static-ip-name: {{ .service }}-{{ .port }}-external-ingress-ip
+    networking.gke.io/managed-certificates: {{ .service }}-{{ .port }}-external-ingress-cert
 spec:
-  {{- with .Values.ingress.className }}
-  ingressClassName: {{ . }}
-  {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
-  rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
-        paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
-            backend:
-              service:
-                name: {{ include "test.fullname" $ }}
-                port:
-                  number: {{ $.Values.service.port }}
-          {{- end }}
-    {{- end }}
+  defaultBackend:
+    service:
+      name: {{ .service }}
+      port:
+        number: {{ .port }}
 {{- end }}
+

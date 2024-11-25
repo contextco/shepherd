@@ -170,6 +170,40 @@ func TestServer_PublishChart(t *testing.T) {
 			},
 		},
 		{
+			name: "valid chart with external ingress",
+			req: &sidecar_pb.PublishChartRequest{
+				RepositoryDirectory: "test-repo",
+				Chart: &sidecar_pb.ChartParams{
+					Name:    "test-chart-external-ingress",
+					Version: "1.0.0",
+					Services: []*sidecar_pb.ServiceParams{
+						{
+							Name: "test-service",
+							Image: &sidecar_pb.Image{
+								Name: "nginx",
+								Tag:  "latest",
+							},
+							ReplicaCount: 1,
+							Endpoints: []*sidecar_pb.Endpoint{
+								{
+									Port: 80,
+								},
+							},
+							IngressConfig: &sidecar_pb.IngressParams{
+								External: []*sidecar_pb.ExternalIngressParams{
+									{
+										Service: "test-service",
+										Port:    80,
+										Host:    "test-host",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "missing chart",
 			req: &sidecar_pb.PublishChartRequest{
 				RepositoryDirectory: "test-repo",
@@ -207,6 +241,7 @@ func TestServer_PublishChart(t *testing.T) {
 
 			if err := cluster.Install(ctx, c.Chart); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
+
 			}
 			defer cluster.Uninstall(ctx, c.Chart)
 
@@ -236,8 +271,12 @@ func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStor
 	}
 
 	for _, service := range chartParams.Services {
-		keyArchiveFiles = append(keyArchiveFiles, fmt.Sprintf("%s/charts/%s/Chart.yaml", chartParams.Name, service.Name))
-		keyArchiveFiles = append(keyArchiveFiles, fmt.Sprintf("%s/charts/%s/values.yaml", chartParams.Name, service.Name))
+		keyArchiveFiles = append(keyArchiveFiles,
+			[]string{
+				fmt.Sprintf("%s/charts/%s/Chart.yaml", chartParams.Name, service.Name),
+				fmt.Sprintf("%s/charts/%s/values.yaml", chartParams.Name, service.Name),
+			}...,
+		)
 	}
 
 	for _, file := range keyArchiveFiles {

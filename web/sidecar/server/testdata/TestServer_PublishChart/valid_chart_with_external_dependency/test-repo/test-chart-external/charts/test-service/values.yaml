@@ -1,3 +1,4 @@
+externalIngress: {}
 image:
   repository: nginx
   tag: latest
