@@ -1,0 +1,11 @@
+{{- if .Capabilities.APIVersions.Has "networking.gke.io/v1" }}
+{{- range .Values.externalIngress.configs }}
+kind: ManagedCertificate
+metadata:
+  name: {{ .service }}-{{ .port }}-external-ingress-cert
+  namespace: {{ $.Release.Namespace }}
+spec:
+  domains:
+    - {{ .host }}
+{{- end }}
+{{- end }}
