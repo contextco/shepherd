@@ -9,6 +9,7 @@
           <% if user_signed_in? %>
             <div class="items-center rounded-md gap-4 hidden sm:flex flex-col flex">
               <%= render Sidebar::IconComponent.new(path: root_path, icon: 'computer-desktop', label: "Applications") %>
+              <%= render Sidebar::IconComponent.new(path: project_subscriber_index_path, icon: 'building-office-2', label: "Deployments") %>
             </div>
           <% end %>
         </div>
