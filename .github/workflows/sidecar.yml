@@ -4,10 +4,9 @@
 name: Sidecar
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+    paths: [ "web/sidecar/**" ]
 
 
 defaults:
