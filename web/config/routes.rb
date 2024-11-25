@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :subscriber, only: [ :index, :new, :create, :show, :destroy ], as: :project_subscriber, controller: "subscriber"
 
   resources :team, only: [ :index, :create ]
 
