@@ -1,6 +1,6 @@
 externalIngress:
   configs:
-  - host: test-host
+  - host: context.ai
     port: 80
     service: test-service
 image:
