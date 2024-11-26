@@ -6,11 +6,41 @@ RSpec.describe SubscriberController, type: :request do
   let(:team) { create(:team) }
   let(:user) { create(:user, team:) }
   let(:subscriber) { create(:project_subscriber, project:) }
-  let(:project) { create(:project, team:) }
+  let!(:project) { create(:project, team:) }
   let(:project_version) { create(:project_version, project:) }
 
   before do
     login_as user
+  end
+
+  describe 'GET #show' do
+    subject { get project_subscriber_path(subscriber) }
+
+    it 'returns a success response' do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'POST #create' do
+    subject { post project_subscriber_index_path, params: { project_subscriber: { name: 'test', project_id: project.id } } }
+
+    it 'creates a new subscriber' do
+      expect { subject }.to change { ProjectSubscriber.count }.by(1)
+    end
+
+    it 'redirects to the subscriber index path' do
+      subject
+      expect(response).to redirect_to(project_subscriber_index_path)
+    end
+
+    it 'creates a new helm repo' do
+      expect { subject }.to change { HelmRepo.count }.by(1)
+    end
+
+    it 'creates a new helm user' do
+      expect { subject }.to change { HelmUser.count }.by(1)
+    end
   end
 
   describe 'GET #client_values_yaml' do
