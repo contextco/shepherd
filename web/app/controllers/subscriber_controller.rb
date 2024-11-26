@@ -1,5 +1,8 @@
 
 class SubscriberController < ApplicationController
+
+  class NotFoundError < StandardError; end
+
   def index
     @subscribers = current_team.non_dummy_project_subscribers
   end
@@ -25,6 +28,28 @@ class SubscriberController < ApplicationController
 
     flash[:notice] = "Subscriber \"#{subscriber_params[:name]}\" removed"
     redirect_to project_subscriber_index_path
+  end
+
+  def client_values_yaml
+    helm_repo = current_team.project_subscribers.find(params[:id]).helm_repo
+    version = current_team.project_versions.find(params[:project_version_id])
+
+    begin
+      file = helm_repo.client_values_yaml(version:)
+      raise NotFoundError, "File not found" if file.nil? unless file.present?
+
+      yaml = file.download.string
+
+      response.headers["Cache-Control"] = "no-cache"
+      response.headers["Content-Disposition"] = "attachment; filename=#{helm_repo.client_yaml_filename(version:)}"
+
+      render plain: yaml, content_type: "application/x-yaml", layout: false
+    rescue NotFoundError => e
+      Rails.logger.error("Error loading client_values.yaml: #{e.message}")
+
+      flash[:error] = "File not found"
+      redirect_to project_subscriber_path(params[:id])
+    end
   end
 
   private
