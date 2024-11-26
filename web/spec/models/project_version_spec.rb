@@ -177,10 +177,4 @@ RSpec.describe ProjectVersion do
       )
     end
   end
-
-  describe '#client_values_yaml_path' do
-    it 'returns the correct path' do
-      expect(project_version.client_values_yaml_path).to eq("test-repo-test-user/my-testing-project-#{project_version.version}-values.yaml")
-    end
-  end
 end

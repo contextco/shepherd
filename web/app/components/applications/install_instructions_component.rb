@@ -2,5 +2,13 @@
 
 class Applications::InstallInstructionsComponent < ApplicationComponent
   attribute :version
-  attribute :project
+  attribute :subscriber
+
+  def project
+    subscriber.project
+  end
+
+  def helm_repo
+    subscriber.helm_repo
+  end
 end

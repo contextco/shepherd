@@ -64,12 +64,4 @@ class ProjectVersion < ApplicationRecord
       new_version
     end
   end
-
-  def client_yaml_filename
-    "values-#{version}.yaml"
-  end
-
-  def client_values_yaml_path
-    "#{helm_repo.repo_name}/#{project.name}-#{version}-values.yaml"
-  end
 end
