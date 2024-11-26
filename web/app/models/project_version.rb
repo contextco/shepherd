@@ -7,7 +7,6 @@ class ProjectVersion < ApplicationRecord
   has_many :services, dependent: :destroy, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy
 
-  has_one :helm_repo, through: :project
   has_one :helm_chart, dependent: :destroy, as: :owner
 
   has_one :team, through: :project
@@ -38,7 +37,7 @@ class ProjectVersion < ApplicationRecord
     building!
     # could we do this more elegantly by keeping track in helm_repo model of already published versions?
     # TODO: investigate and potentially fix
-    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo) + [ helm_repo ]
+    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo)
     helm_repos = [ helm_repos ] unless helm_repos.is_a?(Array)
     publisher = Chart::Publisher.new(rpc_chart, helm_repos)
     publisher.publish_chart!
