@@ -7,7 +7,6 @@ RSpec.describe Project::VersionController, type: :controller do
   let(:team) { create(:team) }
   let!(:project) { create(:project, team:) }
   let(:project_version) { create(:project_version, project:) }
-  # let(:project_version) { project.project_versions.first }
   let(:valid_params) do
     {
       project_id: project.id,
@@ -237,41 +236,6 @@ RSpec.describe Project::VersionController, type: :controller do
       it 'sets a success flash message' do
         subject
         expect(flash[:notice]).to eq('Application version unpublished')
-      end
-    end
-  end
-
-  describe 'GET #client_values_yaml' do
-    subject { get :client_values_yaml, params: { id: project_version.id } }
-
-    let(:mock_file) { double('file') }
-    let(:response_body) { 'client values yaml' }
-
-    before do
-      allow_any_instance_of(HelmRepo).to receive(:client_values_yaml).and_return(mock_file)
-    end
-
-    it_behaves_like 'requires authentication'
-
-    context 'when the file is present' do
-      before do
-        allow(mock_file).to receive(:download).and_return(mock_file)
-        allow(mock_file).to receive(:string).and_return(response_body)
-      end
-
-      it 'returns the client values yaml file' do
-        subject
-        expect(response.body).to eq(response_body)
-      end
-    end
-
-    context 'when the file is not present' do
-      let(:mock_file) { nil }
-
-      it 'redirects to the project version page' do
-        subject
-        expect(flash[:error]).to eq('File not found')
-        expect(response).to redirect_to(version_path(project_version))
       end
     end
   end

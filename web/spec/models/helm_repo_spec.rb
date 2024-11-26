@@ -26,4 +26,10 @@ RSpec.describe HelmRepo do
       expect(helm_repo.install_chart_command(version: project_version)).to eq("helm install -f values-#{project_version.version}.yaml --create-namespace --namespace another-one another-one test-repo/another-one --version #{project_version.version}")
     end
   end
+
+  describe '#client_values_yaml_path' do
+    it 'returns the correct path' do
+      expect(helm_repo.send(:client_values_yaml_path, version: project_version)).to eq("test-repo-test-user/another-one-#{project_version.version}-values.yaml")
+    end
+  end
 end
