@@ -1,6 +1,5 @@
 
 class SubscriberController < ApplicationController
-
   class NotFoundError < StandardError; end
 
   def index
