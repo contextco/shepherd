@@ -12,7 +12,7 @@ class Project < ApplicationRecord
   has_one :dummy_project_subscriber, -> { dummy }, class_name: "ProjectSubscriber"
   has_many :non_dummy_project_subscribers, -> { non_dummy }, class_name: "ProjectSubscriber"
 
-  after_create :setup_dummy_subscriber
+  after_commit :setup_dummy_subscriber
 
   scope :in_version_order, -> { order(created_at: :desc) }
 
