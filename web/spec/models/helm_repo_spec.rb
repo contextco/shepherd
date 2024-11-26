@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe HelmRepo do
   let(:project) { create(:project, name: 'another-one') }
   let(:project_version) { create(:project_version, project:) }
-  let(:helm_repo) { create(:helm_repo, name: 'test-repo', project:) }
+  let(:project_subscriber) { create(:project_subscriber, project:) }
+  let(:helm_repo) { create(:helm_repo, name: 'test-repo', project_subscriber:) }
   let!(:helm_user) { create(:helm_user, helm_repo:, name: 'test-user', password: 'test-password') }
   let!(:service) { create(:project_service, name: 'test-service', project_version:) }
 
