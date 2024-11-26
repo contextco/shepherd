@@ -17,6 +17,10 @@ func (c *kindCluster) isReusable() bool {
 	return false
 }
 
+func (c *kindCluster) source() string {
+	return "kind"
+}
+
 func (c *kindCluster) create(ctx context.Context) error {
 	cmd := exec.CommandContext(ctx, "kind", "create", "cluster", "--name", c.name)
 	if output, err := cmd.CombinedOutput(); err != nil {
