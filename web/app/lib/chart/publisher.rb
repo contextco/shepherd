@@ -3,10 +3,10 @@
 class Chart::Publisher
   class ChartValidationError < StandardError; end
 
-  def initialize(rpc_chart, project_version)
+  def initialize(rpc_chart, helm_repos)
     @client = SidecarClient.client
     @rpc_chart = rpc_chart
-    @project_version = project_version
+    @helm_repos = helm_repos
   end
 
   def validate_chart!
@@ -20,13 +20,15 @@ class Chart::Publisher
   end
 
   def publish_chart!
-    req = Sidecar::PublishChartRequest.new(chart: @rpc_chart, repository_directory:)
-    @client.send(:publish_chart, req)
+    repository_directories.each do |repository_directory|
+      req = Sidecar::PublishChartRequest.new(chart: @rpc_chart, repository_directory:)
+      @client.send(:publish_chart, req)
+    end
   end
 
   private
 
-  def repository_directory
-    @repository_directory ||= @project_version.helm_repo.repo_name
+  def repository_directories
+    @repository_directories ||= @helm_repos.map(&:repo_name)
   end
 end
