@@ -7,7 +7,7 @@ class ProjectSubscriber < ApplicationRecord
 
   has_one :helm_repo, dependent: :destroy
 
-  after_commit :setup_helm_repo
+  after_create_commit :setup_helm_repo
 
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
