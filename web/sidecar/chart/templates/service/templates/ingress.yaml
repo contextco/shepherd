@@ -7,6 +7,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.global-static-ip-name: {{ .service }}-{{ .port }}-external-ingress-ip
     networking.gke.io/managed-certificates: {{ .service }}-{{ .port }}-external-ingress-cert
+    {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
+    alb.ingress.k8s.aws/scheme: internet-facing
+    {{- end }}
 spec:
   defaultBackend:
     service:

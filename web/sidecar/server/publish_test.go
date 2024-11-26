@@ -23,8 +23,21 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+func TestServer_Capabilities(t *testing.T) {
+	testenv.MustLoad(t)
+
+	ctx := context.Background()
+	clusters := testcluster.All(t, ctx)
+	capabilities, err := clusters.Capabilities(ctx)
+	if err != nil {
+		t.Fatalf("failed to get capabilities: %v", err)
+	}
+
+	t.Logf("capabilities: %v", capabilities)
+}
+
 func TestServer_PublishChart(t *testing.T) {
-	_ = testenv.Load(t)
+	testenv.MustLoad(t)
 
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 
@@ -242,6 +255,7 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
+			err = clusters.Install(ctx, c.Chart, tt.req.Chart.Name)
 			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
