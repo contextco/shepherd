@@ -69,6 +69,10 @@ func (c *gkeCluster) restConfig(ctx context.Context) (*rest.Config, error) {
 	return clientConfig, nil
 }
 
+func (c *gkeCluster) source() string {
+	return "gke"
+}
+
 func getGkeKubeConfig(ctx context.Context) ([]byte, error) {
 	client, err := container.NewClusterManagerClient(ctx)
 	if err != nil {

@@ -35,6 +35,7 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 	impls := []clusterImpl{
 		&kindCluster{name: name},
 		&gkeCluster{name: name},
+		&eksCluster{name: name},
 	}
 
 	clusters := make([]*Cluster, len(impls))
@@ -46,40 +47,22 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 }
 
 func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
-	var errgroup errgroup.Group
-	for _, cluster := range c.clusters {
-		cluster := cluster
-		errgroup.Go(func() error {
-			_ = cluster.Uninstall(ctx, ch)
-			return cluster.Install(ctx, ch, namespace)
-		})
-	}
-
-	return errgroup.Wait()
+	return runInParallel(ctx, func(cluster *Cluster) error {
+		_ = cluster.Uninstall(ctx, ch)
+		return cluster.Install(ctx, ch, namespace)
+	}, c.clusters)
 }
 
 func (c *ClusterSet) Uninstall(ctx context.Context, ch *chart.Chart) error {
-	var errgroup errgroup.Group
-	for _, cluster := range c.clusters {
-		cluster := cluster
-		errgroup.Go(func() error {
-			return cluster.Uninstall(ctx, ch)
-		})
-	}
-
-	return errgroup.Wait()
+	return runInParallel(ctx, func(cluster *Cluster) error {
+		return cluster.Uninstall(ctx, ch)
+	}, c.clusters)
 }
 
 func (c *ClusterSet) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
-	var errgroup errgroup.Group
-	for _, cluster := range c.clusters {
-		cluster := cluster
-		errgroup.Go(func() error {
-			return cluster.WaitForPods(ctx, matchFunc)
-		})
-	}
-
-	return errgroup.Wait()
+	return runInParallel(ctx, func(cluster *Cluster) error {
+		return cluster.WaitForPods(ctx, matchFunc)
+	}, c.clusters)
 }
 
 // Cluster represents a kind kubernetes test cluster
@@ -93,6 +76,7 @@ type clusterImpl interface {
 	restConfig(ctx context.Context) (*rest.Config, error)
 	getKubeConfig(ctx context.Context) ([]byte, error)
 	isReusable() bool
+	source() string
 }
 
 func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
@@ -303,4 +287,13 @@ func Capabilities(kubeConfig []byte) ([]string, error) {
 	}
 
 	return versions, nil
+}
+
+func runInParallel[T any](ctx context.Context, fn func(T) error, items []T) error {
+	errgroup, ctx := errgroup.WithContext(ctx)
+	for _, item := range items {
+		item := item
+		errgroup.Go(func() error { return fn(item) })
+	}
+	return errgroup.Wait()
 }
