@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 class HelmRepo < ApplicationRecord
-  belongs_to :project
+  belongs_to :project, optional: true # TODO: remove this when helm repos are created through subscribers
+  belongs_to :project_subscriber, optional: true # remove optional when migration complete
 
   has_one :helm_user, dependent: :destroy
   validates :name, presence: true
+
+  after_create :setup_helm_user
 
   def repo_name
     # name is not necessarily unique so we need to include the user name which is SecureRandom
@@ -46,6 +49,13 @@ class HelmRepo < ApplicationRecord
   end
 
   private
+
+  def setup_helm_user
+      create_helm_user!(
+        name: SecureRandom.urlsafe_base64(10),
+        password: SecureRandom.urlsafe_base64(16)
+      )
+  end
 
   def base_url
     # TODO: this does not belong here
