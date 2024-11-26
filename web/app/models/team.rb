@@ -10,20 +10,17 @@ class Team < ApplicationRecord
   has_many :services, dependent: :destroy, through: :project_versions, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy, through: :project_versions, class_name: "Dependency"
   has_many :project_subscribers, through: :projects
+  has_many :non_dummy_project_subscribers, through: :projects
 
   def setup_scaffolding!(name, description)
     transaction do
-      app = projects.create!(name:)
-      version = app.project_versions.create!(
+      project = projects.create!(name:)
+      version = project.project_versions.create!(
         description:,
         version: "0.0.1",
         state: :draft
       )
-      repo = app.create_helm_repo!(name: app.name)
-      repo.create_helm_user!(
-        name: SecureRandom.urlsafe_base64(10),
-        password: SecureRandom.urlsafe_base64(16)
-      )
+      project.create_helm_repo!(name: project.name) # TODO: remove this when helm repos are created through subscribers
 
       version
     end
