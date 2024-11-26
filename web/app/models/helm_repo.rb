@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class HelmRepo < ApplicationRecord
-  belongs_to :project, optional: true # TODO: remove this when helm repos are created through subscribers
   belongs_to :project_subscriber, optional: true # remove optional when migration complete
 
   has_one :helm_user, dependent: :destroy
+  has_one :project, through: :project_subscriber
   validates :name, presence: true
 
   after_create :setup_helm_user
@@ -28,7 +28,7 @@ class HelmRepo < ApplicationRecord
 
   def install_chart_command(version:)
     version_version = version.version
-    project_name = project_subscriber&.project&.name || project.name # remove after mgiration complete
+    project_name = project.name
     "helm install -f #{client_yaml_filename(version:)} --create-namespace --namespace #{project_name} #{project_name} #{name}/#{project_name} --version #{version_version}"
   end
 

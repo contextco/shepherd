@@ -20,7 +20,6 @@ class Team < ApplicationRecord
         version: "0.0.1",
         state: :draft
       )
-      project.create_helm_repo!(name: project.name) # TODO: remove this when helm repos are created through subscribers
 
       version
     end

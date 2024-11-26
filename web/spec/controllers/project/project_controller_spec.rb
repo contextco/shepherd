@@ -23,16 +23,6 @@ RSpec.describe Project::ProjectController, type: :controller do
         subject
         expect(Project.last.project_versions.count).to eq(1)
       end
-
-      it 'creates a new helm repo' do
-        subject
-        expect(Project.last.helm_repo).to be_present
-      end
-
-      it 'creates a new helm user' do
-        subject
-        expect(Project.last.helm_repo.helm_user).to be_present
-      end
     end
 
     context 'when using an illegal name' do
