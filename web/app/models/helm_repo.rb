@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class HelmRepo < ApplicationRecord
-  belongs_to :project_subscriber, optional: true # remove optional when migration complete
+  belongs_to :project_subscriber
 
   has_one :helm_user, dependent: :destroy
   has_one :project, through: :project_subscriber
