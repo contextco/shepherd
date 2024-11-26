@@ -3,10 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe ProjectVersion do
-  let(:project) { create(:project, name: "my-testing-project") }
+  let!(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
-  let(:helm_repo) { project.helm_repo }
-  let(:helm_user) { project.helm_repo.helm_user }
+  let(:helm_repo) { project.dummy_project_subscriber.helm_repo }
+  let(:helm_user) { project.dummy_project_subscriber.helm_repo.helm_user }
+  let(:temp_helm_repo) { project.helm_repo }
+  let(:temp_helm_user) { project.helm_repo.helm_user }
   let!(:service) do
     create(:project_service,
            project_version:,
@@ -27,8 +29,8 @@ RSpec.describe ProjectVersion do
   let(:mock_client) { double(:sidecar_client) }
 
   before do
-    helm_repo.update!(name: 'test-repo')
-    helm_user.update!(name: 'test-user', password: 'test-password')
+    temp_helm_repo.update!(name: 'test-repo')
+    temp_helm_user.update!(name: 'test-user', password: 'test-password')
     allow(SidecarClient).to receive(:client).and_return(mock_client)
   end
 
@@ -41,13 +43,18 @@ RSpec.describe ProjectVersion do
         .and_return(response)
     end
 
-    it 'calls publish_chart with correct parameters' do
-      expect(mock_client).to receive(:send) do |method, request|
+    it 'calls publish_chart twice' do
+      expect(mock_client).to receive(:send).twice.and_return(response)
+      project_version.publish!
+    end
+
+    it 'calls publish_chart twice with correct parameters' do
+      expect(mock_client).to receive(:send).twice do |method, request|
         expect(method).to eq(:publish_chart)
         expect(request.chart.name).to eq('my-testing-project')
         expect(request.chart.version).to eq(project_version.version)
         expect(request.chart.services.first.replica_count).to eq(1)
-        expect(request.repository_directory).to eq('test-repo-test-user')
+        expect(request.repository_directory).to eq(helm_repo.repo_name).or eq(temp_helm_repo.repo_name)
         expect(request.chart.services.first.endpoints).to contain_exactly(
           have_attributes(port: 80),
           have_attributes(port: 443)
@@ -168,12 +175,6 @@ RSpec.describe ProjectVersion do
         Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
         Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user'))
       )
-    end
-  end
-
-  describe '#client_values_yaml_path' do
-    it 'returns the correct path' do
-      expect(project_version.client_values_yaml_path).to eq("test-repo-test-user/my-testing-project-#{project_version.version}-values.yaml")
     end
   end
 end

@@ -34,9 +34,13 @@ class ProjectVersion < ApplicationRecord
     versions[versions.find_index(self) + 1]
   end
 
-  def publish!
+  def publish!(project_subscriber: nil)
     building!
-    publisher = Chart::Publisher.new(rpc_chart, self)
+    # could we do this more elegantly by keeping track in helm_repo model of already published versions?
+    # TODO: investigate and potentially fix
+    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo) + [ helm_repo ]
+    helm_repos = [ helm_repos ] unless helm_repos.is_a?(Array)
+    publisher = Chart::Publisher.new(rpc_chart, helm_repos)
     publisher.publish_chart!
     published!
   end
@@ -59,13 +63,5 @@ class ProjectVersion < ApplicationRecord
 
       new_version
     end
-  end
-
-  def client_yaml_filename
-    "values-#{version}.yaml"
-  end
-
-  def client_values_yaml_path
-    "#{helm_repo.repo_name}/#{project.name}-#{version}-values.yaml"
   end
 end

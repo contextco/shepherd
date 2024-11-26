@@ -14,7 +14,7 @@
   </div>
 
   <% if @most_recent_published_version.present? %>
-    <%= render Applications::InstallInstructionsComponent.new(version: @most_recent_published_version, project: @subscriber.project) %>
+    <%= render Applications::InstallInstructionsComponent.new(version: @most_recent_published_version, subscriber: @subscriber) %>
   <% else %>
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-4">
