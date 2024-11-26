@@ -6,7 +6,8 @@ RSpec.describe Project::VersionController, type: :controller do
   let(:user) { create(:user, team:) }
   let(:team) { create(:team) }
   let!(:project) { create(:project, team:) }
-  let(:project_version) { project.project_versions.first }
+  let(:project_version) { create(:project_version, project:) }
+  # let(:project_version) { project.project_versions.first }
   let(:valid_params) do
     {
       project_id: project.id,
@@ -208,7 +209,7 @@ RSpec.describe Project::VersionController, type: :controller do
       end
 
       it 'calls the Chart::Publisher' do
-        expect(Chart::Publisher).to receive(:new).with(project_version.rpc_chart, project_version)
+        expect(Chart::Publisher).to receive(:new).with(project_version.rpc_chart, [ project.project_subscribers.first.helm_repo, project.helm_repo ])
         expect(chart_publisher).to receive(:publish_chart!)
         subject
       end
