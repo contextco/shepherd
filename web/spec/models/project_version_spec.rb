@@ -6,7 +6,7 @@ RSpec.describe ProjectVersion do
   let(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
   let(:helm_repo) { project.helm_repo }
-  let!(:helm_user) { create(:helm_user, name: 'test-user', password: 'test-password', helm_repo:) }
+  let(:helm_user) { project.helm_repo.helm_user }
   let!(:service) do
     create(:project_service,
            project_version:,
@@ -28,6 +28,7 @@ RSpec.describe ProjectVersion do
 
   before do
     helm_repo.update!(name: 'test-repo')
+    helm_user.update!(name: 'test-user', password: 'test-password')
     allow(SidecarClient).to receive(:client).and_return(mock_client)
   end
 
