@@ -1,7 +1,7 @@
 
 class SubscriberController < ApplicationController
   def index
-    @subscribers = current_team.project_subscribers
+    @subscribers = current_team.non_dummy_project_subscribers
   end
 
   def show
