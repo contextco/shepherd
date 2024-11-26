@@ -65,6 +65,12 @@ func (c *ClusterSet) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod
 	}, c.clusters)
 }
 
+func (c *ClusterSet) Capabilities(ctx context.Context) ([][]string, error) {
+	return runInParallelValues(ctx, func(cluster *Cluster) ([]string, error) {
+		return cluster.Capabilities(ctx)
+	}, c.clusters)
+}
+
 // Cluster represents a kind kubernetes test cluster
 type Cluster struct {
 	impl clusterImpl
@@ -270,7 +276,12 @@ func (c *Cluster) Pods(ctx context.Context, selector string) ([]corev1.Pod, erro
 	return pods.Items, nil
 }
 
-func Capabilities(kubeConfig []byte) ([]string, error) {
+func (c *Cluster) Capabilities(ctx context.Context) ([]string, error) {
+	kubeConfig, err := c.impl.getKubeConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get kubeconfig: %w", err)
+	}
+
 	rcg, err := newRestClientGetter(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create rest client getter: %w", err)
@@ -296,4 +307,22 @@ func runInParallel[T any](ctx context.Context, fn func(T) error, items []T) erro
 		errgroup.Go(func() error { return fn(item) })
 	}
 	return errgroup.Wait()
+}
+
+func runInParallelValues[T any, V any](ctx context.Context, fn func(T) (V, error), items []T) ([]V, error) {
+	errgroup, ctx := errgroup.WithContext(ctx)
+	results := make([]V, len(items))
+	for i, item := range items {
+		item := item
+		errgroup.Go(func() error {
+			result, err := fn(item)
+			if err != nil {
+				return err
+			}
+			results[i] = result
+			return nil
+		})
+	}
+
+	return results, errgroup.Wait()
 }
