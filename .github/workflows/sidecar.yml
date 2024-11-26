@@ -17,6 +17,7 @@ env:
   GKE_PROJECT_ID: context-co
   GKE_ZONE: us-central1
   GKE_CLUSTER_NAME: autopilot-cluster-1
+  AWS_REGION: us-east-2
 
 jobs:
 
