@@ -2,8 +2,8 @@
   <%= link_to path,
               data: { action: 'mouseenter->sidebar-icon#showTooltip mouseleave->sidebar-icon#hideTooltip' },
               class: ["rounded-md p-2 text-stone-800 select-none cursor-pointer duration-200 block", {
-    "bg-stone-200": current_page?(path) || request.path_parameters&.fetch(:controller) == "deployment",
-    "hover:bg-stone-200 bg-transparent": !(current_page?(path) || request.path_parameters&.fetch(:controller) == "deployment")
+    "bg-stone-200": current_page?(path) || associated_controllers.include?(request.path_parameters&.fetch(:controller)),
+    "hover:bg-stone-200 bg-transparent": !(current_page?(path) || associated_controllers.include?(request.path_parameters&.fetch(:controller))),
   }] do %>
     <%= heroicon icon, class: 'size-6' %>
   <% end %>
