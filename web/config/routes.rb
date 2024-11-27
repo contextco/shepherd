@@ -42,7 +42,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :subscriber, only: [ :index, :new, :create, :show, :destroy ], as: :project_subscriber, controller: "subscriber" do
+  resources :subscriber, only: [ :index, :new, :create, :show, :destroy, :edit, :update ], as: :project_subscriber, controller: "subscriber" do
     get "/client_values_yaml/:project_version_id", to: "subscriber#client_values_yaml", on: :member, as: :client_values_yaml
   end
 

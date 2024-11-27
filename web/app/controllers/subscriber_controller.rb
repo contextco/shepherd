@@ -21,11 +21,15 @@ class SubscriberController < ApplicationController
     redirect_to project_subscriber_index_path
   end
 
+  def edit
+    @subscriber = current_team.project_subscribers.find(params[:id])
+  end
+
   def destroy
     @subscriber = current_team.project_subscribers.find(params[:id])
     @subscriber.destroy!
 
-    flash[:notice] = "Subscriber \"#{subscriber_params[:name]}\" removed"
+    flash[:notice] = "Subscriber \"#{@subscriber.name}\" removed"
     redirect_to project_subscriber_index_path
   end
 
