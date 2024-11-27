@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectSubscriber < ApplicationRecord
+  has_secure_token :password
+
   belongs_to :project
 
   validates :name, presence: true
@@ -11,6 +13,10 @@ class ProjectSubscriber < ApplicationRecord
 
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
+
+  def authenticate(user_password)
+    password == user_password
+  end
 
   private
 
