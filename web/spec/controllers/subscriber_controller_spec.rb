@@ -23,7 +23,7 @@ RSpec.describe SubscriberController, type: :request do
   end
 
   describe 'POST #create' do
-    subject { post project_subscriber_index_path, params: { project_subscriber: { name: 'test', project_id: project.id } } }
+    subject { post project_subscriber_index_path, params: { project_subscriber: { name: 'test', project_id: project.id, auth: true } } }
 
     it 'creates a new subscriber' do
       expect { subject }.to change { ProjectSubscriber.count }.by(1)
@@ -40,6 +40,28 @@ RSpec.describe SubscriberController, type: :request do
 
     it 'creates a new helm user' do
       expect { subject }.to change { HelmUser.count }.by(1)
+    end
+
+    it 'creates a subscriber with the correct attributes' do
+      subject
+      subscriber = ProjectSubscriber.order(:created_at).last
+      expect(subscriber.name).to eq('test')
+      expect(subscriber.project_id).to eq(project.id)
+      expect(subscriber.auth).to eq(true)
+    end
+
+    context 'when auth is false' do
+      subject { post project_subscriber_index_path, params: { project_subscriber: { name: 'test', project_id: project.id, auth: false } } }
+
+      it 'creates a new subscriber' do
+        expect { subject }.to change { ProjectSubscriber.count }.by(1)
+      end
+
+      it 'sets auth to false' do
+        subject
+        subscriber = ProjectSubscriber.order(:created_at).last
+        expect(subscriber.auth).to eq(false)
+      end
     end
   end
 
