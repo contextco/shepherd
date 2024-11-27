@@ -13,13 +13,13 @@ class DocsController < ActionController::Base
   def verify_password
     subscriber = ProjectSubscriber.find_by_id(params[:id])
 
-    if subscriber&.authenticate(params[:password])
-      set_session_token(subscriber)
-      return redirect_to doc_path(params[:id])
+    unless subscriber&.authenticate(params[:password])
+      flash[:error] = "Invalid password"
+      return redirect_to auth_doc_path(params[:id])
     end
 
-    flash[:error] = "Invalid password"
-    redirect_to auth_doc_path(params[:id])
+    set_session_token(subscriber)
+    redirect_to doc_path(params[:id])
   end
 
   private
@@ -46,7 +46,7 @@ class DocsController < ActionController::Base
   end
 
   def valid_session_token?(subscriber)
-    return false unless auth_token.present?
+    return false unless auth_token.present? && auth_timestamp.present?
 
     expected_token = generate_session_token(subscriber, auth_timestamp)
     ActiveSupport::SecurityUtils.secure_compare(auth_token, expected_token)
