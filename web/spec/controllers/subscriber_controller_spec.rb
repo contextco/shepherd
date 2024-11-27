@@ -43,6 +43,29 @@ RSpec.describe SubscriberController, type: :request do
     end
   end
 
+  describe 'DELETE #destroy' do
+    subject { delete project_subscriber_path(subscriber) }
+
+    it 'deletes the subscriber' do
+      subscriber
+      expect { subject }.to change { ProjectSubscriber.count }.by(-1)
+    end
+
+    it 'redirects to the subscriber index path' do
+      subject
+      expect(response).to redirect_to(project_subscriber_index_path)
+    end
+  end
+
+  describe 'GET #new' do
+    subject { get new_project_subscriber_path }
+
+    it 'returns a success response' do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe 'GET #client_values_yaml' do
     subject { get client_values_yaml_project_subscriber_path(project_version_id: project_version.id, id: subscriber.id) }
 
