@@ -1,6 +1,6 @@
 
 class DocsController < ActionController::Base
-  layout "application"
+  layout "docs_controller"
   protect_from_forgery with: :exception
   before_action :check_password, only: [ :show ]
 
@@ -8,7 +8,9 @@ class DocsController < ActionController::Base
 
   def show; end
 
-  def auth; end
+  def auth
+    render layout: "application"
+  end
 
   def verify_password
     subscriber = ProjectSubscriber.find_by_id(params[:id])
