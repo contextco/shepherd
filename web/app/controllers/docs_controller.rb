@@ -29,6 +29,7 @@ class DocsController < ActionController::Base
   def check_password
     @subscriber = ProjectSubscriber.find_by_id(params[:id])
     return redirect_to auth_doc_path(params[:id]) if @subscriber.nil?
+    return true if @subscriber.auth == false
     return true if timestamp_in_unexpired_range && valid_session_token?(@subscriber)
 
     session.delete(auth_token_key)
