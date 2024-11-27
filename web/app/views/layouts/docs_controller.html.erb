@@ -1,0 +1,18 @@
+<%= content_for :content do %>
+  <div class="h-full flex">
+    <div class="header flex flex-col justify-between p-3 gap-8 items-center border-r">
+      <div class="left font-bold flex flex-col items-center gap-8">
+        <%= link_to doc_path(@subscriber), class: 'text-2xl' do %>
+          <%= image_tag 'icon.png', class: 'w-8 h-8' %>
+        <% end %>
+      </div>
+      <div class="right">
+      </div>
+    </div>
+    <div class="content grow overflow-y-auto">
+      <%= yield %>
+    </div>
+  </div>
+<% end %>
+
+<%= render template: 'layouts/application' %>
