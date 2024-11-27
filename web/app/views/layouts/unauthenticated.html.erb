@@ -2,16 +2,7 @@
   <div class="min-h-screen w-full bg-white">
     <div class="flex justify-center pt-32 pb-12 basis-0">
       <div class="p-12 bg-white flex flex-col gap-20 items-center">
-        <div class="flex flex-col gap-1">
-          <header class="flex items-center gap-1 font-medium text-6xl">
-            <%= image_tag 'icon.png', class: 'h-16' %>
-            Shepherd
-          </header>
-
-          <span class="ml-3 text-stone-400 font-medium text-xl">
-            Self-hosting, made easy.
-          </span>
-        </div>
+        <%= render LargeAppIconComponent.new %>
 
         <%= yield %>
       </div>
