@@ -1,0 +1,21 @@
+<div class="min-h-screen w-full bg-white">
+  <div class="flex justify-center pt-32 pb-12 basis-0">
+    <div class="p-12 bg-white flex flex-col gap-14 items-center">
+      <%= render LargeAppIconComponent.new %>
+
+      <div class="flex flex-col gap-5">
+        <%= form_tag verify_password_doc_path, class: "flex gap-2 rounded-md px-3 py-2 border border-stone-300" do %>
+          <%= password_field_tag :password,
+                                 nil,
+                                 'data-1p-ignore': true,
+                                 'data-lpignore': true,
+                                 placeholder: 'Password',
+                                 class: "w-64 p-0 border-0 focus:ring-0" %>
+          <%= button_tag type: 'submit', class: "button" do %>
+            <%= heroicon 'arrow-right', class: 'size-4 stroke-2' %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

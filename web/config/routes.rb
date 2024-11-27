@@ -28,6 +28,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :docs, only: [ :show ] do
+    member do
+      get :auth
+      post :verify_password
+    end
+  end
+
   resources :application, only: [ :new, :create, :destroy, :edit, :index ], controller: "project/project", as: :project do
     resources :version, only: [ :new, :create, :destroy, :show, :update, :edit ], controller: "project/version", shallow: true do
       post :publish, on: :member
