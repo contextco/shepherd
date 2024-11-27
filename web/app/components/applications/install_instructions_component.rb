@@ -8,6 +8,10 @@ class Applications::InstallInstructionsComponent < ApplicationComponent
     subscriber.project
   end
 
+  def version_object
+    version || subscriber.most_recent_version
+  end
+
   def helm_repo
     subscriber.helm_repo
   end

@@ -18,6 +18,10 @@ class ProjectSubscriber < ApplicationRecord
     password == user_password
   end
 
+  def most_recent_version
+    project.published_versions.first
+  end
+
   private
 
   def setup_helm_repo
