@@ -37,6 +37,7 @@ func TestServer_Capabilities(t *testing.T) {
 }
 
 func TestServer_PublishChart(t *testing.T) {
+
 	_ = testenv.Load(t)
 
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
@@ -199,9 +200,8 @@ func TestServer_PublishChart(t *testing.T) {
 							IngressConfig: &sidecar_pb.IngressParams{
 								External: []*sidecar_pb.ExternalIngressParams{
 									{
-										Service: "test-service",
-										Port:    80,
-										Host:    "context.ai",
+										Port: 80,
+										Host: "context.ai",
 									},
 								},
 							},
@@ -255,11 +255,10 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			err = clusters.Install(ctx, c.Chart, tt.req.Chart.Name)
 			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
-			defer clusters.Uninstall(ctx, c.Chart)
+			// defer clusters.Uninstall(ctx, c.Chart)
 
 			if err := waitForPods(t, ctx, clusters, tt.req.Chart); err != nil {
 				t.Fatalf("failed to wait for pods: %v", err)
