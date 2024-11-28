@@ -22,7 +22,7 @@ RSpec.describe ProjectVersion do
     )
   end
   let!(:dependency_redis) { create(:dependency, project_version:, name: 'redis') }
-  let!(:dependency_postgresql) { create(:dependency, project_version:, name: 'postgresql', version: '17.x.x', repo_url: 'oci://registry-1.docker.io/bitnamicharts/postgresql', configs: { cpu_cores: 32, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'test_db', db_user: 'test_user' }) }
+  let!(:dependency_postgresql) { create(:dependency, project_version:, name: 'postgresql', version: '17.x.x', repo_url: 'oci://registry-1.docker.io/bitnamicharts/postgresql', configs: { cpu_cores: 32, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'test_db', db_user: 'test_user', db_password: 'test_pass' }) }
 
   let(:mock_client) { double(:sidecar_client) }
 
@@ -72,7 +72,8 @@ RSpec.describe ProjectVersion do
           Sidecar::OverrideParams.new(path: 'primary.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
           Sidecar::OverrideParams.new(path: 'primary.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
           Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
-          Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user'))
+          Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user')),
+          Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'test_pass'))
         )
 
         response

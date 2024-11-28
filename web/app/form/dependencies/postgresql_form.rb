@@ -44,9 +44,32 @@ class Dependencies::PostgresqlForm < Dependencies::Base
     end
   end
 
+  def configs_params
+    {
+      db_name: configs.db_name.present? ? configs.db_name : postgresql_dbname_generator,
+      db_user: configs.db_user.present? ? configs.db_user : postgresql_username_generator,
+      db_password: postgresql_password_generator,
+      cpu_cores: configs.cpu_cores,
+      memory_bytes: configs.memory_bytes,
+      disk_bytes: configs.disk_bytes
+    }
+  end
+
   def version_inclusion
     return if Chart::Dependency.from_name("postgresql").variants.map(&:version).include?(version)
 
     errors.add(:version, "is not a valid version")
+  end
+
+  def postgresql_username_generator
+    "user_#{SecureRandom.hex(6)}"
+  end
+
+  def postgresql_dbname_generator
+    "db_#{SecureRandom.hex(6)}"
+  end
+
+  def postgresql_password_generator
+    SecureRandom.hex(16)
   end
 end
