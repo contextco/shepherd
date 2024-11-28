@@ -2,19 +2,29 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .service }}-{{ .port }}-external-ingress
+  name: {{ include "test.fullname" $ }}-external-ingress
   namespace: {{ $.Release.Namespace }}
   annotations:
     kubernetes.io/ingress.global-static-ip-name: {{ .service }}-{{ .port }}-external-ingress-ip
     networking.gke.io/managed-certificates: {{ .service }}-{{ .port }}-external-ingress-cert
     {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
-    alb.ingress.k8s.aws/scheme: internet-facing
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/target-type: ip
     {{- end }}
 spec:
-  defaultBackend:
-    service:
-      name: {{ .service }}
-      port:
-        number: {{ .port }}
+  {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
+  ingressClassName: alb
+  {{- end }}
+  rules:
+    - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "test.fullname" $ }}-service
+                port:
+                  number: {{ .port }}
 {{- end }}
 
