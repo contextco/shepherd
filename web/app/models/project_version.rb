@@ -34,7 +34,8 @@ class ProjectVersion < ApplicationRecord
   end
 
   def publish!(project_subscriber: nil)
-    building!
+    # do not update state of the version if we are publishing a dummy version
+    building! unless project_subscriber&.dummy?
     # could we do this more elegantly by keeping track in helm_repo model of already published versions?
     # some choices here, we can check to see if files are present in the bucket which will ensure we are keeping correct
     # state but could be costly (wrt latency) or we can keep track of versions in the helm_repo model (dont currently do)
@@ -42,7 +43,7 @@ class ProjectVersion < ApplicationRecord
     helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo)
     publisher = Chart::Publisher.new(rpc_chart, Array(helm_repos))
     publisher.publish_chart!
-    published!
+    published! unless project_subscriber&.dummy?
   end
 
   def fork!(version_params)
