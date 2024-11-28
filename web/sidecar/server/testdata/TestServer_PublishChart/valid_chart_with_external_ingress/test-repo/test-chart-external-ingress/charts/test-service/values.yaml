@@ -2,7 +2,7 @@ externalIngress:
   configs:
   - host: context.ai
     port: 80
-    service: test-service
+    service: ""
 image:
   repository: nginx
   tag: latest

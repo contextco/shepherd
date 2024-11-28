@@ -3,7 +3,7 @@
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: {{ .service }}-{{ .port }}-external-ingress-cert
+  name: {{ include "test.fullname" $ }}-external-ingress-cert
   namespace: {{ $.Release.Namespace }}
 spec:
   domains:
