@@ -12,6 +12,6 @@ class Dependencies::Base
   validates :version, presence: true
 
   def create_dependency(project_version)
-    project_version.dependencies.create!(name:, version:, repo_url:, configs: configs.attributes)
+    project_version.dependencies.create!(name:, version:, repo_url:, configs: configs_params)
   end
 end
