@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"testing"
@@ -36,8 +38,145 @@ func TestServer_Capabilities(t *testing.T) {
 	t.Logf("capabilities: %v", capabilities)
 }
 
-func TestServer_PublishChart(t *testing.T) {
+func TestServerPublishChart_ExternalIngress(t *testing.T) {
+	_ = testenv.Load(t)
 
+	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name    string
+		host    string
+		cluster *testcluster.Cluster
+		wantErr bool
+	}{
+		{
+			name:    "valid chart with external ingress on EKS",
+			host:    "vpc.context.ai",
+			cluster: testcluster.EKS(t, ctx),
+		},
+		{
+			name:    "valid chart with external ingress on GKE",
+			host:    "vpcgke.context.ai",
+			cluster: testcluster.GKE(t, ctx),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			store := store.NewMemoryStore()
+			repoClient, err := repo.NewClient(ctx, store, &url.URL{})
+			if err != nil {
+				t.Fatalf("Failed to create repo client: %v", err)
+			}
+
+			s := &Server{repoClient: repoClient}
+
+			req := ingressRequest(tt.host)
+
+			_, err = s.PublishChart(ctx, req)
+			if err != nil {
+				if tt.wantErr {
+					return
+				}
+				t.Fatalf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
+			} else if tt.wantErr {
+				t.Fatalf("PublishChart() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err := verifyChartFiles(t, ctx, store, req.Chart); err != nil {
+				t.Errorf("Failed to verify chart files: %v", err)
+			}
+
+			chartName := fmt.Sprintf("%s-%s", req.Chart.Name, req.Chart.Version)
+			c, err := chart.LoadFromArchive(&chart.ChartArchive{
+				Name: chartName,
+				Data: store.Files[fmt.Sprintf("test-repo/%s.tgz", chartName)],
+			})
+			if err != nil {
+				t.Fatalf("Failed to load chart from archive: %v", err)
+			}
+
+			_ = tt.cluster.Uninstall(ctx, c.Chart)
+
+			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name); err != nil {
+				t.Fatalf("Failed to install chart: %v", err)
+			}
+			defer tt.cluster.Uninstall(ctx, c.Chart)
+
+			log.Printf("waiting for ingress %s", tt.host)
+			if err := tt.cluster.WaitForIngress(ctx, tt.host); err != nil {
+				t.Fatalf("failed to wait for ingress: %v", err)
+			}
+		})
+	}
+}
+
+func waitForHost(t *testing.T, ctx context.Context, host string) error {
+	t.Helper()
+
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			resp, err := http.Get("https://" + host)
+			if err != nil {
+				t.Logf("failed to get host: %v", err)
+				continue
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode == http.StatusOK {
+				return nil
+			}
+		}
+	}
+}
+
+func ingressRequest(host string) *sidecar_pb.PublishChartRequest {
+	return &sidecar_pb.PublishChartRequest{
+		RepositoryDirectory: "test-repo",
+		Chart: &sidecar_pb.ChartParams{
+			Name:    "test-chart-external-ingress",
+			Version: "1.0.0",
+			Services: []*sidecar_pb.ServiceParams{
+				{
+					Name: "test-service",
+					Image: &sidecar_pb.Image{
+						Name: "nginx",
+						Tag:  "latest",
+					},
+					ReplicaCount: 1,
+					Endpoints: []*sidecar_pb.Endpoint{
+						{
+							Port: 80,
+						},
+					},
+					IngressConfig: &sidecar_pb.IngressParams{
+						External: []*sidecar_pb.ExternalIngressParams{
+							{
+								Port: 80,
+								Host: host,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func TestServer_PublishChart(t *testing.T) {
 	_ = testenv.Load(t)
 
 	clock.SetFakeClockForTest(t, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
@@ -228,9 +367,7 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to create repo client: %v", err)
 			}
 
-			s := &Server{
-				repoClient: repoClient,
-			}
+			s := &Server{repoClient: repoClient}
 
 			_, err = s.PublishChart(ctx, tt.req)
 			if err != nil {

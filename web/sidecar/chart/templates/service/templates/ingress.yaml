@@ -5,8 +5,7 @@ metadata:
   name: {{ include "test.fullname" $ }}-external-ingress
   namespace: {{ $.Release.Namespace }}
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: {{ .service }}-{{ .port }}-external-ingress-ip
-    networking.gke.io/managed-certificates: {{ .service }}-{{ .port }}-external-ingress-cert
+    networking.gke.io/managed-certificates: {{ include "test.fullname" $ }}-external-ingress-cert
     {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
