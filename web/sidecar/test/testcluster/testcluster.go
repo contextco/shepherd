@@ -21,9 +21,20 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func EKS(t *testing.T, ctx context.Context) *Cluster {
+	name := strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))
+	return New(t, ctx, &eksCluster{name: name})
+}
+
+func GKE(t *testing.T, ctx context.Context) *Cluster {
+	name := strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))
+	return New(t, ctx, &gkeCluster{name: name})
+}
 
 type ClusterSet struct {
 	clusters []*Cluster
@@ -221,13 +232,51 @@ func (c *Cluster) KubeConfig(ctx context.Context) ([]byte, error) {
 	return c.impl.getKubeConfig(ctx)
 }
 
-func (c *Cluster) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
-	clientConfig, err := c.impl.restConfig(ctx)
+func (c *Cluster) WaitForIngress(ctx context.Context, host string) error {
+	client, err := c.client(ctx)
 	if err != nil {
 		return err
 	}
 
-	client, err := kubernetes.NewForConfig(clientConfig)
+	factory := informers.NewSharedInformerFactoryWithOptions(client, 0)
+	ingressInformer := factory.Networking().V1().Ingresses().Informer()
+
+	waitC := make(chan struct{}, 1)
+	handleNewIngressState := func(obj any) {
+		ingress, ok := obj.(*networkingv1.Ingress)
+		if !ok {
+			return
+		}
+		if len(ingress.Status.LoadBalancer.Ingress) == 0 {
+			return
+		}
+		if ingress.Spec.Rules[0].Host == host {
+			waitC <- struct{}{}
+		}
+	}
+	ingressInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: handleNewIngressState,
+		UpdateFunc: func(old, new any) {
+			handleNewIngressState(new)
+		},
+	})
+
+	factory.Start(ctx.Done())
+	<-waitC
+	return nil
+}
+
+func (c *Cluster) client(ctx context.Context) (*kubernetes.Clientset, error) {
+	clientConfig, err := c.impl.restConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return kubernetes.NewForConfig(clientConfig)
+}
+
+func (c *Cluster) WaitForPods(ctx context.Context, matchFunc func(*corev1.Pod) bool) error {
+	client, err := c.client(ctx)
 	if err != nil {
 		return err
 	}
