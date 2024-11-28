@@ -80,13 +80,11 @@ message ServiceParams {
 }
 
 message IngressParams {
-    repeated ExternalIngressParams external = 1;
+    ExternalIngressParams external = 1;
 }
 
 message ExternalIngressParams {
-    string service = 1;
-    int32 port = 2;
-    string host = 3;
+    int32 port = 1;
 }
 
 message PersistentVolumeClaimParams {

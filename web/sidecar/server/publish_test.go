@@ -98,7 +98,11 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 
 			_ = tt.cluster.Uninstall(ctx, c.Chart)
 
-			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name); err != nil {
+			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, map[string]any{
+				"externalIngress": map[string]any{
+					"host": tt.host,
+				},
+			}); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
 			defer tt.cluster.Uninstall(ctx, c.Chart)
@@ -168,11 +172,8 @@ func ingressRequest(t *testing.T, host string) *sidecar_pb.PublishChartRequest {
 						},
 					},
 					IngressConfig: &sidecar_pb.IngressParams{
-						External: []*sidecar_pb.ExternalIngressParams{
-							{
-								Port: 80,
-								Host: host,
-							},
+						External: &sidecar_pb.ExternalIngressParams{
+							Port: 80,
 						},
 					},
 				},
@@ -342,11 +343,8 @@ func TestServer_PublishChart(t *testing.T) {
 								},
 							},
 							IngressConfig: &sidecar_pb.IngressParams{
-								External: []*sidecar_pb.ExternalIngressParams{
-									{
-										Port: 80,
-										Host: "vpc.context.ai",
-									},
+								External: &sidecar_pb.ExternalIngressParams{
+									Port: 80,
 								},
 							},
 						},
@@ -397,7 +395,11 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name); err != nil {
+			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, map[string]any{
+				"externalIngress": map[string]any{
+					"host": "arbitrary-host.com",
+				},
+			}); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
 			defer clusters.Uninstall(ctx, c.Chart)
