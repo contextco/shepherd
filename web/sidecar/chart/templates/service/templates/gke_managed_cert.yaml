@@ -1,5 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.gke.io/v1" }}
-{{- range .Values.externalIngress.configs }}
+{{- if and .Capabilities.APIVersions.Has "networking.gke.io/v1" .Values.externalIngress.host }}
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
@@ -7,6 +6,5 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 spec:
   domains:
-    - {{ .host }}
-{{- end }}
+    - {{ $.Values.externalIngress.host }}
 {{- end }}
