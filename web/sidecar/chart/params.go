@@ -27,20 +27,30 @@ type Params struct {
 }
 
 type IngressConfig struct {
-	External []*ExternalIngressConfig
+	External *ExternalIngressConfig
 }
 
 type ExternalIngressConfig struct {
-	Service string
-	Port    int
-	Host    string
+	Port int
 }
 
-func (e ExternalIngressConfig) toValues() map[string]interface{} {
+func (e *ExternalIngressConfig) toValues() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
+
 	return map[string]interface{}{
-		"service": e.Service,
-		"port":    e.Port,
-		"host":    e.Host,
+		"port": e.Port,
+	}
+}
+
+func (e *ExternalIngressConfig) toClientFacingValues() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
+
+	return map[string]interface{}{
+		"host": "",
 	}
 }
 
@@ -187,9 +197,7 @@ func (p *Params) toValues() (*values.File, error) {
 			"resources":              p.Resources.toValues(),
 			"initConfig":             p.InitConfig.toValues(),
 			"persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
-			"externalIngress": map[string]any{
-				"configs": sliceToValues(p.IngressConfig.External),
-			},
+			"externalIngress":        p.IngressConfig.External.toValues(),
 			"ingress": map[string]any{
 				"enabled": false,
 			},
@@ -257,14 +265,11 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			persistentVolumeClaims = append(persistentVolumeClaims, p)
 		}
 
-		externalIngressConfigs := []*ExternalIngressConfig{}
-		for _, v := range service.GetIngressConfig().GetExternal() {
-			e := &ExternalIngressConfig{
-				Service: v.GetService(),
-				Port:    int(v.GetPort()),
-				Host:    v.GetHost(),
+		var externalIngressConfig *ExternalIngressConfig
+		if service.GetIngressConfig().GetExternal() != nil {
+			externalIngressConfig = &ExternalIngressConfig{
+				Port: int(service.GetIngressConfig().GetExternal().GetPort()),
 			}
-			externalIngressConfigs = append(externalIngressConfigs, e)
 		}
 
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
@@ -280,7 +285,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
 			},
 			IngressConfig: IngressConfig{
-				External: externalIngressConfigs,
+				External: externalIngressConfig,
 			},
 			Environment:            env,
 			Secrets:                secrets,
