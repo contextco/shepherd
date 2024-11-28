@@ -1,7 +1,7 @@
 
 class Project::VersionController < ApplicationController
   before_action :authenticate_user!
-  before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish]
+  before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish preview_chart]
   before_action :fetch_previous_version, only: %i[new create]
 
   def show; end
@@ -57,6 +57,36 @@ class Project::VersionController < ApplicationController
 
     flash[:notice] = "Application version unpublished"
     redirect_to version_path(@version)
+  end
+
+  def preview_chart
+    @version.publish!(project_subscriber: @app.dummy_project_subscriber)
+    helm_repo = @app.dummy_project_subscriber.helm_repo
+
+    filename = "#{helm_repo.name}-#{@version.version}.tgz"
+
+    file = helm_repo.file_yaml(filename)
+    return render json: { error: "Chart not found" }, status: :not_found if file.nil?
+
+    begin
+      signed_url = file.signed_url(
+        version: :v4,
+        expires: 300, # 5 minutes
+        query: {
+          "response-content-disposition" => "attachment; filename=#{filename}",
+          "response-content-type" => "application/x-tar"
+        }
+      )
+
+      redirect_to signed_url, allow_other_host: true, status: :temporary_redirect
+    rescue Google::Cloud::Storage::SignedUrlUnavailable => e
+      Rails.logger.error("SignedUrlUnavailable error: #{e.message}")
+      render json: { error: "Missing credentials for signed URL" }, status: :internal_server_error
+    rescue StandardError => e
+      Rails.logger.error("Error generating signed URL: #{e.class}: #{e.message}")
+      Rails.logger.error(e.backtrace&.join("\n"))
+      render json: { error: "Could not generate download URL" }, status: :internal_server_error
+    end
   end
 
   private
