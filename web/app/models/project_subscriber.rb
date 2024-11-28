@@ -1,16 +1,26 @@
 # frozen_string_literal: true
 
 class ProjectSubscriber < ApplicationRecord
+  has_secure_token :password
+
   belongs_to :project
 
   validates :name, presence: true
 
   has_one :helm_repo, dependent: :destroy
 
-  after_commit :setup_helm_repo
+  after_create_commit :setup_helm_repo
 
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
+
+  def authenticate(user_password)
+    password == user_password
+  end
+
+  def most_recent_version
+    project.published_versions.first
+  end
 
   private
 

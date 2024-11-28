@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_25_175906) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_27_174004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -85,13 +85,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_25_175906) do
   end
 
   create_table "helm_repos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "project_id"
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "project_subscriber_id"
-    t.index ["project_id", "name"], name: "index_helm_repos_on_project_id_and_name", unique: true
-    t.index ["project_id"], name: "index_helm_repos_on_project_id"
+    t.uuid "project_subscriber_id", null: false
     t.index ["project_subscriber_id"], name: "index_helm_repos_on_project_subscriber_id"
   end
 
@@ -128,6 +125,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_25_175906) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "dummy", default: false, null: false
+    t.string "password"
+    t.boolean "auth", default: true, null: false
     t.index ["project_id"], name: "index_project_subscribers_on_project_id"
   end
 
@@ -188,7 +187,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_25_175906) do
   add_foreign_key "deployments", "teams"
   add_foreign_key "event_logs", "containers"
   add_foreign_key "helm_repos", "project_subscribers"
-  add_foreign_key "helm_repos", "projects"
   add_foreign_key "helm_users", "helm_repos"
   add_foreign_key "project_services", "project_versions"
   add_foreign_key "project_subscribers", "projects"

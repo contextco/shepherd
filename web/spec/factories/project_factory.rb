@@ -5,7 +5,6 @@ FactoryBot.define do
 
     after(:create) do |project|
       create(:project_version, project:)
-      create(:helm_repo, project:)
     end
   end
 end

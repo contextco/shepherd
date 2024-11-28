@@ -1,20 +1,58 @@
-<div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+<div class="h-full w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
   <div class="flex w-full justify-between items-center">
-    <div class="flex flex-col">
-      <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.project.name %></span>
-      <div class="flex items-center gap-2 text-2xl">
-        <span class=" font-medium text-stone-700 w-fit">Deployment</span>
-        <span class="text-stone-500"><%= @subscriber.name %></span>
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-col">
+        <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.project.name %></span>
+        <div class="flex items-center gap-2 text-2xl">
+          <span class=" font-medium text-stone-700 w-fit">Deployment</span>
+          <span class="text-stone-500"><%= @subscriber.name %></span>
+        </div>
       </div>
+      <% unless @subscriber.auth %>
+        <div class="rounded-md text-xs flex items-center bg-stone-700 text-stone-100 px-1.5 rounded-md w-fit">
+          Public
+        </div>
+      <% end %>
     </div>
 
-    <%= link_to version_path(@most_recent_published_version || @subscriber.project.project_versions.last), class: "p-2 rounded-md hover:bg-stone-50 duration-200" do %>
-      <%= heroicon 'computer-desktop', class: 'size-6' %>
-    <% end %>
+    <div class="flex items-center gap-2">
+      <%= link_to edit_project_subscriber_path(@subscriber), class: "button" do %>
+        <%= heroicon 'pencil', class: 'size-4' %>
+      <% end %>
+
+      <%= link_to doc_path(@subscriber), class: "button flex gap-1 items-center" do %>
+        <%= heroicon 'document-text', class: 'size-4' %>
+        <span class="text-sm">Documentation</span>
+      <% end %>
+
+      <%= link_to version_path(@most_recent_published_version || @subscriber.project.project_versions.last), class: "button flex gap-1 items-center" do %>
+        <%= heroicon 'computer-desktop', class: 'size-4' %>
+        <span class="text-sm">Application</span>
+      <% end %>
+    </div>
   </div>
 
   <% if @most_recent_published_version.present? %>
-    <%= render Applications::InstallInstructionsComponent.new(version: @most_recent_published_version, subscriber: @subscriber) %>
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold">Customer Documentation</div>
+        <div class="flex flex-col gap-1">
+          <span class="text-sm">
+            When ready to begin the initial deployment, provide <span class="font-bold"><%= @subscriber.name %></span> with a link to the documentation<%= ' and a the password below' if @subscriber.auth %>.
+          </span>
+          <% if @subscriber.auth %>
+            <span class="text-sm">
+              Documentation is password protected to ensure only authorized users can access it.
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <%= render CommandSnippetComponent.new(title: "Documentation", snippet: doc_url(@subscriber) ) %>
+        <%= render CommandSnippetComponent.new(title: "Password", snippet: @subscriber.password ) if @subscriber.auth %>
+      </div>
+    </div>
   <% else %>
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-4">

@@ -7,7 +7,6 @@ class ProjectVersion < ApplicationRecord
   has_many :services, dependent: :destroy, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy
 
-  has_one :helm_repo, through: :project
   has_one :helm_chart, dependent: :destroy, as: :owner
 
   has_one :team, through: :project
@@ -37,10 +36,11 @@ class ProjectVersion < ApplicationRecord
   def publish!(project_subscriber: nil)
     building!
     # could we do this more elegantly by keeping track in helm_repo model of already published versions?
+    # some choices here, we can check to see if files are present in the bucket which will ensure we are keeping correct
+    # state but could be costly (wrt latency) or we can keep track of versions in the helm_repo model (dont currently do)
     # TODO: investigate and potentially fix
-    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo) + [ helm_repo ]
-    helm_repos = [ helm_repos ] unless helm_repos.is_a?(Array)
-    publisher = Chart::Publisher.new(rpc_chart, helm_repos)
+    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo)
+    publisher = Chart::Publisher.new(rpc_chart, Array(helm_repos))
     publisher.publish_chart!
     published!
   end

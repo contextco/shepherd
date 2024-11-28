@@ -28,6 +28,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :docs, only: [ :show ] do
+    member do
+      get :auth
+      post :verify_password
+    end
+  end
+
   resources :application, only: [ :new, :create, :destroy, :edit, :index ], controller: "project/project", as: :project do
     resources :version, only: [ :new, :create, :destroy, :show, :update, :edit ], controller: "project/version", shallow: true do
       post :publish, on: :member
@@ -42,7 +49,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :subscriber, only: [ :index, :new, :create, :show, :destroy ], as: :project_subscriber, controller: "subscriber" do
+  resources :subscriber, only: [ :index, :new, :create, :show, :destroy, :edit, :update ], as: :project_subscriber, controller: "subscriber" do
     get "/client_values_yaml/:project_version_id", to: "subscriber#client_values_yaml", on: :member, as: :client_values_yaml
   end
 

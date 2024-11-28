@@ -1,0 +1,13 @@
+<div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+  <div class="flex w-full justify-between items-center">
+    <div class="flex flex-col">
+      <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.name %></span>
+      <div class="flex items-center gap-2 text-2xl">
+        <span class=" font-medium text-stone-700 w-fit"><%= @subscriber.project.name %></span>
+        <span class="text-stone-500">Deployment Documentation</span>
+      </div>
+    </div>
+  </div>
+
+  <%= render Applications::InstallInstructionsComponent.new(subscriber: @subscriber) %>
+</div>
