@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     member do
       get :auth
       post :verify_password
+      get "/client_values_yaml/:project_version_id", to: "docs#client_values_yaml", as: :client_values_yaml
     end
   end
 

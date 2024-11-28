@@ -2,11 +2,33 @@
 class DocsController < ActionController::Base
   layout "docs_controller"
   protect_from_forgery with: :exception
-  before_action :check_password, only: [ :show ]
+  before_action :check_password, only: [ :show, :client_values_yaml ]
 
   SESSION_TIMEOUT = 6.hours.to_i
 
   def show; end
+
+  def client_values_yaml
+    version = @subscriber.most_recent_version
+    helm_repo = @subscriber.helm_repo
+
+    begin
+      file = helm_repo.client_values_yaml(version:)
+      raise SubscriberController::NotFoundError, "File not found" if file.nil? unless file.present?
+
+      yaml = file.download.string
+
+      response.headers["Cache-Control"] = "no-cache"
+      response.headers["Content-Disposition"] = "attachment; filename=#{helm_repo.client_yaml_filename(version:)}"
+
+      render plain: yaml, content_type: "application/x-yaml", layout: false
+    rescue SubscriberController::NotFoundError => e
+      Rails.logger.error("Error loading client_values.yaml: #{e.message}")
+
+      flash[:error] = "File not found"
+      redirect_to project_subscriber_path(params[:id])
+    end
+  end
 
   def auth
     render layout: "application"
