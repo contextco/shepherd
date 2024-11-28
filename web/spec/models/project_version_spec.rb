@@ -89,6 +89,44 @@ RSpec.describe ProjectVersion do
 
       project_version.publish!
     end
+
+    context 'when calling with a specific project subscriber' do
+      context 'when the project subscriber is a dummy' do
+        it 'includes correct helm repo name in request' do
+          expect(mock_client).to receive(:send) do |_, request|
+            expect(request.repository_directory).to eq(helm_repo.repo_name)
+            response
+          end
+
+          project_version.publish!(project_subscriber: project.dummy_project_subscriber)
+        end
+
+        it 'does not update the state to published' do
+          expect(project_version).not_to receive(:published!)
+
+          project_version.publish!(project_subscriber: project.dummy_project_subscriber)
+        end
+      end
+
+      context 'when the project subscriber is not a dummy' do
+        let!(:project_subscriber) { create(:project_subscriber, project:) }
+
+        it 'includes correct helm repo name in request' do
+          expect(mock_client).to receive(:send) do |_, request|
+            expect(request.repository_directory).to eq(project_subscriber.helm_repo.repo_name)
+            response
+          end
+
+          project_version.publish!(project_subscriber: project_subscriber)
+        end
+
+        it 'updates the state to published' do
+          expect(project_version).to receive(:published!)
+
+          project_version.publish!(project_subscriber:)
+        end
+      end
+    end
   end
 
   describe '#rpc_chart' do
