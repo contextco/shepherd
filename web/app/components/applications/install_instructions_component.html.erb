@@ -5,7 +5,7 @@
       <%= render Applications::CircleTextComponent.new(text: '1') %>
       <div class="flex gap-1 font-medium text-sm mt-1.5">
         <span>Download</span>
-        <%= link_to client_values_yaml_project_subscriber_path(subscriber, project_version_id: version_object.id, format: :yaml), data: { turbo: false }, class: 'underline font-bold' do %>
+        <%= link_to values_url, data: { turbo: false }, class: 'underline font-bold' do %>
           <%= helm_repo.client_yaml_filename(version: version_object) %>
         <% end %>
         <span> and set appropriate values</span>
