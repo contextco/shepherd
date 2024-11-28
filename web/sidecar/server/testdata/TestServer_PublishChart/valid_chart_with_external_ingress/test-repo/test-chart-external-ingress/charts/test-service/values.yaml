@@ -1,6 +1,6 @@
 externalIngress:
   configs:
-  - host: context.ai
+  - host: vpc.context.ai
     port: 80
     service: ""
 image:

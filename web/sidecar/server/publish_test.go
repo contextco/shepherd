@@ -201,7 +201,7 @@ func TestServer_PublishChart(t *testing.T) {
 								External: []*sidecar_pb.ExternalIngressParams{
 									{
 										Port: 80,
-										Host: "context.ai",
+										Host: "vpc.context.ai",
 									},
 								},
 							},
