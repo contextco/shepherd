@@ -52,6 +52,10 @@ class HelmRepo < ApplicationRecord
     bucket.file("#{repo_name}/#{filename}")
   end
 
+  def public_repo?
+    project_subscriber.auth == false
+  end
+
   private
 
   def setup_helm_user

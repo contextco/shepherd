@@ -9,7 +9,7 @@ metadata:
     networking.gke.io/managed-certificates: {{ .service }}-{{ .port }}-external-ingress-cert
     {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/target-type: ip
     {{- end }}
 spec:
@@ -17,7 +17,8 @@ spec:
   ingressClassName: alb
   {{- end }}
   rules:
-    - http:
+    - host: {{ .host }}
+      http:
         paths:
           - path: /*
             pathType: ImplementationSpecific

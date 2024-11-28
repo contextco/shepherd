@@ -71,11 +71,7 @@ class Helm::RepoController < ActionController::Base
 
       @repo = user.helm_repo
       return render plain: "Invalid credentials", status: :unauthorized if @repo.name != params[:repo_name]
-
-      # if the repo does not exist we still say invalid credentials to avoid leaking repo names
-      return if @repo&.valid_credentials?(username, password)
-
-      return render plain: "Invalid credentials", status: :unauthorized
+      return render plain: "Invalid credentials", status: :unauthorized unless @repo.valid_credentials?(username, password)
     end
   end
 
