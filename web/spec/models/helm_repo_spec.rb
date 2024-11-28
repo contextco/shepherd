@@ -35,7 +35,6 @@ RSpec.describe HelmRepo do
   end
 
   describe '#valid_credentials?' do
-
     context 'when the repo is private (default)' do
       it 'returns true if the credentials are correct' do
         expect(helm_repo.valid_credentials?('test-user', 'test-password')).to be true
