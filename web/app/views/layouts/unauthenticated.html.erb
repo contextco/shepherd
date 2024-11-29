@@ -2,9 +2,23 @@
   <div class="min-h-screen w-full bg-white">
     <div class="flex justify-center pt-32 pb-12 basis-0">
       <div class="p-12 bg-white flex flex-col gap-20 items-center">
-        <%= render LargeAppIconComponent.new %>
+        <div class="flex flex-col gap-1 flex-none">
 
-        <%= yield %>
+          <div class="flex items-start gap-1">
+            <%= image_tag 'icon.png', class: 'size-8 shrink-0' %>
+            <div class="flex flex-col gap-2">
+              <span class="text-4xl">Shepherd</span>
+
+              <div class="text-stone-500 text-lg">
+                Self-hosting as easy as SaaS.
+              </div>
+
+              <div class="mt-8">
+                <%= yield %>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
