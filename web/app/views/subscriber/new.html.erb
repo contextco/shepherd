@@ -22,14 +22,15 @@
         </div>
 
         <%= form.collection_select :project_id,
-                                    current_user.team.projects,
-                                    :id,
-                                    :name,
-                                    {
+                                   current_user.team.projects,
+                                   :id,
+                                   :name,
+                                   {
                                      prompt: 'Select an application',
                                      required: true,
+                                     selected: params.dig(:project_subscriber, :project_id),
                                    },
-                                    class: 'w-7/12 p-2 rounded-md border-stone-400' %>
+                                   class: 'w-7/12 p-2 rounded-md border-stone-400' %>
       </div>
 
       <div class="flex items-center justify-between">
