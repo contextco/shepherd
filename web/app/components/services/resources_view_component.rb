@@ -16,7 +16,7 @@ class Services::ResourcesViewComponent < ApplicationComponent
   end
 
   def disk_bytes
-    return service.disk_bytes if service.respond_to?(:disk_bytes)
+    return service.pvc_size_bytes if service.respond_to?(:pvc_size_bytes)
 
     service.configs["disk_bytes"] if service.respond_to?(:configs)
   end
