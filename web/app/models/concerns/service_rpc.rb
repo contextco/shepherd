@@ -12,11 +12,22 @@ module ServiceRPC
       environment_config: rpc_environment_config,
       endpoints: rpc_endpoints,
       init_config: rpc_init_configs,
-      persistent_volume_claims: rpc_persistent_volume_claims
+      persistent_volume_claims: rpc_persistent_volume_claims,
+      ingress_config: rpc_ingress_config
     )
   end
 
   private
+
+  def rpc_ingress_config
+    return nil if ingress_port.nil?
+
+    Sidecar::IngressParams.new(
+      external: Sidecar::ExternalIngressParams.new(
+        port: ingress_port
+      )
+    )
+  end
 
   def rpc_resources
     Sidecar::Resources.new(

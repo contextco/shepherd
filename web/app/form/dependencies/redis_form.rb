@@ -28,6 +28,15 @@ class Dependencies::RedisForm < Dependencies::Base
     validates :disk_bytes, presence: true, inclusion: { in: DISK_OPTIONS }, numericality: { only_integer: true }
   end
 
+  def configs_params
+    {
+      max_memory_policy: configs.max_memory_policy,
+      cpu_cores: configs.cpu_cores,
+      memory_bytes: configs.memory_bytes,
+      disk_bytes: configs.disk_bytes
+    }
+  end
+
   def version_inclusion
     return if Chart::Dependency.from_name("redis").variants.map(&:version).include?(version)
 
