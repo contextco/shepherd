@@ -13,6 +13,12 @@
           <%= render Applications::EditVersionComponent.new(version: @version) %>
           <%= render Applications::PreviewChartComponent.new(version: @version) %>
           <%= render Applications::PublishButtonComponent.new(version: @version) %>
+
+          <% if @version.published? %>
+            <%= link_to new_project_subscriber_path(project_subscriber: { project_id: @version.project_id }), class: 'primary-button' do %>
+              + Create Deployment
+            <% end  %>
+          <% end %>
         </div>
       </div>
     </div>

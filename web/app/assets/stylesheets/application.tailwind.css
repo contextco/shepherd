@@ -15,6 +15,10 @@
     @apply select-none cursor-pointer text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 flex items-center gap-1;
 }
 
+.primary-button {
+    @apply select-none cursor-pointer text-sm border border-stone-400 rounded-md px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 flex items-center gap-1;
+}
+
 .text-input {
     @apply border rounded p-2 text-stone-700 shadow-sm border-stone-400;
 }
