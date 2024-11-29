@@ -28,6 +28,7 @@ class ProjectSubscriber < ApplicationRecord
     create_helm_repo!(name: project.name)
 
     project.project_versions.each do |version|
+      next unless version.published?
       # TODO: this condition is a smell that we should be using a "fake" publisher in tests
       version.publish!(project_subscriber: self) unless Rails.env.test?
     end
