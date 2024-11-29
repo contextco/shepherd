@@ -1,4 +1,4 @@
-{{- range .Values.externalIngress.configs }}
+{{- if $.Values.externalIngress }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -16,7 +16,7 @@ spec:
   ingressClassName: alb
   {{- end }}
   rules:
-    - host: {{ .host }}
+    - host: {{ $.Values.externalIngress.host }}
       http:
         paths:
           - path: /*
@@ -25,6 +25,5 @@ spec:
               service:
                 name: {{ include "test.fullname" $ }}-service
                 port:
-                  number: {{ .port }}
+                  number: {{ $.Values.externalIngress.port }}
 {{- end }}
-
