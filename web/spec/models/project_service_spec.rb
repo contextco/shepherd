@@ -16,14 +16,16 @@ RSpec.describe ProjectService do
              { 'name' => 'ENV_VAR2', 'value' => 'value2' }
            ],
            secrets: [ 'TEST_SECRET' ],
-           ports: %w[80 443],
+           ports: [ 80, 443 ],
            pvc_name: 'test-pvc',
            pvc_size_bytes: 10.gigabytes,
-           pvc_mount_path: '/data'
+           pvc_mount_path: '/data',
+           ingress_port: 443
     )
   end
 
   let(:mock_client) { double(:sidecar_client) }
+
   before do
     service.instance_variable_set(:@rpc_client, mock_client)
   end
@@ -66,7 +68,12 @@ RSpec.describe ProjectService do
             name: 'test-pvc',
             size_bytes: 10.gigabytes
           }
-        ]
+        ],
+        ingress_config: {
+          external: {
+            port: 443
+          }
+        }
       )
     end
 
@@ -78,6 +85,16 @@ RSpec.describe ProjectService do
       it 'sets the init_config attribute' do
         expect(service.rpc_service.init_config).to be_a(Sidecar::InitConfig)
         expect(service.rpc_service.init_config.init_commands).to eq([ 'echo "predeploy"' ])
+      end
+    end
+
+    context 'without ingress port' do
+      before do
+        service.update!(ingress_port: nil)
+      end
+
+      it 'does not set the ingress_config attribute' do
+        expect(service.rpc_service.ingress_config).to be_nil
       end
     end
   end
