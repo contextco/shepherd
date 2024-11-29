@@ -51,6 +51,7 @@ class Service::Form
 
   attribute :ports, multiple: true do
     attribute :port
+    attribute :ingress, :boolean, default: false
 
     validates :port, numericality: { greater_than: 0, less_than: 65536 }, allow_blank: true
   end
@@ -63,6 +64,7 @@ class Service::Form
   validate :name_format
   validate :unique_environment_variable_secret_names
   validate :unique_port_numbers
+  validate :one_or_none_ingress_ports
 
   def self.empty
     f = Service::Form.new
@@ -88,7 +90,7 @@ class Service::Form
         { name: env[:name], value: env[:value], templated: env[:templated] }
       end,
       secrets: service.secrets.map { |secret| { name: secret } },
-      ports: service.ports.map { |port| { port: port } }
+      ports: service.ports.map { |port| { port: port.to_i, ingress: port.to_i == service.ingress_port } }
     )
 
     f
@@ -119,7 +121,8 @@ class Service::Form
       pvc_mount_path: pvc_mount_path.presence,
       environment_variables: environment_variables_object,
       secrets: secrets_object,
-      ports: ports_object
+      ports: ports_object,
+      ingress_port: ports.find { |port| port.ingress }&.port&.to_i
     }
   end
 
@@ -136,7 +139,7 @@ class Service::Form
   end
 
   def ports_object
-    ports.map(&:port).reject(&:empty?)
+    ports.map(&:port).reject(&:empty?).map(&:to_i)
   end
 
   def unique_environment_variable_secret_names
@@ -156,6 +159,12 @@ class Service::Form
     return if present_ports.uniq.length == present_ports.length
 
     errors.add(:ports, "must have unique port numbers")
+  end
+
+  def one_or_none_ingress_ports
+    return if ports.select(&:ingress).size <= 1
+
+    errors.add(:ports, "must have at most one ingress port")
   end
 
   def name_format

@@ -9,6 +9,7 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   attribute :child_component
 
   renders_one :label
+  renders_one :header
 
   def unique_id
     # random id to be used for html element

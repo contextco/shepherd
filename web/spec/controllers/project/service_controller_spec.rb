@@ -74,7 +74,8 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(service.environment_variables.first['name']).to eq('MY_ENV')
         expect(service.environment_variables.first['value']).to eq('value')
         expect(service.secrets.first).to eq('MY_SECRET')
-        expect(service.ports).to eq(%w[80 443])
+        expect(service.ports).to eq([ 80, 443 ])
+        expect(service.ingress_port).to eq(nil)
       end
 
       it 'creates a service with the correct PVC attributes' do
@@ -82,6 +83,18 @@ RSpec.describe Project::ServiceController, type: :controller do
         service = ProjectService.order(:created_at).last
         expect(service.pvc_mount_path).to eq('/data')
         expect(service.pvc_size_bytes).to eq(10.gigabytes)
+      end
+
+      context 'with an ingress port' do
+        before do
+          valid_params[:service_form][:ports].first[:ingress] = true
+        end
+
+        it 'creates a service with the correct ingress port' do
+          subject
+          service = ProjectService.order(:created_at).last
+          expect(service.ingress_port).to eq(80)
+        end
       end
     end
 
