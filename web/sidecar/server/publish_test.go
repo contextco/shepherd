@@ -415,6 +415,26 @@ func TestServer_PublishChart(t *testing.T) {
 	}
 }
 
+func clientFacingValuesForReq(t *testing.T, req *sidecar_pb.PublishChartRequest) map[string]any {
+	t.Helper()
+
+	vals := map[string]any{}
+
+	for _, service := range req.Chart.Services {
+		if service.IngressConfig == nil {
+			continue
+		}
+
+		vals[service.Name] = map[string]any{
+			"externalIngress": map[string]any{
+				"host": "arbitrary-host.com",
+			},
+		}
+	}
+
+	return vals
+}
+
 func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {
 	keyFiles := []string{
 		"test-repo/index.yaml",
