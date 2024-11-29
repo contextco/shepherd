@@ -1,6 +1,5 @@
 environment:
   FOO: bar
-externalIngress: {}
 image:
   repository: test-image
   tag: latest

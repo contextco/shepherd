@@ -57,10 +57,10 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 	return &ClusterSet{clusters: clusters}
 }
 
-func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
+func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string, values map[string]any) error {
 	return runInParallel(ctx, func(cluster *Cluster) error {
 		_ = cluster.Uninstall(ctx, ch)
-		return cluster.Install(ctx, ch, namespace)
+		return cluster.Install(ctx, ch, namespace, values)
 	}, c.clusters)
 }
 
@@ -96,7 +96,7 @@ type clusterImpl interface {
 	source() string
 }
 
-func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string) error {
+func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string, values map[string]any) error {
 	kubeConfig, err := c.impl.getKubeConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get kubeconfig: %w", err)
@@ -113,7 +113,7 @@ func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string
 	client.Replace = true
 	client.CreateNamespace = true
 
-	rel, err := client.RunWithContext(ctx, ch.KubeChart(), nil)
+	rel, err := client.RunWithContext(ctx, ch.KubeChart(), values)
 	if err != nil {
 		return fmt.Errorf("failed to install chart: %w", err)
 	}
