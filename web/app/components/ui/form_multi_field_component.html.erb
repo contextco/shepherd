@@ -6,28 +6,31 @@
     </span>
   </div>
 
-  <div class="flex flex-col rounded-md gap-2 p-4 border border-stone-400 w-7/12">
-    <%= render UI::DynamicNestedForm::FormComponent.new(
-      form:,
-      id: unique_id,
-      association_name:,
-      model_class:,
-      wrapper_classes: 'flex flex-col gap-2',
-      maximum_subforms: 10,
-      ) do |component| %>
-      <% component.with_subform_content do |secret_form| %>
-        <%= render child_component.new(form: secret_form) %>
+  <div class="flex flex-col rounded-md gap-1 p-4 border border-stone-400 w-7/12">
+    <%= header %>
+    <div class="flex flex-col gap-2">
+      <%= render UI::DynamicNestedForm::FormComponent.new(
+        form:,
+        id: unique_id,
+        association_name:,
+        model_class:,
+        wrapper_classes: 'flex flex-col gap-2',
+        maximum_subforms: 10,
+        ) do |component| %>
+        <% component.with_subform_content do |secret_form| %>
+          <%= render child_component.new(form: secret_form) %>
+        <% end %>
       <% end %>
-    <% end %>
 
-    <%= render UI::DynamicNestedForm::AddButtonComponent.new(
-      for_id: unique_id,
-      ) do |component| %>
-      <% component.with_button do %>
-        <div class="text-sm rounded-md cursor-pointer w-fit">
-          + Add
-        </div>
+      <%= render UI::DynamicNestedForm::AddButtonComponent.new(
+        for_id: unique_id,
+        ) do |component| %>
+        <% component.with_button do %>
+          <div class="text-sm rounded-md cursor-pointer w-fit">
+            + Add
+          </div>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </div>
 </div>

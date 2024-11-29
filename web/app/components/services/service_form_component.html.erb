@@ -72,17 +72,26 @@
 
     <hr class="border-stone-300 my-2">
 
-    <%= render UI::FormMultiFieldComponent.new(
-      title: 'Open Ports',
-      form:,
-      association_name: :ports,
-      model_class: Service::Form::PortForm,
-      child_component: Services::PortComponent,
-      ) do |component| %>
-      <%= component.with_label do %>
-        Optional open ports for the service. Leave empty if not needed.
+    <div data-controller="singular-checkbox">
+      <%= render UI::FormMultiFieldComponent.new(
+        title: 'Open Ports',
+        form:,
+        association_name: :ports,
+        model_class: Service::Form::PortForm,
+        child_component: Services::PortComponent,
+        ) do |component| %>
+        <%= component.with_label do %>
+          Optional open ports for the service.
+          Check <span class="font-bold">Ingress</span> to expose the port to the internet.
+        <% end %>
+        <%= component.with_header do %>
+          <div class="flex items-center gap-8 text-sm font-medium justify-between">
+            <span class="text-stone-800 flex-none">Port</span>
+            <span class="text-stone-800 flex-none mr-14">Ingress</span>
+          </div>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
 
     <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
   </div>
