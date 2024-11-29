@@ -23,6 +23,16 @@ RSpec.describe Project::ProjectController, type: :controller do
         subject
         expect(Project.last.project_versions.count).to eq(1)
       end
+
+      it 'creates a new dummy project subscriber' do
+        subject
+        expect(Project.last.dummy_project_subscriber).to be_present
+      end
+
+      it 'does not call publish! on the project version' do
+        expect_any_instance_of(ProjectVersion).not_to receive(:publish!)
+        subject
+      end
     end
 
     context 'when using an illegal name' do
