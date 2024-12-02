@@ -15,7 +15,8 @@ class Chart::Override::Redis < Chart::Override::Base
     cpu_cores: :number,
     memory_bytes: :number,
     disk_bytes: :number,
-    max_memory_policy: :string
+    max_memory_policy: :string,
+    db_password: :string
   }.freeze
 
   def initialize(configs:)

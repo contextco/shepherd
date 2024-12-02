@@ -8,7 +8,8 @@ class Dependencies::PostgresqlComponent < DependenciesComponent
     password = dependency.configs["db_password"]
     username = dependency.configs["db_user"]
     db_name = dependency.configs["db_name"]
+    host = "#{dependency.project.name}-postgresql"
 
-    "postgresql://#{username}:#{password}@postgresql/#{db_name}"
+    "postgresql://#{username}:#{password}@#{host}/#{db_name}"
   end
 end
