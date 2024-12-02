@@ -3,7 +3,7 @@
 class Dependencies::Base
   include FormObject
 
-  attribute :dependency_id
+  attribute :dependency
 
   attribute :name
   attribute :version
@@ -25,7 +25,7 @@ class Dependencies::Base
     # override as needed in child forms
     f = self.new
     f.assign_attributes(
-      dependency_id: dependency.id,
+      dependency: dependency,
       name: dependency.name,
       version: dependency.version,
       repo_url: dependency.repo_url,
