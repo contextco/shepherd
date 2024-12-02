@@ -7,7 +7,8 @@ class Chart::Override::Redis < Chart::Override::Base
     cpu_cores: %w[master.resources.requests.cpu master.resources.limits.cpu],
     memory_bytes: %w[master.resources.requests.memory master.resources.limits.memory],
     disk_bytes: %w[master.persistence.size],
-    max_memory_policy: %w[master.maxmemory-policy]
+    max_memory_policy: %w[master.maxmemory-policy],
+    db_password: %w[auth.password]
   }
 
   VALUE_TYPES = {

@@ -4,7 +4,7 @@
 
   <% if update? %>
     <div class="flex flex-col gap-6">
-      <%= render CommandSnippetComponent.new(title: "Database Connection String", snippet: dependency_instance.db_connection_string ) %>
+      <%= render CommandSnippetComponent.new(title: "Database Connection String", snippet: db_connection_string ) %>
       <hr class="border-stone-300 my-4" />
     </div>
   <% end %>
