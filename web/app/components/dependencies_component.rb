@@ -15,7 +15,6 @@ class DependenciesComponent < ApplicationComponent
     update? ? dependency_path(dependency_instance.dependency_id) : version_dependencies_path(version)
   end
 
-
   def update_create_text
     update? ? "Update" : "Create"
   end
