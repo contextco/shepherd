@@ -6,6 +6,11 @@
     </div>
   </div>
 
+  <%= render @dependency_info.form_component.new(
+    dependency_instance: @dependency_instance,
+    dependency_info: @dependency_info,
+    form_method: :patch
+  ) %>
 
 
   <div class="flex flex-col gap-4 p-4 rounded-md border-stone-300 border">
