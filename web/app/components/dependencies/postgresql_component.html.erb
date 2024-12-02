@@ -2,6 +2,13 @@
   <%= form.hidden_field :name, value: dependency_info.name %>
   <%= form.hidden_field :repo_url, value: dependency_info.repository %>
 
+  <% if update? %>
+    <div class="flex flex-col gap-6">
+      <%= render CommandSnippetComponent.new(title: "Database Connection String", snippet: dependency_instance.db_connection_string ) %>
+      <hr class="border-stone-300 my-4" />
+    </div>
+  <% end %>
+
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1 max-w-96">
       <%= form.label :version, class: 'font-medium text-stone-800 flex-none' %>

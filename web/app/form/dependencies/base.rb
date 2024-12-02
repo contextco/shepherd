@@ -23,7 +23,7 @@ class Dependencies::Base
 
   def self.from_dependency(dependency)
     # override as needed in child forms
-    f = Dependencies::RedisForm.new
+    f = self.new
     f.assign_attributes(
       dependency_id: dependency.id,
       name: dependency.name,
