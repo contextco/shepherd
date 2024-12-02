@@ -14,7 +14,7 @@
             <% end %>
           <% end %>
         </div>
-        <% if !project_version.published? && project_version.eligible_dependencies.present? && Flipper.enabled?(:dependencies, current_user) %>
+        <% if !project_version.published? && project_version.eligible_dependencies.present? %>
           <div class="flex items-center">
             <%= link_to version_dependencies_path(project_version), class: 'button flex gap-1 items-center' do %>
               <%= heroicon 'squares-plus', class: 'size-4' %>
