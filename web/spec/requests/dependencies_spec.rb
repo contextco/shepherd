@@ -80,6 +80,11 @@ RSpec.describe "Dependencies", type: :request do
       expect(response).to redirect_to(version_path(version))
     end
 
+    it 'creates a password' do
+      subject
+      expect(version.dependencies.last.configs['db_password']).to be_present
+    end
+
     context 'when using an illegal name' do
       subject { post version_dependencies_path(version), params: { dependency: {
         name: 'Test',
@@ -171,6 +176,11 @@ RSpec.describe "Dependencies", type: :request do
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
         expect(dependency.configs['disk_bytes']).to eq(20.gigabytes)
+      end
+
+      it 'does not update the password' do
+        subject
+        expect(dependency.reload.configs['db_password']).to eq('password')
       end
 
       it "redirects to the version page" do

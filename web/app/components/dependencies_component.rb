@@ -12,7 +12,7 @@ class DependenciesComponent < ApplicationComponent
   end
 
   def url
-    update? ? dependency_path(dependency_instance.dependency_id) : version_dependencies_path(version)
+    update? ? dependency_path(dependency_instance.dependency.id) : version_dependencies_path(version)
   end
 
   def update_create_text
