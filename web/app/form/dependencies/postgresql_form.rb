@@ -16,8 +16,8 @@ class Dependencies::PostgresqlForm < Dependencies::Base
   ].freeze
 
   attribute :configs do
-    attribute :db_name, default: "default_db_name"
-    attribute :db_user, default: "default_db_username"
+    attribute :db_name
+    attribute :db_user
     attribute :cpu_cores, :integer
     attribute :memory_bytes, :integer
     attribute :disk_bytes, :integer
@@ -43,6 +43,21 @@ class Dependencies::PostgresqlForm < Dependencies::Base
       errors.add(:db_user, "must start with a letter or underscore and contain only letters, numbers, and underscores")
     end
   end
+
+  def self.from_dependency(dependency)
+    f = Dependencies::PostgresqlForm.new
+    f.assign_attributes(
+      dependency_id: dependency.id,
+      name: dependency.name,
+      version: dependency.version,
+      repo_url: dependency.repo_url,
+      configs: dependency.configs.except("db_password")
+    )
+
+    f
+  end
+
+  private
 
   def configs_params
     {

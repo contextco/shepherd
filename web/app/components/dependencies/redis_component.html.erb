@@ -1,4 +1,4 @@
-<%= form_with model: dependency_instance, url: version_dependencies_path, class: 'flex flex-col gap-6' do |form| %>
+<%= form_with model: dependency_instance, scope: :dependency, method: form_method, url:, class: 'flex flex-col gap-6' do |form| %>
   <%= form.hidden_field :name, value: dependency_info.name %>
   <%= form.hidden_field :repo_url, value: dependency_info.repository %>
   <%= form.hidden_field :version, value: dependency_info.variants.first.version %>

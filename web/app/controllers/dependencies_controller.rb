@@ -3,7 +3,7 @@ class DependenciesController < ApplicationController
 
   def new
     @dependency_info = Chart::Dependency.from_name!(params[:name])
-    @dependency_instance = @version.dependencies.build
+    @dependency_instance = @dependency_info.form.new
   end
 
   def index
@@ -27,15 +27,33 @@ class DependenciesController < ApplicationController
     end
 
     form.create_dependency(@version)
+
+    flash[:notice] = "Dependency created"
     redirect_to version_path(@version)
   end
 
   def edit
     @dependency = @version.dependencies.find(params[:id])
+    @dependency_info = @dependency.info
+    @dependency_instance = @dependency_info.form.from_dependency(@dependency)
   end
 
   def destroy
     @version.dependencies.find(params[:id]).destroy
+    redirect_to version_path(@version)
+  end
+
+  def update
+    @dependency = @version.dependencies.find(params[:id])
+
+    if form.invalid?
+      flash[:error] = form.errors.full_messages.first
+      return redirect_to edit_dependency_path(@dependency)
+    end
+
+    form.update_dependency(@dependency)
+    flash[:notice] = "Dependency updated"
+
     redirect_to version_path(@version)
   end
 
@@ -48,7 +66,7 @@ class DependenciesController < ApplicationController
   end
 
   def dependency_params
-    params.require(:dependency).permit(:name, :version, :repo_url, configs: {})
+    @dependency_params ||= params.require(:dependency).permit(:name, :version, :repo_url, configs_attributes: {})
   end
 
   def dependency_info
