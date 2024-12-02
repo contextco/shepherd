@@ -11,4 +11,15 @@ class Dependencies::RedisComponent < DependenciesComponent
     %w[volatile-random volatile-random],
     %w[volatile-ttl volatile-ttl]
   ].freeze
+
+  def db_connection_string
+    return if dependency_instance&.dependency.nil?
+
+    dependency = dependency_instance.dependency
+    password = dependency.configs["db_password"]
+    namespace_name = dependency.project.name
+    host = "#{dependency.project.name}-#{dependency.name}-master.#{namespace_name}.svc.cluster.local"
+
+    "redis://:#{password}@#{host}:6379"
+  end
 end
