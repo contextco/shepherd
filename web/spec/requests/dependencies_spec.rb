@@ -132,6 +132,7 @@ RSpec.describe "Dependencies", type: :request do
             name: dependency_object.name,
             version: dependency_object.variants.sample.version,
             repo_url: dependency_object.repository,
+            chart_name: dependency_object.chart_name,
             configs_attributes: {
               cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
               memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
