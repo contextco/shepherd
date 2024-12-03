@@ -42,7 +42,7 @@ class Dependencies::RedisForm < Dependencies::Base
 
   def update_dependency(dependency)
     configs = dependency.configs.symbolize_keys.merge(configs_params.except(:db_password)) # don't update password
-    dependency.update!(name:, version:, repo_url:, configs:)
+    dependency.update!(name:, version:, repo_url:, chart_name:, configs:)
   end
 
   private
