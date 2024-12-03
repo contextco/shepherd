@@ -5,7 +5,7 @@ module DependencyRPC
 
   def rpc_dependency
     Sidecar::DependencyParams.new(
-      name:,
+      name: chart_name,
       version:,
       repository_url: repo_url,
       overrides: rpc_overrides

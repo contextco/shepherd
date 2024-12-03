@@ -64,6 +64,7 @@ RSpec.describe "Dependencies", type: :request do
       name: dependency_object.name,
       version: dependency_object.variants.sample.version,
       repo_url: dependency_object.repository,
+      chart_name: dependency_object.chart_name,
       configs_attributes: {
         cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
         memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
@@ -153,7 +154,8 @@ RSpec.describe "Dependencies", type: :request do
       subject { patch dependency_path(dependency), params: { dependency: {
         name: 'redis',
         version: '20.x.x',
-        repo_url: 'oci://registry-1.docker.io/bitnamicharts/redis',
+        repo_url: 'oci://registry-1.docker.io',
+        chart_name: 'bitnamicharts/redis',
         configs_attributes: {
           max_memory_policy: 'allkeys-lfu',
           cpu_cores: 2,
@@ -171,7 +173,8 @@ RSpec.describe "Dependencies", type: :request do
         subject
         expect(dependency.reload.name).to eq('redis')
         expect(dependency.version).to eq('20.x.x')
-        expect(dependency.repo_url).to eq('oci://registry-1.docker.io/bitnamicharts/redis')
+        expect(dependency.repo_url).to eq('oci://registry-1.docker.io')
+        expect(dependency.chart_name).to eq('bitnamicharts/redis')
         expect(dependency.configs['max_memory_policy']).to eq('allkeys-lfu')
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
@@ -193,6 +196,7 @@ RSpec.describe "Dependencies", type: :request do
           name: 'redis',
           version: '20.x.x',
           repo_url: 'oci://registry-1.docker.io/bitnamicharts/redis',
+          chart_name: 'bitnamicharts/redis',
           configs_attributes: {
             max_memory_policy: 'allkeys-lfu',
             cpu_cores: 3,
@@ -229,14 +233,16 @@ RSpec.describe "Dependencies", type: :request do
         project_version: version,
         name: 'postgresql',
         version: '17.x.x',
-        repo_url: 'oci://registry-1.docker.io/bitnamicharts/postgresql',
+        repo_url: 'oci://registry-1.docker.io',
+        chart_name: 'bitnamicharts/postgresql',
         configs: { cpu_cores: 4, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'bob', db_user: 'bob_2', db_password: 'password' }
       ) }
 
       subject { patch dependency_path(dependency), params: { dependency: {
         name: 'postgresql',
         version: '17.x.x',
-        repo_url: 'oci://registry-1.docker.io/bitnamicharts/postgresql',
+        repo_url: 'oci://registry-1.docker.io',
+        chart_name: 'bitnamicharts/postgresql',
         configs_attributes: {
           cpu_cores: 2,
           memory_bytes: 2.gigabyte,
@@ -255,7 +261,8 @@ RSpec.describe "Dependencies", type: :request do
         subject
         expect(dependency.reload.name).to eq('postgresql')
         expect(dependency.version).to eq('17.x.x')
-        expect(dependency.repo_url).to eq('oci://registry-1.docker.io/bitnamicharts/postgresql')
+        expect(dependency.repo_url).to eq('oci://registry-1.docker.io')
+        expect(dependency.chart_name).to eq('bitnamicharts/postgresql')
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
         expect(dependency.configs['disk_bytes']).to eq(20.gigabytes)
