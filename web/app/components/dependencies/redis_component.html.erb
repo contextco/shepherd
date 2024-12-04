@@ -1,7 +1,14 @@
-<%= form_with model: dependency_instance, url: version_dependencies_path, class: 'flex flex-col gap-6' do |form| %>
+<%= form_with model: dependency_instance, scope: :dependency, method: form_method, url:, class: 'flex flex-col gap-6' do |form| %>
   <%= form.hidden_field :name, value: dependency_info.name %>
   <%= form.hidden_field :repo_url, value: dependency_info.repository %>
   <%= form.hidden_field :version, value: dependency_info.variants.first.version %>
+
+  <% if update? %>
+    <div class="flex flex-col gap-6">
+      <%= render CommandSnippetComponent.new(title: "Internal Redis URL", snippet: db_connection_string ) %>
+      <hr class="border-stone-300 my-4" />
+    </div>
+  <% end %>
 
   <%= form.fields_for :configs do |config_form| %>
 

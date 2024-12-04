@@ -6,6 +6,7 @@ class Chart::Dependency
 
   attribute :name
   attribute :repository
+  attribute :chart_name
   attribute :variants
   attribute :human_visible_name
   attribute :icon
@@ -61,6 +62,7 @@ class Chart::Dependency
         name: attrs.fetch(:name),
         human_visible_name: attrs[:human_visible_name],
         repository: attrs.fetch(:repository),
+        chart_name: attrs.fetch(:chart_name),
         icon: attrs.fetch(:icon),
         description: attrs.fetch(:description),
         variants: attrs.fetch(:variants)&.map do |version|

@@ -3,19 +3,19 @@
     {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
-      "fingerprint": "e8f1ffbd84fbf7850f86c2954b9813b9894840200236a7cf4280b42c3d1586f0",
+      "fingerprint": "1ef3363e69a3de36d6e8f05936d6d2fbb6e278f950f7068dacba6db2647cc3bb",
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/dependencies/new.html.erb",
       "line": 9,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(action => Chart::Dependency.from_name!(params[:name]).form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.build, :dependency_info => Chart::Dependency.from_name!(params[:name])), {})",
+      "code": "render(action => Chart::Dependency.from_name!(params[:name]).form_component.new(:dependency_info => Chart::Dependency.from_name!(params[:name]), :version => current_team.dependencies.find(params[:id]).project_version), {})",
       "render_path": [
         {
           "type": "controller",
           "class": "DependenciesController",
           "method": "new",
-          "line": 6,
+          "line": 7,
           "file": "app/controllers/dependencies_controller.rb",
           "rendered": {
             "name": "dependencies/new",
@@ -27,7 +27,41 @@
         "type": "template",
         "template": "dependencies/new"
       },
-      "user_input": "params[:name]",
+      "user_input": "params[:id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "396799b9218f7d616d69c59006a6377170309f759e949f8897aa99cb2fc3a83a",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/dependencies/edit.html.erb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(action => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form.from_dependency(current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id])), :dependency_info => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info, :form_method => :patch), {})",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "DependenciesController",
+          "method": "edit",
+          "line": 39,
+          "file": "app/controllers/dependencies_controller.rb",
+          "rendered": {
+            "name": "dependencies/edit",
+            "file": "app/views/dependencies/edit.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "dependencies/edit"
+      },
+      "user_input": "params[:id]",
       "confidence": "Weak",
       "cwe_id": [
         22
@@ -35,6 +69,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-11-19 17:53:12 +0000",
+  "updated": "2024-12-02 10:50:00 +0000",
   "brakeman_version": "6.2.2"
 }

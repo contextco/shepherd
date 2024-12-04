@@ -4,6 +4,7 @@ class Dependency < ApplicationRecord
   validate :name_is_known, :version_is_known, :repo_url_is_known
 
   belongs_to :project_version
+  has_one :project, through: :project_version
 
   def name_is_known
     return if info.present?

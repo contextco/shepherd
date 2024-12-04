@@ -1,6 +1,14 @@
-<%= form_with model: dependency_instance, url: version_dependencies_path, class: 'flex flex-col gap-6' do |form| %>
+<%= form_with model: dependency_instance, method: form_method, scope: :dependency, url:, class: 'flex flex-col gap-6' do |form| %>
   <%= form.hidden_field :name, value: dependency_info.name %>
   <%= form.hidden_field :repo_url, value: dependency_info.repository %>
+  <%= form.hidden_field :chart_name, value: dependency_info.chart_name %>
+
+  <% if update? %>
+    <div class="flex flex-col gap-6">
+      <%= render CommandSnippetComponent.new(title: "Database Connection String", snippet: db_connection_string ) %>
+      <hr class="border-stone-300 my-4" />
+    </div>
+  <% end %>
 
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1 max-w-96">
@@ -28,7 +36,6 @@
       </div>
 
       <%= config_form.text_field :db_name,
-                          value: dependency_instance.configs.fetch(:db_name, nil),
                           'data-1p-ignore': true,
                           'data-lpignore': true,
                           class: 'w-1/2 p-2 rounded-md' %>
@@ -43,7 +50,6 @@
       </div>
 
       <%= config_form.text_field :db_user,
-                          value: dependency_instance.configs.fetch(:db_user, nil),
                           'data-1p-ignore': true,
                           'data-lpignore': true,
                           class: 'w-1/2 p-2 rounded-md' %>

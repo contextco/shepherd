@@ -15,9 +15,11 @@ class Dependencies::PostgresqlForm < Dependencies::Base
     10.gigabytes, 20.gigabytes, 40.gigabytes, 80.gigabytes, 160.gigabytes, 320.gigabytes
   ].freeze
 
+
   attribute :configs do
-    attribute :db_name, default: "default_db_name"
-    attribute :db_user, default: "default_db_username"
+    attribute :db_name
+    attribute :db_user
+    attribute :db_password # this is never set from ui, only generated
     attribute :cpu_cores, :integer
     attribute :memory_bytes, :integer
     attribute :disk_bytes, :integer
@@ -43,6 +45,17 @@ class Dependencies::PostgresqlForm < Dependencies::Base
       errors.add(:db_user, "must start with a letter or underscore and contain only letters, numbers, and underscores")
     end
   end
+
+  def db_connection_string
+    "postgresql://#{configs.db_user}:#{configs.db_password}@#{name}/#{configs.db_name}"
+  end
+
+  def update_dependency(dependency)
+    configs = dependency.configs.symbolize_keys.merge(configs_params.except(:db_password)) # don't update password
+    dependency.update!(name:, version:, repo_url:, chart_name:, configs:)
+  end
+
+  private
 
   def configs_params
     {
