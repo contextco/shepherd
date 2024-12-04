@@ -72,7 +72,7 @@ RSpec.describe ProjectVersion do
           Sidecar::OverrideParams.new(path: 'primary.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
           Sidecar::OverrideParams.new(path: 'primary.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
           Sidecar::OverrideParams.new(path: 'primary.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
-          Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
+          Sidecar::OverrideParams.new(path: 'auth.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
           Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user')),
           Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'test_pass'))
         )
@@ -204,7 +204,7 @@ RSpec.describe ProjectVersion do
         Sidecar::OverrideParams.new(path: 'primary.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
         Sidecar::OverrideParams.new(path: 'primary.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
         Sidecar::OverrideParams.new(path: 'primary.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
-        Sidecar::OverrideParams.new(path: 'primary.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
+        Sidecar::OverrideParams.new(path: 'auth.database', value: Google::Protobuf::Value.new(string_value: 'test_db')),
         Sidecar::OverrideParams.new(path: 'auth.username', value: Google::Protobuf::Value.new(string_value: 'test_user')),
         Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'test_pass'))
       )

@@ -74,7 +74,7 @@ class HelmRepo < ApplicationRecord
     # TODO: this does not belong here
     return "http://localhost:3000" if Rails.env.development? || Rails.env.test?
 
-    "https://vpc.context.ai"
+    "https://app.trustshepherd.com"
   end
 
   def bucket
