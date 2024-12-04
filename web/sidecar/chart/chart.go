@@ -85,7 +85,7 @@ func (c *ParentChart) AddExternalDependencyFromProto(proto *sidecar_pb.Dependenc
 	overrides := []*values.Override{}
 	for _, o := range proto.GetOverrides() {
 		overrides = append(overrides, &values.Override{
-			Path:  strings.Join([]string{proto.GetName(), o.GetPath()}, "."),
+			Path:  strings.Join([]string{proto.GetValuesAlias(), o.GetPath()}, "."),
 			Value: o.GetValue().AsInterface(),
 		})
 	}

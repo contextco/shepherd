@@ -41,9 +41,11 @@ message ChartParams {
     reserved 3 to 6;
 }
 
-// Next ID: 4
+// Next ID: 6
 message DependencyParams {
     string name = 1;
+
+    string values_alias = 5;
 
     string version = 2;
 
