@@ -136,6 +136,7 @@ func (c *Cluster) Uninstall(ctx context.Context, ch *chart.Chart) error {
 
 	client := action.NewUninstall(actionConfig)
 	client.IgnoreNotFound = true
+	client.Wait = true
 
 	_, err = client.Run(ch.ReleaseName())
 	if err != nil {
