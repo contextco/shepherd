@@ -1,0 +1,6 @@
+test-service-1: {}
+test-service-2:
+  secrets:
+  - environmentKey: TEST_SECRET
+    name: test-secret
+    value: ""
