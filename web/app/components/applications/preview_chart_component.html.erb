@@ -1,4 +1,4 @@
-<%= link_to preview_chart_version_path(version), data: { turbo: false }, class: 'button flex gap-1 items-center' do %>
+<%= button_to preview_chart_version_path(version), method: :get, disabled: disabled?, data: { turbo: false }, class: "button flex gap-1 items-center #{'disabled' if disabled?}", title: ("Must be at least one service to preview." if disabled?) do %>
   <%= heroicon 'eye', variant: :outline, class: 'w-4' %>
   Preview Chart
 <% end %>

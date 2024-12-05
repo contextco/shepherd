@@ -2,4 +2,8 @@
 
 class Applications::PreviewChartComponent < ApplicationComponent
   attribute :version
+
+  def disabled?
+    !version.deployable?
+  end
 end

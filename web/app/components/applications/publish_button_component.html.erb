@@ -4,7 +4,7 @@
     Unpublish
   <% end %>
 <% else %>
-  <%= button_to publish_version_path(version), class: 'button flex gap-1 items-center' do %>
+  <%= button_to publish_version_path(version), disabled: disabled?, data: { turbo: false }, class: "button flex gap-1 items-center #{'disabled' if disabled?}", title: ("Must be at least one service to preview." if disabled?) do %>
     <%= heroicon :play, class: 'size-4' %>
     Publish
   <% end %>

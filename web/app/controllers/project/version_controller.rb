@@ -60,6 +60,11 @@ class Project::VersionController < ApplicationController
   end
 
   def preview_chart
+    if @version.services.empty?
+      flash[:error] = "No services attached to publish"
+      return redirect_to version_path
+    end
+
     @version.publish!(project_subscriber: @app.dummy_project_subscriber)
     helm_repo = @app.dummy_project_subscriber.helm_repo
 
