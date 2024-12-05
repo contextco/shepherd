@@ -65,4 +65,8 @@ class ProjectVersion < ApplicationRecord
       new_version
     end
   end
+
+  def deployable?
+    services.any?
+  end
 end

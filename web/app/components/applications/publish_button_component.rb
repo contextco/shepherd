@@ -7,4 +7,8 @@ class Applications::PublishButtonComponent < ApplicationComponent
     # remove this when we support unpublishing
     !version.published?
   end
+
+  def disabled?
+    !version.deployable?
+  end
 end

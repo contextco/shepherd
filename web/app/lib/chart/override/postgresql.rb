@@ -3,7 +3,7 @@
 class Chart::Override::Postgresql < Chart::Override::Base
   # https://artifacthub.io/packages/helm/bitnami/postgresql
   OVERRIDE_MAP = {
-    db_name: %w[primary.database],
+    db_name: %w[auth.database],
     db_user: %w[auth.username],
     db_password: %w[auth.password],
     cpu_cores: %w[primary.resources.requests.cpu primary.resources.limits.cpu],

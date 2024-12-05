@@ -230,7 +230,7 @@ func TestServer_PublishChart(t *testing.T) {
 					Dependencies: []*sidecar_pb.DependencyParams{
 						{
 							Name:          "bitnami/postgresql",
-							Version:       "15.x.x",
+							Version:       "16.2.4",
 							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
 							ValuesAlias:   "postgresql",
 							Overrides: []*sidecar_pb.OverrideParams{
@@ -433,6 +433,7 @@ func clientFacingValuesForReq(t *testing.T, req *sidecar_pb.PublishChartRequest)
 func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {
 	keyFiles := []string{
 		"test-repo/index.yaml",
+		fmt.Sprintf("test-repo/%s-%s-values.yaml", chartParams.Name, chartParams.Version),
 	}
 	for _, file := range keyFiles {
 		if strings.Contains(file, "index.yaml") {
@@ -453,6 +454,18 @@ func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStor
 			[]string{
 				fmt.Sprintf("%s/charts/%s/Chart.yaml", chartParams.Name, service.Name),
 				fmt.Sprintf("%s/charts/%s/values.yaml", chartParams.Name, service.Name),
+			}...,
+		)
+	}
+
+	if len(chartParams.Dependencies) > 0 {
+		keyArchiveFiles = append(keyArchiveFiles, fmt.Sprintf("%s/Chart.lock", chartParams.Name))
+	}
+
+	for _, dependency := range chartParams.Dependencies {
+		keyArchiveFiles = append(keyArchiveFiles,
+			[]string{
+				fmt.Sprintf("%s/charts/%s/%s-%s.tgz", chartParams.Name, dependency.Name, dependency.Name, dependency.Version),
 			}...,
 		)
 	}
