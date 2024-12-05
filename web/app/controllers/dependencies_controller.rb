@@ -66,7 +66,7 @@ class DependenciesController < ApplicationController
   end
 
   def dependency_params
-    @dependency_params ||= params.require(:dependency).permit(:name, :version, :repo_url, :chart_name, configs_attributes: {})
+    @dependency_params ||= params.require(:dependency).permit(:name, configs_attributes: {})
   end
 
   def dependency_info
