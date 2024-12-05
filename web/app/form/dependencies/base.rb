@@ -4,11 +4,7 @@ class Dependencies::Base
   include FormObject
 
   attribute :dependency
-
   attribute :name
-  attribute :version
-  attribute :chart_name
-  attribute :repo_url
 
   validates :name, presence: true
   validates :repo_url, presence: true
@@ -29,11 +25,18 @@ class Dependencies::Base
     f.assign_attributes(
       dependency: dependency,
       name: dependency.name,
-      version: dependency.version,
-      repo_url: dependency.repo_url,
       configs: dependency.configs
     )
 
     f
   end
+
+  private
+
+  def info
+    @info ||= Chart::Dependency.from_name(name)
+  end
+
+  delegate :version, :chart_name, :repository, to: :info
+  alias_method :repo_url, :repository
 end
