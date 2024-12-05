@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Dependencies::PostgresqlForm < Dependencies::Base
-  validate :version_inclusion
-
   CPU_CORES_OPTIONS = [
     1, 2, 4, 8, 16, 32
   ].freeze
@@ -23,10 +21,12 @@ class Dependencies::PostgresqlForm < Dependencies::Base
     attribute :cpu_cores, :integer
     attribute :memory_bytes, :integer
     attribute :disk_bytes, :integer
+    attribute :app_version
 
     validates :cpu_cores, presence: true, inclusion: { in: CPU_CORES_OPTIONS }, numericality: { only_integer: true }
     validates :memory_bytes, presence: true, inclusion: { in: MEMORY_OPTIONS }, numericality: { only_integer: true }
     validates :disk_bytes, presence: true, inclusion: { in: DISK_OPTIONS }, numericality: { only_integer: true }
+    validates :app_version, presence: true, inclusion: { in: %w[15.x.x 16.x.x 17.x.x] }
 
     validate :valid_postgresql_db_name
     validate :valid_postgresql_db_user
@@ -64,14 +64,9 @@ class Dependencies::PostgresqlForm < Dependencies::Base
       db_password: postgresql_password_generator,
       cpu_cores: configs.cpu_cores,
       memory_bytes: configs.memory_bytes,
-      disk_bytes: configs.disk_bytes
+      disk_bytes: configs.disk_bytes,
+      app_version: configs.app_version
     }
-  end
-
-  def version_inclusion
-    return if Chart::Dependency.from_name("postgresql").variants.map(&:version).include?(version)
-
-    errors.add(:version, "is not a valid version")
   end
 
   def postgresql_username_generator

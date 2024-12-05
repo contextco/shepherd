@@ -1,7 +1,7 @@
 class Dependency < ApplicationRecord
   include ::DependencyRPC
 
-  validate :name_is_known, :version_is_known, :repo_url_is_known
+  validate :name_is_known, :repo_url_is_known
 
   belongs_to :project_version
   has_one :project, through: :project_version
@@ -10,12 +10,6 @@ class Dependency < ApplicationRecord
     return if info.present?
 
     errors.add(:name, "Unknown dependency: #{name}")
-  end
-
-  def version_is_known
-    return if info&.variants&.map(&:version)&.include?(version)
-
-    errors.add(:version, "Unknown version for dependency #{name}: #{version}")
   end
 
   def repo_url_is_known
