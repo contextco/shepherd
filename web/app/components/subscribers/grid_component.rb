@@ -2,4 +2,5 @@
 
 class Subscribers::GridComponent < ApplicationComponent
   attribute :subscribers
+  attribute :project # optional
 end

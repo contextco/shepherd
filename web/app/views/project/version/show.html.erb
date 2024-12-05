@@ -15,10 +15,14 @@
           <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
           <% if @version.published? %>
-            <%= link_to new_project_subscriber_path(project_subscriber: { project_id: @version.project_id }), class: 'primary-button' do %>
+            <%= link_to new_project_subscriber_path(project_subscriber: { project_id: @version.project_id }), class: 'button' do %>
               + Create Deployment
             <% end  %>
           <% end %>
+
+          <%= link_to project_subscriber_index_path(project_id: @version.project_id), class: 'primary-button' do %>
+           Deployments
+          <% end  %>
         </div>
       </div>
     </div>
