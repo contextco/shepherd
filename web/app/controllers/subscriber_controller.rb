@@ -3,7 +3,8 @@ class SubscriberController < ApplicationController
   class NotFoundError < StandardError; end
 
   def index
-    @subscribers = current_team.non_dummy_project_subscribers
+    @project = current_team.projects.find(params[:project_id]) if params[:project_id].present?
+    @subscribers = @project&.project_subscribers&.non_dummy || current_team.non_dummy_project_subscribers
   end
 
   def show
