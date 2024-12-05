@@ -3,6 +3,7 @@ class Project::VersionController < ApplicationController
   before_action :authenticate_user!
   before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish preview_chart]
   before_action :fetch_previous_version, only: %i[new create]
+  before_action :check_deployable, only: %i[publish preview_chart]
 
   def show; end
 
@@ -37,11 +38,6 @@ class Project::VersionController < ApplicationController
   def edit; end
 
   def publish
-    if @version.services.empty?
-      flash[:error] = "No services attached to publish"
-      return redirect_to version_path
-    end
-
     @version.publish!
 
     flash[:notice] = "Application version published"
@@ -60,11 +56,6 @@ class Project::VersionController < ApplicationController
   end
 
   def preview_chart
-    if @version.services.empty?
-      flash[:error] = "No services attached to publish"
-      return redirect_to version_path
-    end
-
     @version.publish!(project_subscriber: @app.dummy_project_subscriber)
     helm_repo = @app.dummy_project_subscriber.helm_repo
 
@@ -120,5 +111,12 @@ class Project::VersionController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     flash[:error] = "No previous version found"
     redirect_to root_path
+  end
+
+  def check_deployable
+    return if @version.services.any?
+
+    flash[:error] = "No services attached to publish"
+    redirect_to version_path
   end
 end
