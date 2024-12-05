@@ -1,7 +1,9 @@
 <%= form_with model: dependency_instance, method: form_method, scope: :dependency, url:, class: 'flex flex-col gap-6' do |form| %>
   <%= form.hidden_field :name, value: dependency_info.name %>
+  <%# TODO: remove these hidden fields and use info reference instead %>
   <%= form.hidden_field :repo_url, value: dependency_info.repository %>
   <%= form.hidden_field :chart_name, value: dependency_info.chart_name %>
+  <%= form.hidden_field :version, value: dependency_info.version %>
 
   <% if update? %>
     <div class="flex flex-col gap-6">
@@ -10,23 +12,23 @@
     </div>
   <% end %>
 
-  <div class="flex items-center justify-between">
-    <div class="flex flex-col gap-1 max-w-96">
-      <%= form.label :version, class: 'font-medium text-stone-800 flex-none' %>
-      <span class="text-stone-600 text-sm">
+  <%= form.fields_for :configs do |config_form| %>
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1 max-w-96">
+        <%= config_form.label :app_version, class: 'font-medium text-stone-800 flex-none' %>
+        <span class="text-stone-600 text-sm">
         Version of the dependency to use
       </span>
+      </div>
+
+      <%= config_form.collection_select :app_version,
+                                 dependency_info.variants.sort_by(&:version).reverse,
+                                 :version,
+                                 -> (v) { "Version #{v.human_visible_version}" },
+                                 {},
+                                 class: 'w-1/2 p-2 rounded-md' %>
     </div>
 
-    <%= form.collection_select :version,
-                               dependency_info.variants.sort_by(&:version).reverse,
-                               :version,
-                               -> (v) { "Version #{v.human_visible_version}" },
-                               {},
-                        class: 'w-1/2 p-2 rounded-md' %>
-  </div>
-
-  <%= form.fields_for :configs do |config_form| %>
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1 max-w-96">
         <%= config_form.label :db_name, "Database", class: 'font-medium text-stone-800 flex-none' %>

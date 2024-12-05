@@ -68,12 +68,18 @@ RSpec.describe "Dependencies", type: :request do
       configs_attributes: {
         cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
         memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
-        disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s
+        disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s,
+        app_version: dependency_object.variants.first.version
       }
     } } }
 
     it "creates a new dependency" do
       expect { subject }.to change { version.reload.dependencies.count }.by(1)
+    end
+
+    it 'adds app_version to configs' do
+      subject
+      expect(version.dependencies.last.configs['app_version']).to eq(dependency_object.variants.first.version)
     end
 
     it "redirects to the version page" do
@@ -136,7 +142,8 @@ RSpec.describe "Dependencies", type: :request do
             configs_attributes: {
               cpu_cores: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS.sample.to_s,
               memory_bytes: Dependencies::PostgresqlForm::MEMORY_OPTIONS.sample.to_s,
-              disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s
+              disk_bytes: Dependencies::PostgresqlForm::DISK_OPTIONS.sample.to_s,
+              app_version: dependency_object.variants.first.version
             }
           } }
         end
@@ -236,7 +243,7 @@ RSpec.describe "Dependencies", type: :request do
         version: '17.x.x',
         repo_url: 'oci://registry-1.docker.io',
         chart_name: 'bitnamicharts/postgresql',
-        configs: { cpu_cores: 4, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'bob', db_user: 'bob_2', db_password: 'password' }
+        configs: { cpu_cores: 4, disk_bytes: 5368709120, memory_bytes: 4294967296, app_version: '15.x.x', db_name: 'bob', db_user: 'bob_2', db_password: 'password' }
       ) }
 
       subject { patch dependency_path(dependency), params: { dependency: {
@@ -249,7 +256,8 @@ RSpec.describe "Dependencies", type: :request do
           memory_bytes: 2.gigabyte,
           disk_bytes: 20.gigabytes,
           db_name: 'alice',
-          db_user: 'alice_2'
+          db_user: 'alice_2',
+          app_version: '16.x.x'
         }
       } } }
 
@@ -269,6 +277,7 @@ RSpec.describe "Dependencies", type: :request do
         expect(dependency.configs['disk_bytes']).to eq(20.gigabytes)
         expect(dependency.configs['db_name']).to eq('alice')
         expect(dependency.configs['db_user']).to eq('alice_2')
+        expect(dependency.configs['app_version']).to eq('16.x.x')
       end
 
       it 'does not update config password' do
