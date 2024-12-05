@@ -50,7 +50,7 @@ func (e *ExternalIngressConfig) toClientFacingValues() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"host": "",
+		"host": "TODO: Replace this with the domain name where you will host the service",
 	}
 }
 
@@ -121,9 +121,15 @@ func (r Resources) toValues() map[string]interface{} {
 }
 
 func (p *Params) ClientFacingValuesFile() (*values.File, error) {
+	var externalIngress map[string]interface{}
+	if p.IngressConfig.External != nil {
+		externalIngress = p.IngressConfig.External.toClientFacingValues()
+	}
+
 	return &values.File{
 		Values: compactMap(map[string]interface{}{
-			"secrets": sliceToClientFacingValues(p.Secrets),
+			"secrets":         sliceToClientFacingValues(p.Secrets),
+			"externalIngress": externalIngress,
 		}),
 	}, nil
 }

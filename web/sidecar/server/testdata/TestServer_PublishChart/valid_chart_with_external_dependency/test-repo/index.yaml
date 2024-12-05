@@ -10,7 +10,7 @@ entries:
       version: 1.0.0
     - name: bitnami/postgresql
       repository: oci://registry-1.docker.io/bitnamicharts
-      version: 15.x.x
+      version: 16.2.4
     description: A Helm chart for Kubernetes
     name: test-chart-external
     type: application
