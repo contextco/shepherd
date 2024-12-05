@@ -8,7 +8,8 @@ class Chart::Override::Postgresql < Chart::Override::Base
     db_password: %w[auth.password],
     cpu_cores: %w[primary.resources.requests.cpu primary.resources.limits.cpu],
     memory_bytes: %w[primary.resources.requests.memory primary.resources.limits.memory],
-    disk_bytes: %w[primary.persistence.size]
+    disk_bytes: %w[primary.persistence.size],
+    app_version: %w[image.tag]
   }
 
   VALUE_TYPES = {
@@ -17,7 +18,8 @@ class Chart::Override::Postgresql < Chart::Override::Base
     db_password: :string,
     cpu_cores: :number,
     memory_bytes: :number,
-    disk_bytes: :number
+    disk_bytes: :number,
+    app_version: :string
   }.freeze
 
   def initialize(configs:)

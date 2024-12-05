@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Dependencies::RedisForm < Dependencies::Base
-  validate :version_inclusion
-
   CPU_CORES_OPTIONS = [
     1, 2, 4, 8, 16, 32
   ].freeze
@@ -46,12 +44,6 @@ class Dependencies::RedisForm < Dependencies::Base
   end
 
   private
-
-  def version_inclusion
-    return if Chart::Dependency.from_name("redis").variants.map(&:version).include?(version)
-
-    errors.add(:version, "is not a valid version")
-  end
 
   def postgresql_password_generator
     SecureRandom.hex(16)

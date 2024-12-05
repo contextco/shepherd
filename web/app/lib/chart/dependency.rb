@@ -5,6 +5,7 @@ class Chart::Dependency
   include ActiveModel::Attributes
 
   attribute :name
+  attribute :version
   attribute :repository
   attribute :chart_name
   attribute :variants
@@ -60,6 +61,7 @@ class Chart::Dependency
     def from_attributes(attrs)
       new(
         name: attrs.fetch(:name),
+        version: attrs.fetch(:version),
         human_visible_name: attrs[:human_visible_name],
         repository: attrs.fetch(:repository),
         chart_name: attrs.fetch(:chart_name),

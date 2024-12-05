@@ -7,6 +7,7 @@ module Chart::Dependency::Data
       human_visible_name: "PostgreSQL",
       description: "A popular and powerful open-source relational database management system.",
       icon: "circle-stack",
+      version: "16.x.x",
       variants: [
         {
           version: "15.x.x",
@@ -30,10 +31,11 @@ module Chart::Dependency::Data
     {
       name: "redis",
       icon: "square-3-stack-3d",
+      version: "20.x.x",
       variants: [
         {
-          version: "20.x.x",
-          human_visible_version: "20"
+          version: "7.x.x",
+          human_visible_version: "7"
         }
       ],
       repository: "oci://registry-1.docker.io",
