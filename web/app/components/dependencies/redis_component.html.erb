@@ -13,6 +13,7 @@
   <% end %>
 
   <%= form.fields_for :configs do |config_form| %>
+    <%= config_form.hidden_field :app_version, value: dependency_info.variants.first.version %>
 
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1 max-w-96">

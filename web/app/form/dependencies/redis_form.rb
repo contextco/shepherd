@@ -19,6 +19,7 @@ class Dependencies::RedisForm < Dependencies::Base
     attribute :cpu_cores, :integer
     attribute :memory_bytes, :integer
     attribute :disk_bytes, :integer
+    attribute :app_version, :string
 
     attribute :db_password # this is never set from ui, only generated
 
@@ -34,7 +35,8 @@ class Dependencies::RedisForm < Dependencies::Base
       cpu_cores: configs.cpu_cores,
       memory_bytes: configs.memory_bytes,
       disk_bytes: configs.disk_bytes,
-      db_password: postgresql_password_generator
+      db_password: postgresql_password_generator,
+      app_version: configs.app_version
     }
   end
 
