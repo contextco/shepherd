@@ -8,7 +8,8 @@ class Chart::Override::Redis < Chart::Override::Base
     memory_bytes: %w[master.resources.requests.memory master.resources.limits.memory],
     disk_bytes: %w[master.persistence.size],
     max_memory_policy: %w[master.maxmemory-policy],
-    db_password: %w[auth.password]
+    db_password: %w[auth.password],
+    app_version: []
   }
 
   VALUE_TYPES = {
@@ -16,7 +17,8 @@ class Chart::Override::Redis < Chart::Override::Base
     memory_bytes: :number,
     disk_bytes: :number,
     max_memory_policy: :string,
-    db_password: :string
+    db_password: :string,
+    app_version: :string
   }.freeze
 
   def initialize(configs:)
