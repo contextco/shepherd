@@ -26,6 +26,12 @@
       <% end %>
     <% end %>
 
+    <hr class="border-stone-300 my-2">
+
+    <%= render Services::ImageCredentialsComponent.new(form:) %>
+
+    <hr class="border-stone-300 my-2">
+
     <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory]) %>
 
     <%= render UI::FormMultiFieldComponent.new(
