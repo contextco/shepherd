@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-8" data-controller="form-disk">
+<div class="flex flex-col gap-8" data-controller="expandable-form">
   <div class="flex items-start justify-between gap-24">
     <div class="flex flex-col gap-1 shrink-0 w-64">
       <span class="font-medium text-stone-800 flex-none">Disk</span>
@@ -8,14 +8,14 @@
 
     </div>
 
-    <div class="<%= 'hidden' if existing_mount? %> w-full flex justify-end pr-6" data-form-disk-target="addButton">
-      <div class="border border-stone-300 p-2 hover:bg-stone-50 duration-200 cursor-pointer w-fit text-sm" data-action="click->form-disk#showSubForm">
+    <div class="<%= 'hidden' if existing_mount? %> w-full flex justify-end pr-6" data-expandable-form-target="addButton">
+      <div class="border border-stone-300 p-2 hover:bg-stone-50 duration-200 cursor-pointer w-fit text-sm" data-action="click->expandable-form#showSubForm">
         Add Disk
       </div>
     </div>
   </div>
 
-  <div class="<%= 'hidden' unless existing_mount? %> flex flex-col gap-8" data-form-disk-target="subForm">
+  <div class="<%= 'hidden' unless existing_mount? %> flex flex-col gap-8" data-expandable-form-target="subForm">
 
     <%= render UI::FormTextFieldComponent.new(title: 'Mount Path') do |component| %>
       <%= component.with_label do %>
@@ -28,7 +28,7 @@
                             title: 'Path must be a valid absolute path (not root)',
                             placeholder: '/var/data',
                             disabled: !existing_mount?,
-                            'data-form-disk-target': 'formField',
+                            'data-expandable-form-target': 'formField',
                             class: 'w-full !p-0 border-0 focus:ring-0' %>
       <% end %>
     <% end %>
@@ -48,14 +48,14 @@
           labels: options_value.map { |m| number_to_human_size(m) },
           name: :pvc_size_bytes,
           disabled: !existing_mount?,
-          form_attributes: { 'data-form-disk-target': 'formField' }
+          form_attributes: { 'data-expandable-form-target': 'formField' }
           ) %>
       </div>
     </div>
 
 
     <div class="w-full flex justify-end pr-6">
-      <div class="border bg-red-700 text-white p-2 cursor-pointer w-fit text-sm" data-action="click->form-disk#hideSubForm">
+      <div class="border bg-red-700 text-white p-2 cursor-pointer w-fit text-sm" data-action="click->expandable-form#hideSubForm">
         Remove Disk
       </div>
     </div>

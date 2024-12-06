@@ -9,7 +9,10 @@ class Service::Form
 
   attribute :service_id
   attribute :name
+
   attribute :image
+  attribute :image_username
+  attribute :image_password
 
   attribute :cpu_cores, default: 1
   attribute :memory_bytes, default: 1.gigabyte
@@ -81,6 +84,8 @@ class Service::Form
       service_id: service.id,
       name: service.name,
       image: service.image,
+      image_username: service.image_username,
+      image_password: service.image_password,
       cpu_cores: service.cpu_cores,
       memory_bytes: service.memory_bytes,
       predeploy_command: service.predeploy_command,
@@ -114,6 +119,8 @@ class Service::Form
     {
       name:,
       image:,
+      image_username: image_username.presence,
+      image_password: image_password.presence,
       cpu_cores: cpu_cores.to_i,
       memory_bytes: memory_bytes.to_i,
       predeploy_command: predeploy_command.presence,
