@@ -171,7 +171,7 @@ func TestParams_toValues(t *testing.T) {
 				},
 				"imagePullSecrets": []map[string]interface{}{
 					{
-						"name": "{{ .Release.Name }}-{{ .Chart.Name }}-registry",
+						"name": "registry-credentials",
 					},
 				},
 				"replicaCount": int32(3),
@@ -357,7 +357,7 @@ image:
   repository: test-image
   tag: latest
 imagePullSecrets:
-- name: '{{ .Release.Name }}-{{ .Chart.Name }}-registry'
+- name: registry-credentials
 ingress:
   enabled: false
 initConfig: {}
