@@ -39,7 +39,20 @@ module ServiceRPC
   end
 
   def rpc_image
-    Sidecar::Image.new(name: image_without_tag, tag: image_tag)
+    Sidecar::Image.new(
+      name: image_without_tag,
+      tag: image_tag,
+      credential: rpc_image_credential
+    )
+  end
+
+  def rpc_image_credential
+    return nil if image_username.blank? || image_password.blank?
+
+    Sidecar::ImageCredentials.new(
+      username: image_username,
+      password: image_password
+    )
   end
 
   def rpc_endpoints

@@ -97,6 +97,24 @@ RSpec.describe ProjectService do
         expect(service.rpc_service.ingress_config).to be_nil
       end
     end
+
+    context 'with image credentials' do
+      before do
+        service.update!(image_username: 'user', image_password: 'pass')
+      end
+
+      it 'sets the image credential attribute' do
+        expect(service.rpc_service.image.credential).to be_a(Sidecar::ImageCredentials)
+        expect(service.rpc_service.image.credential.username).to eq('user')
+        expect(service.rpc_service.image.credential.password).to eq('pass')
+      end
+    end
+
+    context 'without image credentials (default)' do
+      it 'does not set the image credential attribute' do
+        expect(service.rpc_service.image.credential).to be_nil
+      end
+    end
   end
 
   describe '#env_to_k8s_secret_name' do
