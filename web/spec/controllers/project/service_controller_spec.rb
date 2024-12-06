@@ -215,6 +215,20 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect { subject }.to change { ProjectService.count }.by(1)
       end
     end
+
+    context 'with image credentials' do
+      before do
+        valid_params[:service_form][:image_username] = 'username-test'
+        valid_params[:service_form][:image_password] = 'password-test'
+      end
+
+      it 'creates a new service with image credentials' do
+        subject
+        service = ProjectService.order(:created_at).last
+        expect(service.image_username).to eq('username-test')
+        expect(service.image_password).to eq('password-test')
+      end
+    end
   end
 
   describe 'GET #edit' do

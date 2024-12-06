@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_03_150849) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_06_153724) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -118,6 +118,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_03_150849) do
     t.string "pvc_mount_path"
     t.string "pvc_name"
     t.integer "ingress_port"
+    t.string "image_username"
+    t.string "image_password"
     t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
   end
 
