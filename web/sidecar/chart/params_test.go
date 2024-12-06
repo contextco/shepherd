@@ -131,6 +131,86 @@ func TestParams_toValues(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "valid params with credentials",
+			params: &Params{
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+					Credential: &ImageCredential{
+						Username: "user",
+						Password: "pass",
+					},
+				},
+				ReplicaCount: 3,
+				Environment: Environment{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+				Services: []*Service{
+					{Port: 8000},
+				},
+				InitConfig: InitConfig{
+					InitCommands: []string{"ls"},
+				},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
+			},
+			want: map[string]interface{}{
+				"image": map[string]interface{}{
+					"repository": "test-image",
+					"tag":        "latest",
+					"credential": map[string]interface{}{
+						"username": "user",
+						"password": "pass",
+					},
+				},
+				"imagePullSecrets": []map[string]interface{}{
+					{
+						"name": "{{ .Release.Name }}-{{ .Chart.Name }}-registry",
+					},
+				},
+				"replicaCount": int32(3),
+				"environment": map[string]interface{}{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+				"initConfig": map[string]interface{}{
+					"initCommands": []map[string]interface{}{
+						{
+							"name":    "init-command-0",
+							"command": []string{"ls"},
+						},
+					},
+				},
+				"resources": map[string]interface{}{
+					"limits": map[string]interface{}{
+						"cpu":    "2000m",
+						"memory": "2048",
+					},
+					"requests": map[string]interface{}{
+						"cpu":    "1000m",
+						"memory": "1024",
+					},
+				},
+				"ingress": map[string]any{
+					"enabled": false,
+				},
+				"services": []map[string]any{
+					{
+						"port": 8000,
+					},
+				},
+				"serviceAccount": map[string]any{
+					"create": false,
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -243,6 +323,59 @@ services:
 `,
 			wantErr: false,
 		},
+		{
+			name: "with image credentials",
+			params: &Params{
+				Image: Image{
+					Name: "test-image",
+					Tag:  "latest",
+					Credential: &ImageCredential{
+						Username: "user",
+						Password: "pass",
+					},
+				},
+				ReplicaCount: 3,
+				Services:     []*Service{{Port: 8000}},
+				Environment: Environment{
+					"ENV_VAR1": "value1",
+					"ENV_VAR2": "value2",
+				},
+				Resources: Resources{
+					CPUCoresRequested:    1,
+					CPUCoresLimit:        2,
+					MemoryBytesRequested: 1024,
+					MemoryBytesLimit:     2048,
+				},
+			},
+			want: `environment:
+  ENV_VAR1: value1
+  ENV_VAR2: value2
+image:
+  credential:
+    password: pass
+    username: user
+  repository: test-image
+  tag: latest
+imagePullSecrets:
+- name: '{{ .Release.Name }}-{{ .Chart.Name }}-registry'
+ingress:
+  enabled: false
+initConfig: {}
+replicaCount: 3
+resources:
+  limits:
+    cpu: 2000m
+    memory: "2048"
+  requests:
+    cpu: 1000m
+    memory: "1024"
+serviceAccount:
+  create: false
+services:
+- port: 8000
+`,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -257,4 +390,52 @@ services:
 			}
 		})
 	}
+}
+
+func TestImage_toValues(t *testing.T) {
+    tests := []struct {
+        name  string
+        image Image
+        want  map[string]interface{}
+    }{
+        {
+            name: "without credentials",
+            image: Image{
+                Name: "test-image",
+                Tag:  "latest",
+            },
+            want: map[string]interface{}{
+                "repository": "test-image",
+                "tag":       "latest",
+            },
+        },
+        {
+            name: "with credentials",
+            image: Image{
+                Name: "test-image",
+                Tag:  "latest",
+                Credential: &ImageCredential{
+                    Username: "user",
+                    Password: "pass",
+                },
+            },
+            want: map[string]interface{}{
+                "repository": "test-image",
+                "tag":       "latest",
+                "credential": map[string]interface{}{
+                    "username": "user",
+                    "password": "pass",
+                },
+            },
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := tt.image.toValues()
+            if diff := cmp.Diff(got, tt.want); diff != "" {
+                t.Errorf("toValues() = %v, want %v, diff = %s", got, tt.want, diff)
+            }
+        })
+    }
 }
