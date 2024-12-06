@@ -175,13 +175,28 @@ func (s *Secret) LoadFromProto(proto *sidecar_pb.Secret) {
 type Image struct {
 	Name string
 	Tag  string
+	Credential *ImageCredential
 }
 
 func (i Image) toValues() map[string]interface{} {
-	return map[string]interface{}{
-		"repository": i.Name,
-		"tag":        i.Tag,
-	}
+    values := map[string]interface{}{
+        "repository": i.Name,
+        "tag":        i.Tag,
+    }
+    
+    if i.Credential != nil {
+        values["credential"] = map[string]interface{}{
+            "username": i.Credential.Username,
+            "password": i.Credential.Password,
+        }
+    }
+    
+    return values
+}
+
+type ImageCredential struct {
+	Username string
+	Password string
 }
 
 func (p *Params) toYaml() (string, error) {
@@ -194,25 +209,35 @@ func (p *Params) toYaml() (string, error) {
 }
 
 func (p *Params) toValues() (*values.File, error) {
-	return &values.File{
-		Values: compactMap(map[string]any{
-			"replicaCount":           p.ReplicaCount,
-			"image":                  p.Image.toValues(),
-			"environment":            p.Environment.toValues(),
-			"secrets":                sliceToValues(p.Secrets),
-			"resources":              p.Resources.toValues(),
-			"initConfig":             p.InitConfig.toValues(),
-			"persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
-			"externalIngress":        p.IngressConfig.External.toValues(),
-			"ingress": map[string]any{
-				"enabled": false,
-			},
-			"services": sliceToValues(p.Services),
-			"serviceAccount": map[string]any{
-				"create": false,
-			},
-		}),
-	}, nil
+    vals := map[string]any{
+        "replicaCount":           p.ReplicaCount,
+        "image":                  p.Image.toValues(),
+        "environment":            p.Environment.toValues(),
+        "secrets":                sliceToValues(p.Secrets),
+        "resources":              p.Resources.toValues(),
+        "initConfig":             p.InitConfig.toValues(),
+        "persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
+        "externalIngress":        p.IngressConfig.External.toValues(),
+        "ingress": map[string]any{
+            "enabled": false,
+        },
+        "services": sliceToValues(p.Services),
+        "serviceAccount": map[string]any{
+            "create": false,
+        },
+    }
+
+    if p.Image.Credential != nil {
+        vals["imagePullSecrets"] = []map[string]interface{}{
+            {
+                "name": "registry-credentials",
+            },
+        }
+    }
+
+    return &values.File{
+        Values: compactMap(vals),
+    }, nil
 }
 
 func NewServiceChartFromParams(name, version string, params *Params) (*ServiceChart, error) {
@@ -278,11 +303,20 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			}
 		}
 
+		var credential *ImageCredential
+		if service.GetImage().GetCredential() != nil {
+			credential = &ImageCredential{
+				Username: service.GetImage().GetCredential().GetUsername(),
+				Password: service.GetImage().GetCredential().GetPassword(),
+			}
+		}
+
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
 				Name: service.GetImage().GetName(),
 				Tag:  service.GetImage().GetTag(),
+				Credential: credential,
 			},
 			Resources: Resources{
 				CPUCoresRequested:    int(service.GetResources().GetCpuCoresRequested()),
