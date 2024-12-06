@@ -123,6 +123,12 @@ message EnvironmentVariable {
 message Image {
     string name = 1;
     string tag = 2;
+    ImageCredentials credential = 3;
+}
+
+message ImageCredentials {
+    string username = 1;
+    string password = 2;
 }
 
 message Resources {
