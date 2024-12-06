@@ -230,7 +230,7 @@ func (p *Params) toValues() (*values.File, error) {
     if p.Image.Credential != nil {
         vals["imagePullSecrets"] = []map[string]interface{}{
             {
-                "name": fmt.Sprintf("%s-%s-registry", "{{ .Release.Name }}", "{{ .Chart.Name }}"),
+                "name": "registry-credentials",
             },
         }
     }
