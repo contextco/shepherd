@@ -70,9 +70,8 @@ RSpec.describe ProjectService do
           }
         ],
         ingress_config: {
-          external: {
-            port: 443
-          }
+          port: 443,
+          preference: :PREFER_INTERNAL
         }
       )
     end

@@ -57,6 +57,9 @@ func TestParams_toValues(t *testing.T) {
 						},
 					},
 				},
+				"ingress": map[string]interface{}{
+					"enabled": false,
+				},
 				"resources": map[string]interface{}{
 					"limits": map[string]interface{}{
 						"cpu":    "2000m",
@@ -66,9 +69,6 @@ func TestParams_toValues(t *testing.T) {
 						"cpu":    "1000m",
 						"memory": "1024",
 					},
-				},
-				"ingress": map[string]any{
-					"enabled": false,
 				},
 				"services": []map[string]any{
 					{
@@ -117,7 +117,7 @@ func TestParams_toValues(t *testing.T) {
 						"memory": "1024",
 					},
 				},
-				"ingress": map[string]any{
+				"ingress": map[string]interface{}{
 					"enabled": false,
 				},
 				"services": []map[string]any{

@@ -4,7 +4,7 @@ image:
 ingress:
   enabled: true
   port: 80
-  scheme: external
+  scheme: internal
 initConfig: {}
 replicaCount: 1
 resources:
