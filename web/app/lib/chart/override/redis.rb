@@ -16,7 +16,7 @@ class Chart::Override::Redis < Chart::Override::Base
   VALUE_TYPES = {
     cpu_cores: :number,
     memory_bytes: :number,
-    disk_bytes: :number,
+    disk_bytes: :string,
     max_memory_policy: :string,
     db_password: :string,
     architecture: :string,
