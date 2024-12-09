@@ -23,9 +23,8 @@ module ServiceRPC
     return nil if ingress_port.nil?
 
     Sidecar::IngressParams.new(
-      external: Sidecar::ExternalIngressParams.new(
-        port: ingress_port
-      )
+      port: ingress_port,
+      preference: Sidecar::IngressPreference::PREFER_INTERNAL,
     )
   end
 

@@ -1,4 +1,4 @@
-{{- if $.Values.externalIngress }}
+{{- if $.Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,8 +7,13 @@ metadata:
   annotations:
     networking.gke.io/managed-certificates: {{ include "test.fullname" $ }}-external-ingress-cert
     {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
+    {{- if eq $.Values.ingress.scheme "external" }}
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    {{- else if eq $.Values.ingress.scheme "internal" }}
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    {{- end }}
     alb.ingress.kubernetes.io/target-type: ip
     {{- end }}
 spec:
@@ -16,8 +21,7 @@ spec:
   ingressClassName: alb
   {{- end }}
   rules:
-    - host: {{ $.Values.externalIngress.host }}
-      http:
+    - http:
         paths:
           - path: /*
             pathType: ImplementationSpecific
@@ -25,5 +29,9 @@ spec:
               service:
                 name: {{ include "test.fullname" $ }}-service
                 port:
-                  number: {{ $.Values.externalIngress.port }}
+                  number: {{ $.Values.ingress.port }}
+      {{- if eq $.Values.ingress.scheme "external" }}
+      host: {{ $.Values.ingress.external.host }}
+      {{- end }}
 {{- end }}
+
