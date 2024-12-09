@@ -54,7 +54,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ $.Release.Name }}-{{ $.Chart.Name }}-secrets
-                  key: {{ $value.environmentKey }}
+                  key: {{ $value.name }}
             {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
