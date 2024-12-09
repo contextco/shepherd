@@ -19,6 +19,7 @@ class Dependencies::RedisForm < Dependencies::Base
     attribute :cpu_cores, :integer
     attribute :memory_bytes, :integer
     attribute :disk_bytes, :integer
+    attribute :architecture, :string, default: "standalone"
     attribute :app_version, :string
 
     attribute :db_password # this is never set from ui, only generated
@@ -27,6 +28,7 @@ class Dependencies::RedisForm < Dependencies::Base
     validates :cpu_cores, presence: true, inclusion: { in: CPU_CORES_OPTIONS }, numericality: { only_integer: true }
     validates :memory_bytes, presence: true, inclusion: { in: MEMORY_OPTIONS }, numericality: { only_integer: true }
     validates :disk_bytes, presence: true, inclusion: { in: DISK_OPTIONS }, numericality: { only_integer: true }
+    validates :architecture, presence: true, inclusion: { in: [ "standalone" ] }
   end
 
   def configs_params
@@ -36,7 +38,8 @@ class Dependencies::RedisForm < Dependencies::Base
       memory_bytes: configs.memory_bytes,
       disk_bytes: configs.disk_bytes,
       db_password: postgresql_password_generator,
-      app_version: configs.app_version
+      app_version: configs.app_version,
+      architecture: configs.architecture
     }
   end
 
