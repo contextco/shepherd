@@ -58,7 +58,7 @@ RSpec.describe ProjectVersion do
           Sidecar::OverrideParams.new(path: 'master.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
           Sidecar::OverrideParams.new(path: 'master.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
           Sidecar::OverrideParams.new(path: 'master.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
-          Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+          Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(string_value: '5Gi')),
           Sidecar::OverrideParams.new(path: 'master.maxmemory-policy', value: Google::Protobuf::Value.new(string_value: 'volatile-lru')),
           Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'password'))
         )
@@ -184,7 +184,7 @@ RSpec.describe ProjectVersion do
         Sidecar::OverrideParams.new(path: 'master.resources.limits.cpu', value: Google::Protobuf::Value.new(number_value: 4.0)),
         Sidecar::OverrideParams.new(path: 'master.resources.requests.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
         Sidecar::OverrideParams.new(path: 'master.resources.limits.memory', value: Google::Protobuf::Value.new(number_value: 4294967296.0)),
-        Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(number_value: 5368709120.0)),
+        Sidecar::OverrideParams.new(path: 'master.persistence.size', value: Google::Protobuf::Value.new(string_value: '5Gi')),
         Sidecar::OverrideParams.new(path: 'master.maxmemory-policy', value: Google::Protobuf::Value.new(string_value: 'volatile-lru')),
         Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'password'))
       )
