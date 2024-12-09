@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -231,13 +232,13 @@ func TestServer_PublishChart(t *testing.T) {
 					Version: "1.0.0",
 					Dependencies: []*sidecar_pb.DependencyParams{
 						{
-							Name:          "bitnami/postgresql",
-							Version:       "16.2.4",
+							Name:          "postgresql",
+							Version:       "16.x.x",
 							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
 							ValuesAlias:   "postgresql",
 							Overrides: []*sidecar_pb.OverrideParams{
 								{
-									Path:  "primary.storage.size",
+									Path:  "primary.persistence.size",
 									Value: structpb.NewStringValue("10Gi"),
 								},
 							},
@@ -441,6 +442,17 @@ func TestServer_PublishChart(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
+
+			dir, err := os.MkdirTemp("", "sidecar-test")
+			if err != nil {
+				t.Fatalf("Failed to create temp dir: %v", err)
+			}
+
+			if err := store.Dump(dir); err != nil {
+				t.Fatalf("Failed to dump store: %v", err)
+			}
+
+			t.Logf("Dumped store to %s", dir)
 
 			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, tt.values); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
