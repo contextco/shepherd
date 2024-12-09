@@ -233,7 +233,7 @@ func TestServer_PublishChart(t *testing.T) {
 						{
 							Name:          "bitnami/postgresql",
 							Version:       "16.2.4",
-							RepositoryUrl: "oci://registry-1.docker.io/bitnamicharts",
+							RepositoryUrl: "oci://registry-1.docker.io",
 							ValuesAlias:   "postgresql",
 							Overrides: []*sidecar_pb.OverrideParams{
 								{
