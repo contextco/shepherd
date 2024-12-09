@@ -100,8 +100,10 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 
 			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, map[string]any{
 				"test-service": map[string]any{
-					"externalIngress": map[string]any{
-						"host": tt.host,
+					"ingress": map[string]any{
+						"external": map[string]any{
+							"host": tt.host,
+						},
 					},
 				},
 			}); err != nil {
@@ -174,9 +176,8 @@ func ingressRequest(t *testing.T) *sidecar_pb.PublishChartRequest {
 						},
 					},
 					IngressConfig: &sidecar_pb.IngressParams{
-						External: &sidecar_pb.ExternalIngressParams{
-							Port: 80,
-						},
+						Preference: sidecar_pb.IngressPreference_PREFER_EXTERNAL,
+						Port:       80,
 					},
 				},
 			},
@@ -195,6 +196,7 @@ func TestServer_PublishChart(t *testing.T) {
 	tests := []struct {
 		name    string
 		req     *sidecar_pb.PublishChartRequest
+		values  map[string]any
 		wantErr bool
 	}{
 		{
@@ -346,12 +348,54 @@ func TestServer_PublishChart(t *testing.T) {
 								},
 							},
 							IngressConfig: &sidecar_pb.IngressParams{
-								External: &sidecar_pb.ExternalIngressParams{
-									Port: 80,
-								},
+								Preference: sidecar_pb.IngressPreference_PREFER_EXTERNAL,
+								Port:       80,
 							},
 						},
 					},
+				},
+			},
+			values: map[string]any{
+				"test-service": map[string]any{
+					"ingress": map[string]any{
+						"external": map[string]any{
+							"host": "arbitrary-host.com",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "valid chart with internal ingress",
+			req: &sidecar_pb.PublishChartRequest{
+				RepositoryDirectory: "test-repo",
+				Chart: &sidecar_pb.ChartParams{
+					Name:    "test-chart-internal-ingress",
+					Version: "1.0.0",
+					Services: []*sidecar_pb.ServiceParams{
+						{
+							Name: "test-service",
+							Image: &sidecar_pb.Image{
+								Name: "nginx",
+								Tag:  "latest",
+							},
+							ReplicaCount: 1,
+							Endpoints: []*sidecar_pb.Endpoint{
+								{
+									Port: 80,
+								},
+							},
+							IngressConfig: &sidecar_pb.IngressParams{
+								Preference: sidecar_pb.IngressPreference_PREFER_INTERNAL,
+								Port:       80,
+							},
+						},
+					},
+				},
+			},
+			values: map[string]any{
+				"test-service": map[string]any{
+					"ingress": map[string]any{},
 				},
 			},
 		},
@@ -398,7 +442,7 @@ func TestServer_PublishChart(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, clientFacingValuesForReq(t, tt.req)); err != nil {
+			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, tt.values); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
 			defer clusters.Uninstall(ctx, c.Chart)
@@ -408,26 +452,6 @@ func TestServer_PublishChart(t *testing.T) {
 			}
 		})
 	}
-}
-
-func clientFacingValuesForReq(t *testing.T, req *sidecar_pb.PublishChartRequest) map[string]any {
-	t.Helper()
-
-	vals := map[string]any{}
-
-	for _, service := range req.Chart.Services {
-		if service.IngressConfig == nil {
-			continue
-		}
-
-		vals[service.Name] = map[string]any{
-			"externalIngress": map[string]any{
-				"host": "arbitrary-host.com",
-			},
-		}
-	}
-
-	return vals
 }
 
 func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {

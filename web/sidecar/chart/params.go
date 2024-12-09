@@ -27,30 +27,42 @@ type Params struct {
 }
 
 type IngressConfig struct {
-	External *ExternalIngressConfig
+	Enabled    bool
+	Port       int
+	Preference sidecar_pb.IngressPreference
 }
 
-type ExternalIngressConfig struct {
-	Port int
+func (i IngressConfig) toValues() map[string]interface{} {
+	if !i.Enabled {
+		return map[string]interface{}{
+			"enabled": false,
+		}
+	}
+
+	var scheme string
+	switch i.Preference {
+	case sidecar_pb.IngressPreference_PREFER_EXTERNAL:
+		scheme = "external"
+	case sidecar_pb.IngressPreference_PREFER_INTERNAL:
+		scheme = "internal"
+	}
+
+	return map[string]interface{}{
+		"enabled": true,
+		"scheme":  scheme,
+		"port":    i.Port,
+	}
 }
 
-func (e *ExternalIngressConfig) toValues() map[string]interface{} {
-	if e == nil {
+func (i IngressConfig) toClientFacingValues() map[string]interface{} {
+	if !i.Enabled {
 		return nil
 	}
 
 	return map[string]interface{}{
-		"port": e.Port,
-	}
-}
-
-func (e *ExternalIngressConfig) toClientFacingValues() map[string]interface{} {
-	if e == nil {
-		return nil
-	}
-
-	return map[string]interface{}{
-		"host": "TODO: Replace this with the domain name where you will host the service",
+		"external": map[string]interface{}{
+			"host": "TODO: Replace this with the domain name where you will host the service. Note, this field has no effect if the ingress is internal.",
+		},
 	}
 }
 
@@ -121,15 +133,10 @@ func (r Resources) toValues() map[string]interface{} {
 }
 
 func (p *Params) ClientFacingValuesFile() (*values.File, error) {
-	var externalIngress map[string]interface{}
-	if p.IngressConfig.External != nil {
-		externalIngress = p.IngressConfig.External.toClientFacingValues()
-	}
-
 	return &values.File{
 		Values: compactMap(map[string]interface{}{
-			"secrets":         sliceToClientFacingValues(p.Secrets),
-			"externalIngress": externalIngress,
+			"secrets": sliceToClientFacingValues(p.Secrets),
+			"ingress": p.IngressConfig.toClientFacingValues(),
 		}),
 	}, nil
 }
@@ -173,25 +180,25 @@ func (s *Secret) LoadFromProto(proto *sidecar_pb.Secret) {
 }
 
 type Image struct {
-	Name string
-	Tag  string
+	Name       string
+	Tag        string
 	Credential *ImageCredential
 }
 
 func (i Image) toValues() map[string]interface{} {
-    values := map[string]interface{}{
-        "repository": i.Name,
-        "tag":        i.Tag,
-    }
-    
-    if i.Credential != nil {
-        values["credential"] = map[string]interface{}{
-            "username": i.Credential.Username,
-            "password": i.Credential.Password,
-        }
-    }
-    
-    return values
+	values := map[string]interface{}{
+		"repository": i.Name,
+		"tag":        i.Tag,
+	}
+
+	if i.Credential != nil {
+		values["credential"] = map[string]interface{}{
+			"username": i.Credential.Username,
+			"password": i.Credential.Password,
+		}
+	}
+
+	return values
 }
 
 type ImageCredential struct {
@@ -209,35 +216,32 @@ func (p *Params) toYaml() (string, error) {
 }
 
 func (p *Params) toValues() (*values.File, error) {
-    vals := map[string]any{
-        "replicaCount":           p.ReplicaCount,
-        "image":                  p.Image.toValues(),
-        "environment":            p.Environment.toValues(),
-        "secrets":                sliceToValues(p.Secrets),
-        "resources":              p.Resources.toValues(),
-        "initConfig":             p.InitConfig.toValues(),
-        "persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
-        "externalIngress":        p.IngressConfig.External.toValues(),
-        "ingress": map[string]any{
-            "enabled": false,
-        },
-        "services": sliceToValues(p.Services),
-        "serviceAccount": map[string]any{
-            "create": false,
-        },
-    }
+	vals := map[string]any{
+		"replicaCount":           p.ReplicaCount,
+		"image":                  p.Image.toValues(),
+		"environment":            p.Environment.toValues(),
+		"secrets":                sliceToValues(p.Secrets),
+		"resources":              p.Resources.toValues(),
+		"initConfig":             p.InitConfig.toValues(),
+		"persistentVolumeClaims": sliceToValues(p.PersistentVolumeClaims),
+		"ingress":                p.IngressConfig.toValues(),
+		"services":               sliceToValues(p.Services),
+		"serviceAccount": map[string]any{
+			"create": false,
+		},
+	}
 
-    if p.Image.Credential != nil {
-        vals["imagePullSecrets"] = []map[string]interface{}{
-            {
-                "name": "registry-credentials",
-            },
-        }
-    }
+	if p.Image.Credential != nil {
+		vals["imagePullSecrets"] = []map[string]interface{}{
+			{
+				"name": "registry-credentials",
+			},
+		}
+	}
 
-    return &values.File{
-        Values: compactMap(vals),
-    }, nil
+	return &values.File{
+		Values: compactMap(vals),
+	}, nil
 }
 
 func NewServiceChartFromParams(name, version string, params *Params) (*ServiceChart, error) {
@@ -296,10 +300,12 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			persistentVolumeClaims = append(persistentVolumeClaims, p)
 		}
 
-		var externalIngressConfig *ExternalIngressConfig
-		if service.GetIngressConfig().GetExternal() != nil {
-			externalIngressConfig = &ExternalIngressConfig{
-				Port: int(service.GetIngressConfig().GetExternal().GetPort()),
+		var ingressConfig IngressConfig
+		if service.IngressConfig != nil {
+			ingressConfig = IngressConfig{
+				Enabled:    true,
+				Port:       int(service.GetIngressConfig().GetPort()),
+				Preference: service.GetIngressConfig().GetPreference(),
 			}
 		}
 
@@ -314,8 +320,8 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 		c, err := NewServiceChartFromParams(service.GetName(), version, &Params{
 			ReplicaCount: service.GetReplicaCount(),
 			Image: Image{
-				Name: service.GetImage().GetName(),
-				Tag:  service.GetImage().GetTag(),
+				Name:       service.GetImage().GetName(),
+				Tag:        service.GetImage().GetTag(),
 				Credential: credential,
 			},
 			Resources: Resources{
@@ -324,9 +330,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				MemoryBytesRequested: service.GetResources().GetMemoryBytesRequested(),
 				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
 			},
-			IngressConfig: IngressConfig{
-				External: externalIngressConfig,
-			},
+			IngressConfig:          ingressConfig,
 			Environment:            env,
 			Secrets:                secrets,
 			Services:               services,
