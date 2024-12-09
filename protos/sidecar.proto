@@ -81,12 +81,23 @@ message ServiceParams {
     IngressParams ingress_config = 9;
 }
 
+enum IngressPreference {
+    PREFER_EXTERNAL = 0;
+    PREFER_INTERNAL = 1;
+}
+
+// Next ID: 5
 message IngressParams {
-    ExternalIngressParams external = 1;
+    IngressPreference preference = 3;
+
+    int32 port = 4;
 }
 
 message ExternalIngressParams {
     int32 port = 1;
+}
+
+message InternalIngressParams {
 }
 
 message PersistentVolumeClaimParams {
