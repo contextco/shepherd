@@ -81,60 +81,6 @@
         }
       }
     },
-    "ingress": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Whether to create an ingress"
-        },
-        "className": {
-          "type": "string",
-          "description": "Ingress class name"
-        },
-        "annotations": {
-          "type": "object",
-          "description": "Annotations to add to the ingress"
-        },
-        "hosts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "host": {
-                "type": "string",
-                "description": "Hostname for the ingress rule"
-              },
-              "paths": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "path": {
-                      "type": "string",
-                      "description": "URL path for the ingress rule"
-                    },
-                    "pathType": {
-                      "type": "string",
-                      "enum": [
-                        "Exact",
-                        "Prefix",
-                        "ImplementationSpecific"
-                      ],
-                      "description": "Path type for the ingress rule"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tls": {
-          "type": "array",
-          "description": "TLS configuration for the ingress"
-        }
-      }
-    },
     "resources": {
       "type": "object",
       "properties": {
@@ -279,6 +225,24 @@
               }
             }
           }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "description": "Ingress configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable ingress"
+        },
+        "port": {
+          "type": "integer",
+          "description": "Port the service will listen on"
+        },
+        "external": {
+          "type": "object",
+          "description": "External ingress configuration"
         }
       }
     },
