@@ -10,15 +10,15 @@ module Chart::Dependency::Data
       version: "16.x.x",
       variants: [
         {
-          version: "15.x.x",
+          version: "15.10.0",
           human_visible_version: "15"
         },
         {
-          version: "16.x.x",
+          version: "16.6.0",
           human_visible_version: "16"
         },
         {
-          version: "17.x.x",
+          version: "17.2.0",
           human_visible_version: "17"
         }
       ],
