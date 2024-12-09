@@ -13,6 +13,9 @@ class Dependencies::PostgresqlForm < Dependencies::Base
     10.gigabytes, 20.gigabytes, 40.gigabytes, 80.gigabytes, 160.gigabytes, 320.gigabytes
   ].freeze
 
+  # two sources of truth for app versions, also in data.rb, TODO: fix
+  APP_VERSIONS = %w[15.10.0 16.6.0 17.2.0].freeze
+
 
   attribute :configs do
     attribute :db_name
@@ -26,7 +29,7 @@ class Dependencies::PostgresqlForm < Dependencies::Base
     validates :cpu_cores, presence: true, inclusion: { in: CPU_CORES_OPTIONS }, numericality: { only_integer: true }
     validates :memory_bytes, presence: true, inclusion: { in: MEMORY_OPTIONS }, numericality: { only_integer: true }
     validates :disk_bytes, presence: true, inclusion: { in: DISK_OPTIONS }, numericality: { only_integer: true }
-    validates :app_version, presence: true, inclusion: { in: %w[15.x.x 16.x.x 17.x.x] }
+    validates :app_version, presence: true, inclusion: { in: APP_VERSIONS }
 
     validate :valid_postgresql_db_name
     validate :valid_postgresql_db_user
