@@ -13,6 +13,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/downloader"
 )
 
 var ValidationError = errors.New("chart validation error")
@@ -154,17 +155,69 @@ func (c *ParentChart) Archive() (*ChartArchive, error) {
 	}
 	defer os.RemoveAll(dir)
 
-	archivePath, err := chartutil.Save(c.template.chart, dir)
+	if err := chartutil.SaveDir(c.template.chart, dir); err != nil {
+		return nil, fmt.Errorf("failed to save chart: %w", err)
+	}
+
+	if len(c.externalDeps) > 0 {
+		chartsDir := filepath.Join(dir, c.name, "charts")
+		entries, err := os.ReadDir(chartsDir)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read charts directory: %w", err)
+		}
+
+		for _, entry := range entries {
+			if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".tgz") {
+				chartPath := filepath.Join(chartsDir, entry.Name())
+				chart, err := loader.LoadFile(chartPath)
+				if err != nil {
+					return nil, fmt.Errorf("failed to load chart %s: %w", entry.Name(), err)
+				}
+
+				if err := chartutil.SaveDir(chart, chartsDir); err != nil {
+					return nil, fmt.Errorf("failed to unarchive chart %s: %w", entry.Name(), err)
+				}
+
+				if err := os.Remove(chartPath); err != nil {
+					return nil, fmt.Errorf("failed to remove chart archive %s: %w", entry.Name(), err)
+				}
+			}
+		}
+
+		if err := loadDeps(filepath.Join(dir, c.name)); err != nil {
+			return nil, fmt.Errorf("failed to load dependencies: %w", err)
+		}
+	}
+
+	chartWithDeps, err := loader.LoadDir(filepath.Join(dir, c.name))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load chart: %w", err)
+	}
+
+	archivePathWithDeps, err := chartutil.Save(chartWithDeps, dir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to save chart: %w", err)
 	}
 
-	archive, err := os.ReadFile(archivePath)
+	archiveWithDeps, err := os.ReadFile(archivePathWithDeps)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read chart archive: %w", err)
 	}
 
-	return &ChartArchive{Name: filepath.Base(archivePath), Data: archive}, nil
+	return &ChartArchive{Name: filepath.Base(archivePathWithDeps), Data: archiveWithDeps}, nil
+}
+
+func loadDeps(dir string) error {
+	m := downloader.Manager{
+		ChartPath: dir,
+		Out:       os.Stderr,
+	}
+
+	if err := m.Build(); err != nil {
+		return fmt.Errorf("failed to update dependencies: %w", err)
+	}
+
+	return nil
 }
 
 func (c *ParentChart) Values() (*values.File, error) {
