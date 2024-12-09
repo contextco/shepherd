@@ -178,6 +178,7 @@ RSpec.describe "Dependencies", type: :request do
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
         expect(dependency.configs['disk_bytes']).to eq(20.gigabytes)
+        expect(dependency.configs['replica_count']).to eq(1)
       end
 
       it 'does not update the password' do

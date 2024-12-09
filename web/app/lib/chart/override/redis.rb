@@ -9,6 +9,7 @@ class Chart::Override::Redis < Chart::Override::Base
     disk_bytes: %w[master.persistence.size],
     max_memory_policy: %w[master.maxmemory-policy],
     db_password: %w[auth.password],
+    replica_count: %w[replica.replicaCount],
     app_version: []
   }
 
@@ -18,6 +19,7 @@ class Chart::Override::Redis < Chart::Override::Base
     disk_bytes: :number,
     max_memory_policy: :string,
     db_password: :string,
+    replica_count: :number,
     app_version: :string
   }.freeze
 
