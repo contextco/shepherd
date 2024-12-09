@@ -100,8 +100,10 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 
 			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, map[string]any{
 				"test-service": map[string]any{
-					"externalIngress": map[string]any{
-						"host": tt.host,
+					"ingress": map[string]any{
+						"external": map[string]any{
+							"host": tt.host,
+						},
 					},
 				},
 			}); err != nil {
