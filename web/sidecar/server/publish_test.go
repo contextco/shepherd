@@ -237,7 +237,7 @@ func TestServer_PublishChart(t *testing.T) {
 							ValuesAlias:   "postgresql",
 							Overrides: []*sidecar_pb.OverrideParams{
 								{
-									Path:  "primary.storage.size",
+									Path:  "primary.persistence.size",
 									Value: structpb.NewStringValue("10Gi"),
 								},
 							},
@@ -440,6 +440,11 @@ func TestServer_PublishChart(t *testing.T) {
 			})
 			if err != nil {
 				t.Fatalf("Failed to load chart from archive: %v", err)
+			}
+
+			dir := t.TempDir()
+			if err := store.Dump(dir); err != nil {
+				t.Fatalf("Failed to dump store: %v", err)
 			}
 
 			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, tt.values); err != nil {
