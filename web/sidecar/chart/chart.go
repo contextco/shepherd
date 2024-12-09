@@ -1,9 +1,13 @@
 package chart
 
 import (
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"sidecar/generated/sidecar_pb"
@@ -13,6 +17,10 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/downloader"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/registry"
 )
 
 var ValidationError = errors.New("chart validation error")
@@ -154,17 +162,149 @@ func (c *ParentChart) Archive() (*ChartArchive, error) {
 	}
 	defer os.RemoveAll(dir)
 
-	archivePath, err := chartutil.Save(c.template.chart, dir)
-	if err != nil {
+	if err := chartutil.SaveDir(c.template.chart, dir); err != nil {
 		return nil, fmt.Errorf("failed to save chart: %w", err)
 	}
 
-	archive, err := os.ReadFile(archivePath)
+	if len(c.services) > 0 || len(c.externalDeps) > 0 {
+		chartsDir := filepath.Join(dir, c.name, "charts")
+		if err := unarchiveAllCharts(chartsDir); err != nil {
+			return nil, fmt.Errorf("failed to unarchive charts: %w", err)
+		}
+	}
+
+	if len(c.externalDeps) > 0 {
+		if err := loadDeps(filepath.Join(dir, c.name)); err != nil {
+			return nil, fmt.Errorf("failed to load dependencies: %w", err)
+		}
+	}
+
+	archivePath := filepath.Join(dir, c.name, c.name+"-"+c.version+".tgz")
+
+	// Create tar writer that writes to gzip
+	var buf bytes.Buffer
+	gzWriter := gzip.NewWriter(&buf)
+	tarWriter := tar.NewWriter(gzWriter)
+
+	// Walk the directory and add files to tar
+	err = filepath.WalkDir(filepath.Join(dir, c.name), func(path string, info fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Get relative path from base dir
+		relPath, err := filepath.Rel(filepath.Join(dir, c.name), path)
+		if err != nil {
+			return fmt.Errorf("failed to get relative path: %w", err)
+		}
+
+		// Skip the root directory itself
+		if relPath == "." {
+			return nil
+		}
+
+		finfo, err := info.Info()
+		if err != nil {
+			return fmt.Errorf("failed to get file info: %w", err)
+		}
+
+		// Create tar header
+		header, err := tar.FileInfoHeader(finfo, "")
+		if err != nil {
+			return fmt.Errorf("failed to create tar header: %w", err)
+		}
+		header.Name = filepath.Join(c.name, relPath)
+
+		// Write header
+		if err := tarWriter.WriteHeader(header); err != nil {
+			return fmt.Errorf("failed to write tar header: %w", err)
+		}
+
+		// If it's a file, write the contents
+		if !info.IsDir() {
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return fmt.Errorf("failed to read file %s: %w", path, err)
+			}
+			if _, err := tarWriter.Write(data); err != nil {
+				return fmt.Errorf("failed to write file contents to tar: %w", err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to walk directory: %w", err)
+	}
+
+	// Close writers
+	if err := tarWriter.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close tar writer: %w", err)
+	}
+	if err := gzWriter.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close gzip writer: %w", err)
+	}
+
+	log.Println("archivePath", archivePath)
+
+	// Write the archive to disk
+	if err := os.WriteFile(archivePath, buf.Bytes(), 0644); err != nil {
+		return nil, fmt.Errorf("failed to write archive file: %w", err)
+	}
+
+	archiveWithDeps, err := os.ReadFile(archivePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read chart archive: %w", err)
 	}
 
-	return &ChartArchive{Name: filepath.Base(archivePath), Data: archive}, nil
+	return &ChartArchive{Name: filepath.Base(archivePath), Data: archiveWithDeps}, nil
+}
+
+func unarchiveAllCharts(dir string) error {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return fmt.Errorf("failed to read charts directory: %w", err)
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".tgz") {
+			chartPath := filepath.Join(dir, entry.Name())
+			chart, err := loader.LoadFile(chartPath)
+			if err != nil {
+				return fmt.Errorf("failed to load chart %s: %w", entry.Name(), err)
+			}
+
+			if err := chartutil.SaveDir(chart, dir); err != nil {
+				return fmt.Errorf("failed to unarchive chart %s: %w", entry.Name(), err)
+			}
+
+			if err := os.Remove(chartPath); err != nil {
+				return fmt.Errorf("failed to remove chart archive %s: %w", entry.Name(), err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func loadDeps(dir string) error {
+	rc, err := registry.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to create registry client: %w", err)
+	}
+
+	m := downloader.Manager{
+		ChartPath:      dir,
+		Out:            os.Stderr,
+		Getters:        getter.All(&cli.EnvSettings{}),
+		RegistryClient: rc,
+	}
+
+	if err := m.Build(); err != nil {
+		return fmt.Errorf("failed to update dependencies: %w", err)
+	}
+
+	return nil
 }
 
 func (c *ParentChart) Values() (*values.File, error) {

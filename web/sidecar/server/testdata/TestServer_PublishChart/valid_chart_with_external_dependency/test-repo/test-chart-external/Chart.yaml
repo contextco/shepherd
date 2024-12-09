@@ -4,9 +4,9 @@ dependencies:
 - name: test-service
   repository: ""
   version: 1.0.0
-- name: bitnami/postgresql
+- name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.2.4
+  version: 16.x.x
 description: A Helm chart for Kubernetes
 name: test-chart-external
 type: application
