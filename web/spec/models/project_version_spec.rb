@@ -22,7 +22,7 @@ RSpec.describe ProjectVersion do
     )
   end
   let!(:dependency_redis) { create(:dependency, project_version:, name: 'redis') }
-  let!(:dependency_postgresql) { create(:dependency, project_version:, name: 'postgresql', version: '17.x.x', repo_url: 'oci://registry-1.docker.io', chart_name: 'bitnamicharts/postgresql', configs: { cpu_cores: 32, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'test_db', db_user: 'test_user', db_password: 'test_pass' }) }
+  let!(:dependency_postgresql) { create(:dependency, project_version:, name: 'postgresql', version: '17.x.x', repo_url: 'oci://registry-1.docker.io/bitnamicharts', chart_name: 'postgresql', configs: { cpu_cores: 32, disk_bytes: 5368709120, memory_bytes: 4294967296, db_name: 'test_db', db_user: 'test_user', db_password: 'test_pass' }) }
 
   let(:mock_client) { double(:sidecar_client) }
 
@@ -50,7 +50,7 @@ RSpec.describe ProjectVersion do
           have_attributes(port: 80),
           have_attributes(port: 443)
         )
-        expect(request.chart.dependencies.first.name).to eq("bitnamicharts/redis")
+        expect(request.chart.dependencies.first.name).to eq("redis")
         expect(request.chart.dependencies.first.version).to eq(dependency_redis.version)
         expect(request.chart.dependencies.first.repository_url).to eq(dependency_redis.repo_url)
         expect(request.chart.dependencies.first.overrides).to contain_exactly(
@@ -63,7 +63,7 @@ RSpec.describe ProjectVersion do
           Sidecar::OverrideParams.new(path: 'auth.password', value: Google::Protobuf::Value.new(string_value: 'password'))
         )
 
-        expect(request.chart.dependencies[1].name).to eq("bitnamicharts/postgresql")
+        expect(request.chart.dependencies[1].name).to eq("postgresql")
         expect(request.chart.dependencies[1].version).to eq(dependency_postgresql.version)
         expect(request.chart.dependencies[1].repository_url).to eq(dependency_postgresql.repo_url)
         expect(request.chart.dependencies[1].overrides).to contain_exactly(
@@ -173,7 +173,7 @@ RSpec.describe ProjectVersion do
 
     it 'includes correct redis dependency' do
       expect(chart.dependencies.first).to have_attributes(
-        name: "bitnamicharts/redis",
+        name: "redis",
         version: dependency_redis.version,
         repository_url: dependency_redis.repo_url
       )
@@ -192,7 +192,7 @@ RSpec.describe ProjectVersion do
 
     it 'includes correct postgresql dependency' do
       expect(chart.dependencies[1]).to have_attributes(
-        name: "bitnamicharts/postgresql",
+        name: "postgresql",
         version: dependency_postgresql.version,
         repository_url: dependency_postgresql.repo_url
       )

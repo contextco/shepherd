@@ -13,6 +13,8 @@ class Dependency < ApplicationRecord
   end
 
   def repo_url_is_known
+    # for backwards compatibility, to do remove after I do the next prod delete
+    return if repo_url == "oci://registry-1.docker.io"
     return if info&.repository == repo_url
 
     errors.add(:repo_url, "Invalid repository URL for dependency #{name}")
