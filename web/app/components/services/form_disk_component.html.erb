@@ -1,14 +1,17 @@
 <div class="flex flex-col gap-8" data-controller="expandable-form">
   <div class="flex items-start justify-between gap-24">
     <div class="flex flex-col gap-1 shrink-0 w-64">
-      <span class="font-medium text-stone-800 flex-none">Disk</span>
-      <span class="text-stone-600 text-sm">
+      <div class="flex flex-col">
+        <span class="font-medium text-stone-800 flex-none">Disk</span>
+        <span class="text-stone-500 text-xs font-medium uppercase">Optional</span>
+      </div>
+      <span class="text-stone-700 text-sm">
         Add a mount to your service.
       </span>
 
     </div>
 
-    <div class="<%= 'hidden' if existing_mount? %> w-full flex justify-end pr-6" data-expandable-form-target="addButton">
+    <div class="<%= 'hidden' if existing_mount? %> w-full flex justify-end" data-expandable-form-target="addButton">
       <div class="border border-stone-300 p-2 hover:bg-stone-50 duration-200 cursor-pointer w-fit text-sm" data-action="click->expandable-form#showSubForm">
         Add Disk
       </div>
@@ -54,7 +57,7 @@
     </div>
 
 
-    <div class="w-full flex justify-end pr-6">
+    <div class="w-full flex justify-end">
       <div class="border bg-red-700 text-white p-2 cursor-pointer w-fit text-sm" data-action="click->expandable-form#hideSubForm">
         Remove Disk
       </div>
