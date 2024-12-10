@@ -40,12 +40,13 @@ class Chart::Override::Postgresql < Chart::Override::Base
     return [] if value.blank?
 
     yaml_targets = OVERRIDE_MAP[name.to_sym] or raise "Not found config #{name}"
+    value_type = VALUE_TYPES[name.to_sym] or raise "Not found value type for #{name}"
 
     transform_proc = VALUE_TRANSFORMS[name.to_sym]
     yaml_targets.map do |target|
       Sidecar::OverrideParams.new(
         path: target,
-        value: convert_value(name, value, VALUE_TYPES, &transform_proc)
+        value: convert_value(name, value, value_type, &transform_proc)
       )
     end
   end
