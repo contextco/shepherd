@@ -4,6 +4,12 @@ kind: Service
 metadata:
   name: {{ include "test.fullname" . }}-service
   namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if .Capabilities.APIVersions.Has "networking.gke.io/v1beta1" }}
+    {{- if eq .Values.ingress.scheme "internal" }}
+    cloud.google.com/neg: '{"ingress": true}'
+    {{- end }}
+    {{- end }}
 spec:
   type: NodePort
   selector:
