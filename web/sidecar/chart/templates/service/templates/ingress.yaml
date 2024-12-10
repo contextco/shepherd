@@ -5,7 +5,13 @@ metadata:
   name: {{ include "test.fullname" $ }}-external-ingress
   namespace: {{ $.Release.Namespace }}
   annotations:
+    {{- if $.Capabilities.APIVersions.Has "networking.gke.io/v1beta1" }}
+    {{- if eq $.Values.ingress.scheme "external" }}
     networking.gke.io/managed-certificates: {{ include "test.fullname" $ }}-external-ingress-cert
+    {{- else if eq $.Values.ingress.scheme "internal" }}
+    kubernetes.io/ingress.class: "gce-internal"
+    {{- end }}
+    {{- end }}
     {{- if $.Capabilities.APIVersions.Has "elbv2.k8s.aws/v1beta1" }}
     {{- if eq $.Values.ingress.scheme "external" }}
     alb.ingress.kubernetes.io/scheme: internet-facing
