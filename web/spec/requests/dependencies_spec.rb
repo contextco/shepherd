@@ -177,7 +177,7 @@ RSpec.describe "Dependencies", type: :request do
         expect(dependency.configs['max_memory_policy']).to eq('allkeys-lfu')
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
-        expect(dependency.configs['disk_bytes']).to eq('20Gi')
+        expect(dependency.configs['disk_bytes']).to eq(21474836480)
         expect(dependency.configs['architecture']).to eq('standalone')
       end
 
