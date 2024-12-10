@@ -12,7 +12,8 @@
     </div>
 
     <div class="<%= 'hidden' if existing_mount? %> w-full flex justify-end" data-expandable-form-target="addButton">
-      <div class="border border-stone-300 p-2 hover:bg-stone-50 duration-200 cursor-pointer w-fit text-sm" data-action="click->expandable-form#showSubForm">
+      <div class="button flex items-center gap-1" data-action="click->expandable-form#showSubForm">
+        <%= heroicon :plus, class: 'size-4' %>
         Add Disk
       </div>
     </div>

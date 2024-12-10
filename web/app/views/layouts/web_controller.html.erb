@@ -1,6 +1,6 @@
 <%= content_for :content do %>
   <div class="h-full flex">
-    <div class="header flex flex-col justify-between p-3 gap-8 items-center border-r">
+    <div class="header flex bg-white-200 flex-col justify-between p-3 gap-8 items-center border-r border-stone-400">
       <div class="left font-bold flex flex-col items-center gap-8">
         <%= link_to root_path, class: 'text-2xl' do %>
           <%= image_tag 'icon.png', class: 'w-8 h-8' %>
@@ -41,7 +41,7 @@
         <% end %>
       </div>
     </div>
-    <div class="content grow overflow-y-auto">
+    <div class="content grow overflow-y-auto bg-stone-50">
       <%= yield %>
     </div>
   </div>
