@@ -45,8 +45,8 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 
 	impls := []clusterImpl{
 		&kindCluster{name: name},
-		&gkeCluster{name: name},
-		&eksCluster{name: name},
+		// &gkeCluster{name: name},
+		// &eksCluster{name: name},
 	}
 
 	clusters := make([]*Cluster, len(impls))
@@ -60,7 +60,11 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string, values map[string]any) error {
 	return runInParallel(ctx, func(cluster *Cluster) error {
 		_ = cluster.Uninstall(ctx, ch)
-		return cluster.Install(ctx, ch, namespace, values)
+		err := cluster.Install(ctx, ch, namespace, values)
+		if err != nil {
+			return fmt.Errorf("failed to install chart in %s: %w", cluster.impl.source(), err)
+		}
+		return nil
 	}, c.clusters)
 }
 

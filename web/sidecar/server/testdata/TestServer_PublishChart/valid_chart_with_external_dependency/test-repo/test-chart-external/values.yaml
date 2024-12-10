@@ -1,5 +1,5 @@
 postgresql:
   primary:
-    storage:
+    persistence:
       size: 10Gi
 test-service: {}
