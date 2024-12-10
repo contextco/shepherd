@@ -95,13 +95,13 @@
         <%= component.with_label do %>
           <div>
             Optional open ports for the service.
-            Check <span class="font-medium">External</span> to expose the port to the internet with an ingress.
+            Check <span class="font-medium">Allow Ingress</span> to expose the port to the internet with an ingress.
           </div>
         <% end %>
         <%= component.with_header do %>
           <div class="flex items-center gap-8 text-sm font-medium justify-between">
             <span class="text-stone-800 flex-none">Port</span>
-            <span class="text-stone-800 flex-none mr-12">External</span>
+            <span class="text-stone-800 flex-none mr-8">Allow Ingress</span>
           </div>
         <% end %>
       <% end %>

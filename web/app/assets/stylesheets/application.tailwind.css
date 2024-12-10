@@ -12,7 +12,7 @@
 }
 
 .button {
-    @apply select-none cursor-pointer text-sm border px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 hover:shadow-md duration-200 hover:border-stone-300 border-stone-300;
+    @apply select-none cursor-pointer text-sm border px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 hover:shadow-md duration-200 border-stone-400 hover:border-stone-500 bg-white;
 }
 
 .button.disabled {
@@ -23,8 +23,12 @@
     @apply select-none cursor-pointer text-sm border border-stone-400 px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 hover:shadow-md duration-200;
 }
 
+.button-destructive {
+    @apply select-none cursor-pointer text-sm border border-red-950 px-2 py-1 text-white shadow-sm h-8 hover:shadow-md duration-200 bg-red-800;
+}
+
 .text-input {
-    @apply border p-2 text-stone-700 shadow-sm border-stone-500;
+    @apply border p-2 text-stone-700 shadow-sm border-stone-500 bg-white;
 }
 
 select {
@@ -34,3 +38,4 @@ select {
 .navigation-link {
     @apply text-sm text-stone-600 hover:text-stone-900 hover:underline;
 }
+

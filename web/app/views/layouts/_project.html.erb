@@ -1,5 +1,5 @@
 <div class="flex h-full">
-  <div class="w-80 shrink-0 border-r min-h-full flex flex-col">
+  <div class="w-80 shrink-0 border-r min-h-full flex flex-col bg-stone-100 border-stone-400">
     <div class="header p-4">
       <div class="flex w-full justify-between">
         <div class="flex flex-col">
@@ -23,15 +23,15 @@
     </div>
 
     <div class="flex flex-col gap-2 overflow-y-auto px-4 pb-8" id="<%= dom_id(@app, :version_list) %>" data-preserve-scroll>
-      <%= link_to new_project_version_path(@app), class: 'font-medium p-2 flex text-sm justify-center items-center min-h-[70px] gap-2 duration-200 hover:bg-stone-100 border-transparent border' do %>
+      <%= link_to new_project_version_path(@app), class: 'font-medium p-2 flex text-sm justify-center items-center gap-2 duration-200 hover:bg-white border-transparent border' do %>
         <%= heroicon 'plus', variant: :outline, class: 'size-4 stroke-2' %>
         New Version
       <% end %>
 
       <% @app.project_versions.order(created_at: :desc).each do |version| %>
         <%= link_to version_path(version), class: ["p-2 flex flex-col gap-2 duration-200", {
-          'bg-stone-100 border border-stone-400': version == @version,
-          'hover:bg-stone-100 border-transparent border': version != @version
+          'bg-white border border-stone-400': version == @version,
+          'hover:bg-stone-200 border-transparent border': version != @version
         }] do %>
           <div class="flex justify-between item">
             <div  class="font-semibold">
@@ -48,7 +48,9 @@
             </div>
 
             <div class="div uppercase">
-              <%= image_tag 'kubernetes-icon-black.svg', class: 'h-4' if version.published? %>
+              <% if version.published? %>
+                <%= heroicon 'lock-closed', class: 'size-4' %>
+              <% end %>
             </div>
           </div>
         <% end %>
