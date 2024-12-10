@@ -12,7 +12,7 @@
 }
 
 .button {
-    @apply select-none cursor-pointer text-sm border rounded-md px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 flex items-center gap-1;
+    @apply select-none cursor-pointer text-sm border px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 hover:shadow-md duration-200 hover:border-stone-300 border-stone-300;
 }
 
 .button.disabled {
@@ -20,9 +20,17 @@
 }
 
 .primary-button {
-    @apply select-none cursor-pointer text-sm border border-stone-400 rounded-md px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 flex items-center gap-1;
+    @apply select-none cursor-pointer text-sm border border-stone-400 px-2 py-1 text-stone-700 shadow-sm max-h-8 h-12 hover:shadow-md duration-200;
 }
 
 .text-input {
-    @apply border rounded p-2 text-stone-700 shadow-sm border-stone-400;
+    @apply border p-2 text-stone-700 shadow-sm border-stone-500;
+}
+
+select {
+    @apply rounded-none border-stone-500;
+}
+
+.navigation-link {
+    @apply text-sm text-stone-600 hover:text-stone-900 hover:underline;
 }

@@ -1,22 +1,24 @@
 <%= render layout: 'layouts/project' do %>
-  <div class="flex w-full justify-between">
-    <div class="flex flex-col">
-      <span class="text-sm text-stone-400 font-medium text-stone-100">Version <%= @version.version %></span>
-      <span class="text-2xl font-medium text-stone-700 w-fit">New Dependency</span>
+  <div class="flex flex-col gap-8">
+    <div class="flex w-full justify-between">
+      <div class="flex flex-col">
+        <span class="text-sm text-stone-400 font-medium text-stone-100">Version <%= @version.version %></span>
+        <span class="text-2xl font-medium text-stone-700 w-fit">New Dependency</span>
+      </div>
     </div>
-  </div>
-  <div class="flex flex-col gap-4">
-    <% if @dependencies.blank? %>
-      <div class="text-md">No dependencies eligible to be added.</div>
-    <% end %>
-    <% @dependencies.each do |dep| %>
-      <%= link_to new_version_dependency_path(name: dep.name), class: 'p-6 hover:bg-stone-50 duration-200 flex items-baseline gap-4 border border-stone-300' do %>
-        <div class="size-5 text-stone-600"><%= heroicon dep.icon, class: 'w-full' %></div>
-        <div class="flex flex-col gap-1 grow">
-          <div class="text-lg font-semibold capitalize"><%= dep.human_visible_name %></div>
-          <div class="text-stone-600 mb-2"><%= dep.description %></div>
-        </div>
+    <div class="flex flex-col gap-4">
+      <% if @dependencies.blank? %>
+        <div class="text-md">No dependencies eligible to be added.</div>
       <% end %>
-    <% end %>
+      <% @dependencies.each do |dep| %>
+        <%= link_to new_version_dependency_path(name: dep.name), class: 'p-6 hover:bg-stone-50 duration-200 flex items-baseline gap-4 border border-stone-300' do %>
+          <div class="size-5 text-stone-600"><%= heroicon dep.icon, class: 'w-full' %></div>
+          <div class="flex flex-col gap-1 grow">
+            <div class="text-lg font-semibold capitalize"><%= dep.human_visible_name %></div>
+            <div class="text-stone-600 mb-2"><%= dep.description %></div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 <% end %>
