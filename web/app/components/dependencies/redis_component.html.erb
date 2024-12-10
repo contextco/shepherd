@@ -24,7 +24,7 @@
                                         :first,
                                         :last,
                                         {},
-                                        class: 'w-1/2 p-2 rounded-md' %>
+                                        class: 'w-1/2 p-2' %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
@@ -35,5 +35,5 @@
     ) %>
   <% end %>
 
-  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
 <% end %>

@@ -172,12 +172,12 @@ RSpec.describe "Dependencies", type: :request do
         subject
         expect(dependency.reload.name).to eq('redis')
         expect(dependency.version).to eq('20.x.x')
-        expect(dependency.repo_url).to eq('oci://registry-1.docker.io')
-        expect(dependency.chart_name).to eq('bitnamicharts/redis')
+        expect(dependency.repo_url).to eq('oci://registry-1.docker.io/bitnamicharts')
+        expect(dependency.chart_name).to eq('redis')
         expect(dependency.configs['max_memory_policy']).to eq('allkeys-lfu')
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
-        expect(dependency.configs['disk_bytes']).to eq('20Gi')
+        expect(dependency.configs['disk_bytes']).to eq(21474836480)
         expect(dependency.configs['architecture']).to eq('standalone')
       end
 
@@ -230,8 +230,8 @@ RSpec.describe "Dependencies", type: :request do
         project_version: version,
         name: 'postgresql',
         version: '16.x.x',
-        repo_url: 'oci://registry-1.docker.io',
-        chart_name: 'bitnamicharts/postgresql',
+        repo_url: 'oci://registry-1.docker.io/bitnamicharts',
+        chart_name: 'postgresql',
         configs: { cpu_cores: 4, disk_bytes: 5368709120, memory_bytes: 4294967296, app_version: '15.10.0', db_name: 'bob', db_user: 'bob_2', db_password: 'password' }
       ) }
 
@@ -256,8 +256,8 @@ RSpec.describe "Dependencies", type: :request do
         subject
         expect(dependency.reload.name).to eq('postgresql')
         expect(dependency.version).to eq('16.x.x')
-        expect(dependency.repo_url).to eq('oci://registry-1.docker.io')
-        expect(dependency.chart_name).to eq('bitnamicharts/postgresql')
+        expect(dependency.repo_url).to eq('oci://registry-1.docker.io/bitnamicharts')
+        expect(dependency.chart_name).to eq('postgresql')
         expect(dependency.configs['cpu_cores']).to eq(2)
         expect(dependency.configs['memory_bytes']).to eq(2.gigabyte)
         expect(dependency.configs['disk_bytes']).to eq(20.gigabytes)

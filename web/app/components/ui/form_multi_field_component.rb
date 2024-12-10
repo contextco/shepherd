@@ -6,6 +6,8 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   attribute :association_name
   attribute :model_class
 
+  attribute :caveat, default: nil
+
   attribute :child_component
 
   renders_one :label
