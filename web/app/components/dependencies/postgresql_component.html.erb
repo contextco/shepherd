@@ -22,7 +22,7 @@
                                  :version,
                                  -> (v) { "Version #{v.human_visible_version}" },
                                  {},
-                                 class: 'w-1/2 p-2 rounded-md' %>
+                                 class: 'w-1/2 p-2' %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -36,7 +36,7 @@
       <%= config_form.text_field :db_name,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          class: 'w-1/2 p-2 rounded-md' %>
+                          class: 'w-1/2 p-2' %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -50,7 +50,7 @@
       <%= config_form.text_field :db_user,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          class: 'w-1/2 p-2 rounded-md' %>
+                          class: 'w-1/2 p-2' %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
@@ -61,5 +61,5 @@
     ) %>
   <% end %>
 
-  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
 <% end %>

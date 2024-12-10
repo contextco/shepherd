@@ -7,6 +7,7 @@
       <% end %>
       <%= component.with_field do %>
         <%= form.text_field :name,
+                            placeholder: 'my-service',
                             required: true,
                             'data-1p-ignore': true,
                             'data-lpignore': true,
@@ -36,29 +37,33 @@
 
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Environment Variables',
+      caveat: :optional,
       form:,
       association_name: :environment_variables,
       model_class: Service::Form::EnvironmentVariableForm,
       child_component: Services::EnvironmentVariableComponent,
       ) do |component| %>
       <%= component.with_label do %>
-        Do not put sensitive values here. Sensitive values should be stored in secrets.
+        <span>Configuration values necessary to configure your service.</span>
+        <span>Do not include sensitive values, for these you should use secrets.</span>
       <% end %>
     <% end %>
 
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Secrets',
       form:,
+      caveat: :optional,
       association_name: :secrets,
       model_class: Service::Form::SecretForm,
       child_component: Services::SecretComponent,
     ) do |component| %>
       <%= component.with_label do %>
-        Client provided secrets. Use for sensitive values like API keys, passwords, etc.
+        <span>Use secrets for sensitive values your clients will provide and own.</span>
+        <span>For example, API keys, database passwords, and encryption keys.</span>
       <% end %>
     <% end %>
 
-    <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command') do |component| %>
+    <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command', caveat: :optional) do |component| %>
       <%= component.with_label do %>
         Command to run before deploying the service. For example, database migrations.
       <% end %>
@@ -81,14 +86,17 @@
     <div data-controller="singular-checkbox">
       <%= render UI::FormMultiFieldComponent.new(
         title: 'Open Ports',
+        caveat: :optional,
         form:,
         association_name: :ports,
         model_class: Service::Form::PortForm,
         child_component: Services::PortComponent,
         ) do |component| %>
         <%= component.with_label do %>
-          Optional open ports for the service.
-          Check <span class="font-bold">External</span> to expose the port to the internet with an ingress.
+          <div>
+            Optional open ports for the service.
+            Check <span class="font-medium">External</span> to expose the port to the internet with an ingress.
+          </div>
         <% end %>
         <%= component.with_header do %>
           <div class="flex items-center gap-8 text-sm font-medium justify-between">
@@ -99,6 +107,6 @@
       <% end %>
     </div>
 
-    <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
+    <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
   </div>
 <% end %>
