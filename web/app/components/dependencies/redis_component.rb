@@ -18,7 +18,7 @@ class Dependencies::RedisComponent < DependenciesComponent
     dependency = dependency_instance.dependency
     password = dependency.configs["db_password"]
     namespace_name = dependency.project.name
-    host = "#{dependency.project.name}-#{dependency.name}-master.#{namespace_name}.svc.cluster.local"
+    host = "#{dependency.project.name}-master.#{namespace_name}.svc.cluster.local"
 
     "redis://:#{password}@#{host}:6379"
   end
