@@ -36,7 +36,7 @@ class Dependencies::RedisForm < Dependencies::Base
       max_memory_policy: configs.max_memory_policy,
       cpu_cores: configs.cpu_cores,
       memory_bytes: configs.memory_bytes,
-      disk_bytes: "#{ActiveSupport::NumberHelper.number_to_human_size(configs.disk_bytes).to_i}Gi",
+      disk_bytes: configs.disk_bytes,
       db_password: postgresql_password_generator,
       app_version: configs.app_version,
       architecture: configs.architecture

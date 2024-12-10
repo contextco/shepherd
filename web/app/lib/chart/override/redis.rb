@@ -23,6 +23,10 @@ class Chart::Override::Redis < Chart::Override::Base
     app_version: :string
   }.freeze
 
+  VALUE_TRANSFORMS = {
+    disk_bytes: ->(v) { "#{ActiveSupport::NumberHelper.number_to_human_size(v).to_i}Gi" }
+  }.freeze
+
   def initialize(configs:)
     @configs = configs
   end
@@ -36,13 +40,13 @@ class Chart::Override::Redis < Chart::Override::Base
   def create_override(name, value)
     return [] if value.blank?
 
-    targets = OVERRIDE_MAP[name.to_sym]
-    raise "Not found config #{name}" if targets.nil?
+    yaml_targets = OVERRIDE_MAP[name.to_sym] or raise "Not found config #{name}"
 
-    targets.map do |target|
+    transform_proc = VALUE_TRANSFORMS[name.to_sym]
+    yaml_targets.map do |target|
       Sidecar::OverrideParams.new(
         path: target,
-        value: convert_value(name, value, VALUE_TYPES)
+        value: convert_value(name, value, VALUE_TYPES, &transform_proc)
       )
     end
   end
