@@ -89,8 +89,7 @@ func (f *Fixture) VerifyWithinArchive(t *testing.T, ctx context.Context, archive
 		header, err := tarReader.Next()
 		if err == io.EOF {
 			break
-		}
-		if err != nil {
+		} else if err != nil {
 			return err
 		}
 

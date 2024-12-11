@@ -59,7 +59,16 @@ func (i IngressConfig) toClientFacingValues() map[string]interface{} {
 		return nil
 	}
 
+	var scheme string
+	switch i.Preference {
+	case sidecar_pb.IngressPreference_PREFER_EXTERNAL:
+		scheme = "external"
+	case sidecar_pb.IngressPreference_PREFER_INTERNAL:
+		scheme = "internal"
+	}
+
 	return map[string]interface{}{
+		"scheme": scheme,
 		"external": map[string]interface{}{
 			"host": "TODO: Replace this with the domain name where you will host the service. Note, this field has no effect if the ingress is internal.",
 		},
