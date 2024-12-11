@@ -4,8 +4,10 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
+	"log"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	service_pb "onprem/generated/service_pb"
 )
@@ -22,8 +24,10 @@ type Client struct {
 }
 
 func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.DialOption) (*Client, error) {
+	log.Printf("Attempting to connect to gRPC server at %s", addr)
 	dialOpts := []grpc.DialOption{
 		grpc.WithPerRPCCredentials(&authHeader{bearerToken: bearerToken}),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 	dialOpts = append(dialOpts, opts...)
 
