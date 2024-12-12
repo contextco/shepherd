@@ -17,6 +17,39 @@ class ProjectService < ApplicationRecord
     super&.map(&:with_indifferent_access)
   end
 
+  class Secret
+    def initialize(environment_key:)
+      @environment_key = environment_key
+    end
+
+    attr_reader :environment_key
+
+    def k8s_name
+      raise ArgumentError, "Env variable cannot be empty" if environment_key.blank?
+
+      # Convert to lowercase and replace invalid characters
+      secret_name = environment_key.to_s.downcase
+                            .gsub(/[^a-z0-9.\-]/, "-")  # Replace invalid chars with hyphen
+                            .gsub(/[-.]{2,}/, "-")      # Replace multiple dots/hyphens with single hyphen
+
+      # Ensure it starts and ends with alphanumeric
+      secret_name = "x#{secret_name}" if secret_name.match?(/^[^a-z0-9]/)
+      secret_name = "#{secret_name}x" if secret_name.match?(/[^a-z0-9]$/)
+
+      # Truncate to maximum length while preserving valid ending
+      if secret_name.length > 253
+        secret_name = secret_name[0...252]
+        secret_name = secret_name.sub(/[^a-z0-9]$/, "x")
+      end
+
+      secret_name
+    end
+  end
+
+  def secrets
+    super&.map { |secret| Secret.new(environment_key: secret) }
+  end
+
   def image_tag
     DockerImageUrlParser.new(image).tag
   end
