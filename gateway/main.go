@@ -64,7 +64,7 @@ func withLogging(handler http.Handler, logger *log.Logger) http.Handler {
 	}
 }
 
-func run() error {
+func run(healthCheck bool) error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -82,20 +82,24 @@ func run() error {
 	}
 
 	// Connect to the gRPC server
-	logger.Printf("Attempting to connect to gRPC server at %s", grpcServerEndpoint)
-	conn, err := grpc.Dial(grpcServerEndpoint, opts...)
-	if err != nil {
-		logger.Printf("Failed to connect to gRPC server: %v", err)
-		return fmt.Errorf("failed to connect to backend: %v", err)
+	if healthCheck {
+		logger.Printf("Attempting to connect to gRPC server at %s", grpcServerEndpoint)
+		conn, err := grpc.Dial(grpcServerEndpoint, opts...)
+		if err != nil {
+			logger.Printf("Failed to connect to gRPC server: %v", err)
+			return fmt.Errorf("failed to connect to backend: %v", err)
+		}
+		defer conn.Close()
+		logger.Printf("Successfully connected to gRPC server")
+	} else {
+		logger.Printf("Skipping gRPC server connection check")
 	}
-	defer conn.Close()
-	logger.Printf("Successfully connected to gRPC server")
 
 	// Register gRPC server endpoint
 	gwmux := runtime.NewServeMux()
 	
 	logger.Printf("Setting handler to gRPC server at %s", grpcServerEndpoint)
-	err = service_pb.RegisterOnPremHandlerFromEndpoint(ctx, gwmux, grpcServerEndpoint, opts)
+	err := service_pb.RegisterOnPremHandlerFromEndpoint(ctx, gwmux, grpcServerEndpoint, opts)
 	if err != nil {
 		return err
 	}
@@ -125,7 +129,7 @@ func run() error {
 func main() {
 	flag.Parse()
 
-	if err := run(); err != nil {
+	if err := run(true); err != nil {
 		grpclog.Fatal(err)
 	}
 }
