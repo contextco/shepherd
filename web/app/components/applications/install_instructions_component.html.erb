@@ -1,29 +1,82 @@
 <div class="flex flex-col gap-6">
   <div class="font-semibold">Install instructions</div>
-  <div class="flex flex-col gap-4 border border-stone-300 p-4 rounded-md">
-    <div class="flex gap-4">
-      <%= render Applications::CircleTextComponent.new(text: '1') %>
-      <div class="flex gap-1 font-medium text-sm mt-1.5">
-        <span>Download</span>
-        <%= link_to values_url, data: { turbo: false }, class: 'underline font-bold' do %>
-          <%= helm_repo.client_yaml_filename(version: version_object) %>
-        <% end %>
-        <span> and set appropriate values</span>
+  <div class="flex flex-col gap-12 p-4 rounded-md">
+    <div class="flex flex-col gap-4">
+      <div class="flex gap-4">
+        <%= render Applications::CircleTextComponent.new(text: '1') %>
+        <div class="font-medium">Configuration</div>
+      </div>
+      <div class="flex gap-4">
+        <div class="size-6"></div>
+        <div class="flex flex-col gap-4 text-sm">
+          <div class="flex flex-col gap-2">
+            <div class="font-medium">Download Configuration Template</div>
+            <div class="flex gap-1">
+              <%= link_to values_url, data: { turbo: false }, class: 'underline flex items-baseline gap-2' do %>
+                Download the configuration file
+              <% end %>
+              for this service and save it to your local machine.
+            </div>
+          </div>
+          <% if version_object.secrets.present? %>
+            <div class="flex flex-col gap-2">
+              <div class="font-medium">Apply secrets</div>
+
+              Within the configuration file, replace the following values with secrets from your environment:
+
+              <% version_object.services.each do |service| %>
+                <div class="bg-stone-200 text-stone-500 font-mono p-4 flex flex-col gap-0.5 border border-stone-400">
+                  <%= service.name %>:
+                  <% service.secrets.each do |secret| %>
+                    <div class="font-medium pl-4">secrets:</div>
+                    <div class="font-medium pl-6">name: <%= secret.k8s_name %></div>
+                    <div class="font-medium pl-6">environment_key: <%= secret.environment_key %></div>
+                    <div class="font-medium w-full bg-stone-300 pl-6 flex gap-2 text-stone-800">
+                      value: <span class="font-semibold">TODO</span>
+                      <div class="flex items-center gap-2 text-stone-700"># <%= heroicon 'arrow-long-left', class: 'size-4' %> Fill in a value for <span class="font-semibold"><%= secret.environment_key %></span> </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
 
-    <div class="flex gap-4 w-full max-w-full">
-      <%= render Applications::CircleTextComponent.new(text: '2') %>
-      <%# getting weird bug where the code snippet is growing to the width of its parent as if the circle component was not there, for now introducing some fake padding.... %>
-      <div class="mt-1.5 w-full pr-12">
-        <%= render CommandSnippetComponent.new(title: "Add Helm repository", snippet: helm_repo.add_repo_command ) %>
+    <div class="flex flex-col gap-4">
+      <div class="flex gap-4">
+        <%= render Applications::CircleTextComponent.new(text: '2') %>
+        <div class="font-medium">Add Helm Repository</div>
+      </div>
+      <div class="flex gap-4">
+        <div class="size-6 shrink-0"></div>
+        <div class="min-w-0 flex flex-col gap-2">
+          <div class="prose-sm prose-stone">
+            <p>
+              Open a new terminal session in the directory containing your configuration file and add the Helm repository by running the command below.
+            </p>
+          </div>
+          <%= render CommandSnippetComponent.new(snippet: helm_repo.add_repo_command ) %>
+        </div>
       </div>
     </div>
 
-    <div class="flex gap-4 w-full pr-12">
-      <%= render Applications::CircleTextComponent.new(text: '3') %>
-      <div class="mt-1.5 w-full">
-        <%= render CommandSnippetComponent.new(title: "Install Chart", snippet: helm_repo.install_chart_command(version: version_object) ) %>
+    <div class="flex flex-col gap-4">
+      <div class="flex gap-4">
+        <%= render Applications::CircleTextComponent.new(text: '3') %>
+        <div class="font-medium">Deploy the application</div>
+      </div>
+      <div class="flex gap-4">
+        <div class="size-6 shrink-0"></div>
+        <div class="min-w-0 flex flex-col gap-2">
+          <div class="prose-sm prose-stone">
+            <p>
+              Ensure you are within the directory containing your configuration file. Install the deployment by running the command below.
+            </p>
+          </div>
+          <%= render CommandSnippetComponent.new(snippet: helm_repo.install_chart_command(version: version_object) ) %>
+        </div>
       </div>
     </div>
   </div>
