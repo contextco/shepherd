@@ -97,4 +97,4 @@ gem "groupdate", "~> 6.5.1"
 
 gem "rails-controller-testing"
 
-gem "google-cloud-storage", "~> 1.53"
+gem "google-cloud-storage", "~> 1.54"
