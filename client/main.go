@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"math"
 	"os"
 	"time"
 
@@ -10,21 +11,19 @@ import (
 
 	"onprem/backend"
 	"onprem/config"
-	"onprem/control"
-	"onprem/process"
 )
 
 var (
-	tsKey = config.Define(
-		"ts-key",
-		"",
-		"The key for the tailscale instance",
-	)
-
 	name = config.Define(
 		"name",
-		"",
+		"default",
 		"The name of the process",
+	)
+
+	bearerToken = config.Define(
+		"bearer-token",
+		"",
+		"The bearer token to authenticate with the backend",
 	)
 
 	backendAddr = config.Define(
@@ -33,6 +32,7 @@ var (
 		"The address of the backend",
 	)
 
+	// bug here: when setting value it converts time to ns, eg. setting to 2s will be 2ns
 	heartbeatInterval = config.Define(
 		"heartbeat-interval",
 		30*time.Second,
@@ -44,27 +44,44 @@ type Agent struct {
 	LifecycleID string
 	Name        string
 
-	client  *backend.Client
-	process *process.Process
-	ctrl    *control.Server
+	client  *backend.Client // gRPC client which sends heartbeats
 }
 
-func (a *Agent) Start(ctx context.Context) error {
-	if err := a.process.Run(ctx); err != nil && err != process.ErrNoCommand {
-		return err
-	}
-	defer a.process.Cancel()
-
+func (a *Agent) Start(ctx context.Context) {
 	go func() {
-		if err := a.heartbeat(ctx); err != nil {
-			log.Fatalf("Failed to heartbeat: %s", err)
+		log.Printf("Starting heartbeat for %s", a.Name)
+		backoff := time.Second // Initial backoff duration
+		maxBackoff := time.Minute * 5
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.Println("Heartbeat stopped: context cancelled")
+				return
+			default:
+				if err := a.heartbeat(ctx); err != nil {
+					log.Printf("Heartbeat error: %v, retrying in %v", err, backoff)
+					time.Sleep(backoff)
+					// Exponential backoff with max cap
+					backoff = time.Duration(math.Min(
+						float64(backoff*2), 
+						float64(maxBackoff),
+					))
+				} else {
+					// Reset backoff on success
+					backoff = time.Second
+				}
+			}
 		}
 	}()
-
-	return a.ctrl.Start(ctx)
+	
+	<-ctx.Done()
+	log.Printf("Agent stopped: context cancelled")
 }
 
 func (a *Agent) heartbeat(ctx context.Context) error {
+	log.Printf("Sending heartbeat for %s", a.Name)
+	log.Printf("Lifecycle ID: %s", a.LifecycleID)
 	ticker := time.NewTicker(heartbeatInterval.MustValue())
 	defer ticker.Stop()
 
@@ -83,20 +100,11 @@ func (a *Agent) heartbeat(ctx context.Context) error {
 func NewAgent() (*Agent, error) {
 	id := uuid.New().String()
 
-	p, err := process.NewFromArgs(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := backend.NewClient(backendAddr.MustValue(), "", backend.Identity{
+	log.Printf("Creating client with backend address %s, and token: %s", backendAddr.MustValue(), bearerToken.MustValue())
+	client, err := backend.NewClient(backendAddr.MustValue(), bearerToken.MustValue(), backend.Identity{
 		LifecycleID: id,
 		Name:        name.MustValue(),
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	ctrl, err := control.New(tsKey.MustValue(), p)
 	if err != nil {
 		return nil, err
 	}
@@ -105,19 +113,21 @@ func NewAgent() (*Agent, error) {
 		LifecycleID: id,
 		Name:        name.MustValue(),
 
-		process: p,
 		client:  client,
-		ctrl:    ctrl,
 	}, nil
 }
 
 func main() {
-	config.Init(os.Args)
+	config.Init(os.Args[1:])
+
+	log.Printf("Starting agent with name %s", name.MustValue())
 
 	agent, err := NewAgent()
 	if err != nil {
 		log.Fatalf("Failed to create agent: %s", err)
 	}
+
+	log.Println("Agent created, starting heartbeat")
 
 	agent.Start(context.Background())
 }

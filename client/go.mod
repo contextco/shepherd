@@ -3,7 +3,7 @@ module onprem
 go 1.23.2
 
 require (
-	github.com/a-h/templ v0.2.778
+	github.com/a-h/templ v0.2.793
 	github.com/creack/pty v1.1.23
 	github.com/gliderlabs/ssh v0.3.7
 	github.com/google/uuid v1.6.0
