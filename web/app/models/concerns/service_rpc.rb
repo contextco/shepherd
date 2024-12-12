@@ -67,10 +67,9 @@ module ServiceRPC
     end
 
     secret_vars = secrets.map do |secret|
-      name = env_to_k8s_secret_name(secret)
       Sidecar::Secret.new(
-        name:,
-        environment_key: secret
+        name: secret.k8s_name,
+        environment_key: secret.environment_key
       )
     end
 
@@ -91,26 +90,5 @@ module ServiceRPC
         path: pvc_mount_path
       )
     ]
-  end
-
-  def env_to_k8s_secret_name(env_name)
-    raise ArgumentError, "Env variable cannot be empty" if env_name.blank?
-
-    # Convert to lowercase and replace invalid characters
-    secret_name = env_name.to_s.downcase
-                          .gsub(/[^a-z0-9.\-]/, "-")  # Replace invalid chars with hyphen
-                          .gsub(/[-.]{2,}/, "-")      # Replace multiple dots/hyphens with single hyphen
-
-    # Ensure it starts and ends with alphanumeric
-    secret_name = "x#{secret_name}" if secret_name.match?(/^[^a-z0-9]/)
-    secret_name = "#{secret_name}x" if secret_name.match?(/[^a-z0-9]$/)
-
-    # Truncate to maximum length while preserving valid ending
-    if secret_name.length > 253
-      secret_name = secret_name[0...252]
-      secret_name = secret_name.sub(/[^a-z0-9]$/, "x")
-    end
-
-    secret_name
   end
 end
