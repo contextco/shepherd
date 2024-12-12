@@ -16,6 +16,10 @@ class ProjectVersion < ApplicationRecord
 
   validates :version, uniqueness: { scope: :project_id }
 
+  def secrets
+    services.flat_map(&:secrets)
+  end
+
   def next_version
     versions = project.project_versions.order(created_at: :desc)
     return nil if versions.first == self

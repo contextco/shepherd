@@ -73,7 +73,7 @@ RSpec.describe Project::ServiceController, type: :controller do
         expect(service.memory_bytes).to eq(2.gigabytes)
         expect(service.environment_variables.first['name']).to eq('MY_ENV')
         expect(service.environment_variables.first['value']).to eq('value')
-        expect(service.secrets.first).to eq('MY_SECRET')
+        expect(service.secrets.first.environment_key).to eq('MY_SECRET')
         expect(service.ports).to eq([ 80, 443 ])
         expect(service.ingress_port).to eq(nil)
       end

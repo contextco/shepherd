@@ -116,9 +116,7 @@ RSpec.describe ProjectService do
     end
   end
 
-  describe '#env_to_k8s_secret_name' do
-    subject(:convert_name) { service.send(:env_to_k8s_secret_name, env_name) }
-
+  describe '#secret.k8s_name' do
     {
       'NORMAL_ENV_VAR' => 'normal-env-var',
       'multiple--hyphens' => 'multiple-hyphens',
@@ -130,13 +128,14 @@ RSpec.describe ProjectService do
     }.each do |input, expected|
       context "with input '#{input}'" do
         let(:env_name) { input }
+        let(:converted_name) { described_class::Secret.new(environment_key: env_name).k8s_name }
 
         it "converts to '#{expected}'" do
-          expect(convert_name).to eq(expected)
+          expect(converted_name).to eq(expected)
         end
 
         it 'produces valid Kubernetes secret name' do
-          result = convert_name
+          result = converted_name
           expect(result).to match(/^[a-z0-9][a-z0-9.-]*[a-z0-9]$/)
           expect(result.length).to be <= 253
         end
