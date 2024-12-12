@@ -15,8 +15,8 @@ class AuthenticationInterceptor < Gruf::Interceptors::ServerInterceptor
   end
 
   def token_from_request_metadata
-    return "" unless request.metadata[:authorization].present?
+    return "" unless request.metadata["authorization"].present?
 
-    request.metadata[:authorization].split(" ").last
+    request.metadata["authorization"].split(" ").last
   end
 end
