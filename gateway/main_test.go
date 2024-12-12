@@ -147,7 +147,7 @@ func TestRun(t *testing.T) {
 	// Start server in goroutine since it blocks
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- run()
+		errCh <- run(false)
 	}()
 
 	// Give server time to start
