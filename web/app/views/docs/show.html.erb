@@ -1,10 +1,49 @@
-<div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+<div class="h-full w-full flex flex-col gap-8 sm:px-20 px-8 py-8">
   <div class="flex w-full justify-between items-center">
     <div class="flex flex-col">
       <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.name %></span>
       <div class="flex items-center gap-2 text-2xl">
         <span class=" font-medium text-stone-700 w-fit"><%= @subscriber.project.name %></span>
         <span class="text-stone-500">Deployment Documentation</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <div class="p">
+      <span class="font-semibold capitalize"><%= @subscriber.project.name %></span> deploys onto Kubernetes using <a href='https://helm.sh/' class="underline">Helm charts</a>.
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%= heroicon :clock, class: 'size-6' %>
+    <span class="text-sm">Deploy in <span class="font-medium">less than 15 minutes</span></span>
+  </div>
+
+  <div class="flex gap-4 flex-col">
+    <div class="font-medium">Prerequisites</div>
+
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2">
+          <%= heroicon :check, class: 'size-6' %>
+          <span class="text-sm">Kubernetes Cluster</span>
+        </div>
+        <div class="bottom-row flex gap-2 text-stone-600">
+          <div class="size-6"></div>
+          <div class="text-xs">Google Kubernetes Engine on GCP or Elastic Kubernetes Service on AWS are supported. Azure support is coming soon.</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2">
+          <%= heroicon :check, class: 'size-6' %>
+          <span class="text-sm">Helm installed on local machine</span>
+        </div>
+        <div class="bottom-row flex gap-2 text-stone-600">
+          <div class="size-6"></div>
+          <div class="text-xs">Helm can easily be installed by following their <a href='https://helm.sh/docs/intro/quickstart/' class="underline">Get Started guide</a></div>
+        </div>
       </div>
     </div>
   </div>
