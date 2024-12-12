@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"onprem/config"
 	service_pb "onprem/generated/service_pb"
 )
 
@@ -27,7 +28,9 @@ func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.
 	log.Printf("Attempting to connect to gRPC server at %s", addr)
 	dialOpts := []grpc.DialOption{
 		grpc.WithPerRPCCredentials(&authHeader{bearerToken: bearerToken}),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+	if config.Development() {
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 	dialOpts = append(dialOpts, opts...)
 
