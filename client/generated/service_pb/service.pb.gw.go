@@ -72,7 +72,7 @@ func RegisterOnPremHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/.OnPrem/Heartbeat", runtime.WithHTTPPathPattern("/OnPrem/Heartbeat"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/.OnPrem/Heartbeat", runtime.WithHTTPPathPattern("/heartbeat"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -136,7 +136,7 @@ func RegisterOnPremHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/.OnPrem/Heartbeat", runtime.WithHTTPPathPattern("/OnPrem/Heartbeat"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/.OnPrem/Heartbeat", runtime.WithHTTPPathPattern("/heartbeat"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -156,7 +156,7 @@ func RegisterOnPremHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_OnPrem_Heartbeat_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"OnPrem", "Heartbeat"}, ""))
+	pattern_OnPrem_Heartbeat_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"heartbeat"}, ""))
 )
 
 var (
