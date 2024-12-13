@@ -17,6 +17,10 @@ class ProjectService < ApplicationRecord
     super&.map(&:with_indifferent_access)
   end
 
+  def ingress?
+    ingress_port.present?
+  end
+
   class Secret
     def initialize(environment_key:)
       @environment_key = environment_key

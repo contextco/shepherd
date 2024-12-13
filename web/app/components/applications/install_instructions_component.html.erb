@@ -1,16 +1,16 @@
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6 pb-12">
   <div class="font-semibold">Install instructions</div>
   <div class="flex flex-col gap-12 p-4 rounded-md">
     <div class="flex flex-col gap-4">
-      <div class="flex gap-4">
+      <div class="flex gap-4 items-center">
         <%= render Applications::CircleTextComponent.new(text: '1') %>
-        <div class="font-medium">Configuration</div>
+        <div class="font-medium text-lg">Configuration</div>
       </div>
       <div class="flex gap-4">
         <div class="size-6"></div>
-        <div class="flex flex-col gap-4 text-sm">
+        <div class="flex flex-col gap-4 grow text-sm">
           <div class="flex flex-col gap-2">
-            <div class="font-medium">Download Configuration Template</div>
+            <div class="font-medium text-base">Download Configuration Template</div>
             <div class="flex gap-1">
               <%= link_to values_url, data: { turbo: false }, class: 'underline flex items-baseline gap-2' do %>
                 Download the configuration file
@@ -18,22 +18,51 @@
               for this service and save it to your local machine.
             </div>
           </div>
+          <% if version_object.ingresses.present? %>
+            <div class="flex flex-col gap-2 items-stretch">
+              <div class="font-medium text-base">Choose Ingress</div>
+
+              Within the configuration file, set how you want ingress to be configured:
+
+              <% version_object.services.each do |service| %>
+                <% next unless service.ingress? %>
+
+                <div class="bg-stone-200 text-stone-600 font-mono p-4 flex flex-col gap-0.5 border border-stone-400 overflow-x-auto w-full">
+                  <%= service.name %>:
+                  <div class="font-medium pl-2">ingress:</div>
+                  <div class="flex items-center gap-2 font-medium pl-4 w-full whitespace-nowrap bg-stone-300">
+                    scheme: <span class="font-semibold">internal</span>
+                    <div class="flex items-center gap-2 text-stone-500">#  <span class="italic font-semibold">internal</span> for VPC only ingress or <span class="italic font-semibold">external</span> for internet-facing ingress</div>
+                  </div>
+                  <div class="flex items-center gap-2 font-medium pl-4 w-full whitespace-nowrap">
+                    external:
+                  </div>
+                  <div class="font-medium w-full pl-6 flex gap-2 bg-stone-300">
+                    host: <span class="font-semibold">service.example.com</span>
+                    <div class="flex items-center gap-2 text-stone-500"># <span class="">required for external ingress</span> </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
           <% if version_object.secrets.present? %>
             <div class="flex flex-col gap-2">
-              <div class="font-medium">Apply secrets</div>
+              <div class="font-medium text-base">Set Values for Secrets</div>
 
               Within the configuration file, replace the following values with secrets from your environment:
 
               <% version_object.services.each do |service| %>
+                <% next if service.secrets.blank? %>
+
                 <div class="bg-stone-200 text-stone-500 font-mono p-4 flex flex-col gap-0.5 border border-stone-400">
                   <%= service.name %>:
                   <% service.secrets.each do |secret| %>
-                    <div class="font-medium pl-4">secrets:</div>
-                    <div class="font-medium pl-6">name: <%= secret.k8s_name %></div>
-                    <div class="font-medium pl-6">environment_key: <%= secret.environment_key %></div>
-                    <div class="font-medium w-full bg-stone-300 pl-6 flex gap-2 text-stone-800">
+                    <div class="font-medium pl-2">secrets:</div>
+                    <div class="font-medium pl-4">name: <%= secret.k8s_name %></div>
+                    <div class="font-medium pl-4">environment_key: <%= secret.environment_key %></div>
+                    <div class="font-medium w-full bg-stone-300 pl-4 flex gap-2 text-stone-800">
                       value: <span class="font-semibold">TODO</span>
-                      <div class="flex items-center gap-2 text-stone-700"># <%= heroicon 'arrow-long-left', class: 'size-4' %> Fill in a value for <span class="font-semibold"><%= secret.environment_key %></span> </div>
+                      <div class="flex items-center gap-2 text-stone-500"># Set a value for <span class="font-semibold"><%= secret.environment_key %></span> </div>
                     </div>
                   <% end %>
                 </div>

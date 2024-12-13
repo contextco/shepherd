@@ -1,4 +1,4 @@
-<div class="h-full w-full flex flex-col gap-8 sm:px-20 px-8 py-8">
+<div class="h-full w-full flex flex-col gap-8 sm:px-20 px-8 py-8 pb-12">
   <div class="flex w-full justify-between items-center">
     <div class="flex flex-col">
       <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.name %></span>
@@ -49,4 +49,8 @@
   </div>
 
   <%= render Applications::InstallInstructionsComponent.new(subscriber: @subscriber, internal: false) %>
+
+  <div class="w-full pb-8 text-center w-full text-sm text-stone-500">
+    Instructions provided by <a class="underline" href='https://trustshepherd.com'>Shepherd</a> - Last updated <%= time_ago_in_words(@subscriber.created_at) %> ago
+  </div>
 </div>
