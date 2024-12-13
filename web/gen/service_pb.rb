@@ -4,8 +4,10 @@
 
 require 'google/protobuf'
 
+require 'google/api/annotations_pb'
 
-descriptor_data = "\n\rservice.proto\"9\n\x10HeartbeatRequest\x12%\n\x08identity\x18\x01 \x01(\x0b\x32\t.IdentityR\x08identity\"\x13\n\x11HeartbeatResponse\"G\n\x08Identity\x12!\n\x0clifecycle_id\x18\x01 \x01(\tR\x0blifecycleId\x12\x12\n\x04name\x18\x03 \x01(\tR\x04nameJ\x04\x08\x02\x10\x03\x32>\n\x06OnPrem\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x42\x16Z\x14generated/service_pbb\x06proto3"
+
+descriptor_data = "\n\rservice.proto\x1a\x1cgoogle/api/annotations.proto\"9\n\x10HeartbeatRequest\x12%\n\x08identity\x18\x01 \x01(\x0b\x32\t.IdentityR\x08identity\"\x13\n\x11HeartbeatResponse\"G\n\x08Identity\x12!\n\x0clifecycle_id\x18\x01 \x01(\tR\x0blifecycleId\x12\x12\n\x04name\x18\x03 \x01(\tR\x04nameJ\x04\x08\x02\x10\x03\x32S\n\x06OnPrem\x12I\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\"\n/heartbeat:\x01*B\x16Z\x14generated/service_pbb\x06proto3"
 
 pool = Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
