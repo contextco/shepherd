@@ -1,3 +1,4 @@
 version: v1
 deps:
   - buf.build/protocolbuffers/wellknowntypes:v21.12
+  - buf.build/googleapis/googleapis
