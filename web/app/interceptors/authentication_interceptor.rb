@@ -8,10 +8,10 @@ class AuthenticationInterceptor < Gruf::Interceptors::ServerInterceptor
   private
 
   def authenticate!
-    token = Deployment::Token.find_by(token: token_from_request_metadata)
+    token = ProjectSubscriber::Token.find_by(token: token_from_request_metadata)
     fail!(:unauthenticated, "Token not found") unless token.present?
 
-    request.context[:current_deployment] = token.deployment
+    request.context[:current_subscriber] = token.project_subscriber
   end
 
   def token_from_request_metadata

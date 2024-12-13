@@ -9,8 +9,8 @@ class ContainerStatus::HeartbeatStats
   OFFLINE_THRESHOLD = 2.hours
   DEGRADED_THRESHOLD = 10.minutes
 
-  def initialize(container)
-    @container = container
+  def initialize(agent_instance)
+    @agent_instance = agent_instance
   end
 
   def generate_status_per_day
@@ -31,7 +31,7 @@ class ContainerStatus::HeartbeatStats
   def initialize_days_hash
     (0..DAYS).each_with_object({}) do |days_ago, hash|
       hash[days_ago] = {
-        lifecycle_id: @container.lifecycle_id,
+        lifecycle_id: @agent_instance.lifecycle_id,
         status: :online,
         date: days_ago.days.ago.to_date,
         downtime_minutes: 0,
@@ -130,6 +130,6 @@ class ContainerStatus::HeartbeatStats
   end
 
   def heartbeat_logs
-    @heartbeat_logs ||= @container.heartbeat_logs
+    @heartbeat_logs ||= @agent_instance.heartbeat_logs
   end
 end
