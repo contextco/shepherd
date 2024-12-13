@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe ContainerStatus::HeartbeatStats do
-  subject { described_class.new(container) }
+  subject { described_class.new(agent_instance) }
 
-  let(:container) { create(:container) }
+  let(:agent_instance) { create(:agent_instance) }
 
   describe '#generate_status_per_day' do
     context 'when no heartbeat logs exist' do
@@ -26,14 +26,14 @@ RSpec.describe ContainerStatus::HeartbeatStats do
       # heart beat for every 5 minutes 2 days ago
       let!(:event_logs_2_days_ago) do
         (0..288).each do |i|
-          create(:event_log, event_type: :heartbeat, container:, created_at: 2.day.ago.beginning_of_day + i * 5.minutes)
+          create(:event_log, event_type: :heartbeat, agent_instance:, created_at: 2.day.ago.beginning_of_day + i * 5.minutes)
         end
       end
 
       # heart beat for every 5 minutes besides 1 hour 1 day ago
       let!(:event_logs_1_day_ago) do
         (0..276).each do |i|
-          create(:event_log, event_type: :heartbeat, container:, created_at: 1.day.ago.beginning_of_day + i * 5.minutes)
+          create(:event_log, event_type: :heartbeat, agent_instance:, created_at: 1.day.ago.beginning_of_day + i * 5.minutes)
         end
       end
 
