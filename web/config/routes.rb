@@ -11,13 +11,6 @@ Rails.application.routes.draw do
 
   root "project/project#index"
 
-  resources :deployment, only: [ :create, :show, :destroy ] do
-    get :settings, on: :member
-    resources :token, only: [ :create, :destroy, :index ], controller: :deployment_token
-  end
-
-  resources :deployment_container, only: [ :show ]
-
   scope :repo do
     get "/:repo_name/:filename", to: "helm/repo#download", constraints: { filename: /.*\.tgz/ }
     get "/:repo_name/index.yaml", to: "helm/repo#index_yaml", controller: "helm/repo"

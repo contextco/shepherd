@@ -3,7 +3,7 @@
 class RpcController < Gruf::Controllers::Base
   protected
 
-  def current_deployment
-    request.context[:current_deployment]
+  def current_subscriber
+    request.context[:current_subscriber]
   end
 end

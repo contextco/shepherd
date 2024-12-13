@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :event_log do
-    container
+    agent_instance
     event_type { :heartbeat }
   end
 end

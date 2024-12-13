@@ -10,18 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_11_174707) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_13_153958) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "containers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "deployment_id", null: false
+  create_table "agent_instances", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name", null: false
     t.string "lifecycle_id", null: false
     t.integer "status", default: 0
-    t.index ["deployment_id"], name: "index_containers_on_deployment_id"
+    t.uuid "project_subscriber_id"
+    t.index ["project_subscriber_id"], name: "index_agent_instances_on_project_subscriber_id"
   end
 
   create_table "dependencies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -36,29 +36,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_174707) do
     t.index ["project_version_id"], name: "index_dependencies_on_project_version_id"
   end
 
-  create_table "deployment_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "deployment_id", null: false
-    t.string "token", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["deployment_id"], name: "index_deployment_tokens_on_deployment_id"
-  end
-
-  create_table "deployments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "team_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "name", null: false
-    t.index ["team_id"], name: "index_deployments_on_team_id"
-  end
-
   create_table "event_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "container_id", null: false
+    t.uuid "agent_instance_id", null: false
     t.integer "event_type", default: 0, null: false
     t.jsonb "payload", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["container_id"], name: "index_event_logs_on_container_id"
+    t.index ["agent_instance_id"], name: "index_event_logs_on_agent_instance_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
@@ -121,6 +105,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_174707) do
     t.string "image_username"
     t.string "image_password"
     t.index ["project_version_id"], name: "index_project_services_on_project_version_id"
+  end
+
+  create_table "project_subscriber_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "project_subscriber_id"
+    t.index ["project_subscriber_id"], name: "index_project_subscriber_tokens_on_project_subscriber_id"
   end
 
   create_table "project_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -186,14 +178,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_174707) do
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 
-  add_foreign_key "containers", "deployments"
+  add_foreign_key "agent_instances", "project_subscribers"
   add_foreign_key "dependencies", "project_versions"
-  add_foreign_key "deployment_tokens", "deployments"
-  add_foreign_key "deployments", "teams"
-  add_foreign_key "event_logs", "containers"
+  add_foreign_key "event_logs", "agent_instances"
   add_foreign_key "helm_repos", "project_subscribers"
   add_foreign_key "helm_users", "helm_repos"
   add_foreign_key "project_services", "project_versions"
+  add_foreign_key "project_subscriber_tokens", "project_subscribers"
   add_foreign_key "project_subscribers", "projects"
   add_foreign_key "project_versions", "projects"
   add_foreign_key "projects", "teams"

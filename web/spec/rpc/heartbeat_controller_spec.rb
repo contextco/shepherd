@@ -3,34 +3,34 @@
 require 'rails_helper'
 
 RSpec.describe HeartbeatController do
-  let(:deployment) { create(:deployment) }
+  let(:project_subscriber) { create(:project_subscriber) }
 
   describe 'heartbeat' do
     let(:request_message) { HeartbeatRequest.new(identity: { lifecycle_id: 'my-lifecycle', name: 'web' }) }
 
-    subject(:heartbeat) { run_rpc(:Heartbeat, request_message, **authorization_options_for(deployment)) }
+    subject(:heartbeat) { run_rpc(:Heartbeat, request_message, **authorization_options_for(project_subscriber)) }
 
     it 'returns a HeartbeatResponse' do
       expect(heartbeat).to be_a(HeartbeatResponse)
     end
 
     it 'records a heartbeat' do
-      expect { heartbeat }.to change { deployment.heartbeat_logs.count }.by(1)
+      expect { heartbeat }.to change { project_subscriber.heartbeat_logs.count }.by(1)
     end
 
     it 'creates a container' do
-      expect { heartbeat }.to change { deployment.containers.count }.by(1)
+      expect { heartbeat }.to change { project_subscriber.agent_instances.count }.by(1)
     end
 
     context 'when the container already exists' do
-      before { deployment.containers.create!(name: 'web', lifecycle_id: 'my-lifecycle') }
+      before { project_subscriber.agent_instances.create!(name: 'web', lifecycle_id: 'my-lifecycle') }
 
       it 'does not create a new container' do
-        expect { heartbeat }.not_to change { deployment.containers.reload.count }
+        expect { heartbeat }.not_to change { project_subscriber.agent_instances.reload.count }
       end
 
       it 'creates a health log' do
-        expect { heartbeat }.to change { deployment.event_logs.count }.by(1)
+        expect { heartbeat }.to change { project_subscriber.event_logs.count }.by(1)
       end
     end
 
