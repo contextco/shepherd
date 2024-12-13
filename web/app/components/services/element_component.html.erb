@@ -18,9 +18,9 @@
       <div class="flex items-center gap-2">
         <%= render Services::ResourcesViewComponent.new(service:) %>
         <% if service.ingress_port.present? %>
-          <div class="border border-stone-300 rounded-md text-sm flex items-center px-1.5 py-0.5 text-stone-700 gap-1 rounded-md">
+          <div class="text-sm flex items-center px-1.5 py-0.5 text-stone-700 gap-1">
             <%= heroicon "globe-alt", class: "size-4" %>
-            Internet
+            Ingress
           </div>
         <% end %>
       </div>

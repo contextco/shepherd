@@ -3,11 +3,11 @@
     <%= heroicon 'cpu-chip', class: 'size-4' %>
     <%= pluralize(cpu_cores, 'core') %>
     <span class="text-stone-400 px-1">|</span>
-    <div class="size-4 mr-0.5"><%= render Icons::MemoryStickComponent.new %></div>
+    <div class="size-4 mr-1"><%= render Icons::MemoryStickComponent.new %></div>
     <%= number_to_human_size(memory_bytes) %>
     <% if disk_bytes %>
       <span class="text-stone-400 px-1">|</span>
-      <div class="size-4 mr-0.5"><%= render Icons::HardDriveComponent.new %></div>
+      <div class="size-4 mr-1"><%= render Icons::HardDriveComponent.new %></div>
       <%= number_to_human_size(disk_bytes) %>
     <% end %>
   </div>
