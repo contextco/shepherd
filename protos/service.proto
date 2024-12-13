@@ -2,8 +2,15 @@ syntax = "proto3";
 
 option go_package = "generated/service_pb";
 
+import "google/api/annotations.proto";
+
 service OnPrem {
-    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {
+        option (google.api.http) = {
+            post: "/heartbeat"
+            body: "*"
+        };
+    }
 }
 
 message HeartbeatRequest {

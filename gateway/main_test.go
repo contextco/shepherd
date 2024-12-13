@@ -38,101 +38,101 @@ func setupGRPCServer(t *testing.T) (*grpc.Server, *bufconn.Listener) {
 	listener := bufconn.Listen(1024 * 1024)
 	server := grpc.NewServer()
 	service_pb.RegisterOnPremServer(server, &mockOnPremServer{t: t}) // Pass t to the mock server
-	
+
 	go func() {
 		if err := server.Serve(listener); err != nil {
 			t.Errorf("Failed to serve: %v", err)
 		}
 	}()
-	
+
 	return server, listener
 }
 
 func TestHeartbeat(t *testing.T) {
-    // Setup mock gRPC server
-    server, listener := setupGRPCServer(t)
-    defer server.Stop()
+	// Setup mock gRPC server
+	server, listener := setupGRPCServer(t)
+	defer server.Stop()
 
-    // Set up the gateway pointing to our mock server
-    ctx := context.Background()
-    mux := runtime.NewServeMux()
-    conn, err := grpc.DialContext(ctx, "bufnet",
-        grpc.WithContextDialer(func(ctx context.Context, s string) (net.Conn, error) {
-            return listener.Dial()
-        }),
-        grpc.WithInsecure(),
-    )
-    if err != nil {
-        t.Fatalf("Failed to dial bufnet: %v", err)
-    }
-    defer conn.Close()
+	// Set up the gateway pointing to our mock server
+	ctx := context.Background()
+	mux := runtime.NewServeMux()
+	conn, err := grpc.DialContext(ctx, "bufnet",
+		grpc.WithContextDialer(func(ctx context.Context, s string) (net.Conn, error) {
+			return listener.Dial()
+		}),
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+	defer conn.Close()
 
-    err = service_pb.RegisterOnPremHandlerClient(ctx, mux, service_pb.NewOnPremClient(conn))
-    if err != nil {
-        t.Fatalf("Failed to register gateway: %v", err)
-    }
+	err = service_pb.RegisterOnPremHandlerClient(ctx, mux, service_pb.NewOnPremClient(conn))
+	if err != nil {
+		t.Fatalf("Failed to register gateway: %v", err)
+	}
 
-    // Create test server
-    ts := httptest.NewServer(mux)
-    defer ts.Close()
+	// Create test server
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
 
-    // Test cases
-    tests := []struct {
-        name       string
-        path       string
-        request    *service_pb.HeartbeatRequest
-        wantStatus int
-    }{
-        {
-            name: "valid request",
-            path: "/OnPrem/Heartbeat",
-            request: &service_pb.HeartbeatRequest{
-                Identity: &service_pb.Identity{
-                    LifecycleId: "test-id",
-                    Name:        "test-worker",
-                },
-            },
-            wantStatus: http.StatusOK,
-        },
-    }
+	// Test cases
+	tests := []struct {
+		name       string
+		path       string
+		request    *service_pb.HeartbeatRequest
+		wantStatus int
+	}{
+		{
+			name: "valid request",
+			path: "/heartbeat",
+			request: &service_pb.HeartbeatRequest{
+				Identity: &service_pb.Identity{
+					LifecycleId: "test-id",
+					Name:        "test-worker",
+				},
+			},
+			wantStatus: http.StatusOK,
+		},
+	}
 
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            jsonReq, err := json.Marshal(tt.request)
-            if err != nil {
-                t.Fatalf("Failed to marshal request: %v", err)
-            }
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			jsonReq, err := json.Marshal(tt.request)
+			if err != nil {
+				t.Fatalf("Failed to marshal request: %v", err)
+			}
 
-            fullURL := ts.URL + tt.path
-            t.Logf("Making request to: %s", fullURL)
+			fullURL := ts.URL + tt.path
+			t.Logf("Making request to: %s", fullURL)
 
-            // Create and make the request
-            req, err := http.NewRequest(http.MethodPost, fullURL, bytes.NewBuffer(jsonReq))
-            if err != nil {
-                t.Fatalf("Failed to create request: %v", err)
-            }
-            req.Header.Set("Content-Type", "application/json")
+			// Create and make the request
+			req, err := http.NewRequest(http.MethodPost, fullURL, bytes.NewBuffer(jsonReq))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+			req.Header.Set("Content-Type", "application/json")
 
-            // Make the request
-            client := &http.Client{}
-            resp, err := client.Do(req)
-            if err != nil {
-                t.Fatalf("Failed to make request: %v", err)
-            }
-            defer resp.Body.Close()
+			// Make the request
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				t.Fatalf("Failed to make request: %v", err)
+			}
+			defer resp.Body.Close()
 
-            // Read and log the response body
-            body, err := io.ReadAll(resp.Body)
-            if err != nil {
-                t.Fatalf("Failed to read response body: %v", err)
-            }
-            t.Logf("Response Status: %d, Body: %s", resp.StatusCode, string(body))
+			// Read and log the response body
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatalf("Failed to read response body: %v", err)
+			}
+			t.Logf("Response Status: %d, Body: %s", resp.StatusCode, string(body))
 
-            if resp.StatusCode != tt.wantStatus {
-                t.Errorf("Expected status %d, got %d", tt.wantStatus, resp.StatusCode)
-            }
-        })
-    }
+			if resp.StatusCode != tt.wantStatus {
+				t.Errorf("Expected status %d, got %d", tt.wantStatus, resp.StatusCode)
+			}
+		})
+	}
 }
 
 func TestRun(t *testing.T) {
