@@ -11,9 +11,17 @@ plugins:
     out: ../client
   - remote: buf.build/protocolbuffers/go:v1.34.2
     out: ../client
-
   - remote: buf.build/grpc-ecosystem/gateway:v2.22.0
     out: ../client
+    opt:
+      - generate_unbound_methods=true
+
+  - remote: buf.build/grpc/go:v1.5.1
+    out: ../gateway
+  - remote: buf.build/protocolbuffers/go:v1.34.2
+    out: ../gateway
+  - remote: buf.build/grpc-ecosystem/gateway:v2.22.0
+    out: ../gateway
     opt:
       - generate_unbound_methods=true
 
