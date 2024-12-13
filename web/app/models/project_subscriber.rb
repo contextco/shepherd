@@ -9,7 +9,13 @@ class ProjectSubscriber < ApplicationRecord
 
   has_one :helm_repo, dependent: :destroy
 
+  has_many :agent_instances, dependent: :destroy
+  has_many :event_logs, through: :agent_instances
+  has_many :heartbeat_logs, -> { heartbeat }, through: :agent_instances, source: :event_logs
+  has_many :tokens, class_name: "ProjectSubscriber::Token", dependent: :destroy
+
   after_create_commit :setup_helm_repo
+  after_create -> { tokens.create! }
 
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
@@ -20,6 +26,10 @@ class ProjectSubscriber < ApplicationRecord
 
   def most_recent_version
     project.published_versions.first
+  end
+
+  def agent_instances_by_name
+    agent_instances.group_by(&:name)
   end
 
   private
