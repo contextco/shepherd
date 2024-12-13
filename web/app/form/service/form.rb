@@ -94,7 +94,7 @@ class Service::Form
       environment_variables: service.environment_variables.map do |env|
         { name: env[:name], value: env[:value], templated: env[:templated] }
       end,
-      secrets: service.secrets.map { |secret| { name: secret } },
+      secrets: service.secrets.map { |secret| { name: secret.environment_key } },
       ports: service.ports.map { |port| { port: port.to_i, ingress: port.to_i == service.ingress_port } }
     )
 
