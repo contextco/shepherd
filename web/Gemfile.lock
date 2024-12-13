@@ -114,7 +114,7 @@ GEM
     diff-lcs (1.5.1)
     digest-crc (0.6.5)
       rake (>= 12.0.0, < 14.0.0)
-    dotenv (3.1.4)
+    dotenv (3.1.6)
     drb (2.2.1)
     erubi (1.13.0)
     factory_bot (6.5.0)
