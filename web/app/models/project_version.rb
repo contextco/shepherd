@@ -20,6 +20,10 @@ class ProjectVersion < ApplicationRecord
     services.flat_map(&:secrets)
   end
 
+  def ingresses
+    services.map(&:ingress_port).compact
+  end
+
   def next_version
     versions = project.project_versions.order(created_at: :desc)
     return nil if versions.first == self

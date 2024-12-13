@@ -11,10 +11,11 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 
-	service_pb "onprem/generated/service_pb"
+	service_pb "gateway/generated/service_pb"
 )
 
 var (
@@ -64,32 +65,59 @@ func withLogging(handler http.Handler, logger *log.Logger) http.Handler {
 	}
 }
 
+func checkConnection(conn *grpc.ClientConn, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// Wait for the connection to be ready
+	state := conn.GetState()
+	for state != connectivity.Ready {
+		if !conn.WaitForStateChange(ctx, state) {
+			return fmt.Errorf("connection timed out while in state: %s", state.String())
+		}
+		state = conn.GetState()
+		if state == connectivity.TransientFailure || state == connectivity.Shutdown {
+			return fmt.Errorf("connection in state: %s", state.String())
+		}
+	}
+
+	return nil
+}
+
 func run(healthCheck bool) error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// Set up logging
 	logger := log.New(os.Stdout, "[GATEWAY] ", log.LstdFlags|log.LUTC)
 
-	// Create a timeout context for the initial connection
-	_, connectCancel := context.WithTimeout(ctx, 5*time.Second)
-	defer connectCancel()
-
-	// Create connection options
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(), // Make Dial blocking
 	}
 
-	// Connect to the gRPC server
+	var conn *grpc.ClientConn
 	if healthCheck {
 		logger.Printf("Attempting to connect to gRPC server at %s", grpcServerEndpoint)
-		conn, err := grpc.Dial(grpcServerEndpoint, opts...)
+		
+		// Create connection with timeout
+		dialCtx, dialCancel := context.WithTimeout(ctx, 5*time.Second)
+		defer dialCancel()
+		
+		var err error
+		conn, err = grpc.DialContext(dialCtx, grpcServerEndpoint, opts...)
 		if err != nil {
-			logger.Printf("Failed to connect to gRPC server: %v", err)
+			logger.Printf("Failed to dial gRPC server: %v", err)
 			return fmt.Errorf("failed to connect to backend: %v", err)
 		}
 		defer conn.Close()
+
+		// Verify the connection
+		if err := checkConnection(conn, 5*time.Second); err != nil {
+			logger.Printf("Connection check failed: %v", err)
+			return fmt.Errorf("connection check failed: %v", err)
+		}
+		
 		logger.Printf("Successfully connected to gRPC server")
 	} else {
 		logger.Printf("Skipping gRPC server connection check")
@@ -107,8 +135,26 @@ func run(healthCheck bool) error {
 	// Create a new serve mux for combining grpc-gateway and health check
 	mux := http.NewServeMux()
 	
-	// Add health check endpoint
+	// Add health check endpoint that verifies the connection state
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		if !healthCheck {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Create a new connection for health check
+		healthConn, err := grpc.Dial(grpcServerEndpoint, opts...)
+		if err != nil {
+			http.Error(w, "Failed to connect to backend", http.StatusServiceUnavailable)
+			return
+		}
+		defer healthConn.Close()
+
+		if err := checkConnection(healthConn, 2*time.Second); err != nil {
+			http.Error(w, fmt.Sprintf("Backend health check failed: %v", err), http.StatusServiceUnavailable)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 	})
 

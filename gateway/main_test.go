@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	service_pb "onprem/generated/service_pb"
+	service_pb "gateway/generated/service_pb"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
