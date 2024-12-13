@@ -1,6 +1,6 @@
 FactoryBot.define do
-  factory :container do
-    deployment
+  factory :agent_instance do
+    project_subscriber
     name { "MyString" }
     lifecycle_id { "MyString" }
   end
