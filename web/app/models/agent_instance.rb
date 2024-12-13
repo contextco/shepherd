@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class Container < ApplicationRecord
+class AgentInstance < ApplicationRecord
   HEARTBEAT_TIMEOUT = 5.minutes
 
-  belongs_to :deployment
+  belongs_to :project_subscriber
   has_many :event_logs, dependent: :destroy
   has_many :heartbeat_logs, -> { heartbeat }, class_name: "EventLog", dependent: :destroy
 
