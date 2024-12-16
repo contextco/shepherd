@@ -49,9 +49,12 @@ class ProjectVersion < ApplicationRecord
     # some choices here, we can check to see if files are present in the bucket which will ensure we are keeping correct
     # state but could be costly (wrt latency) or we can keep track of versions in the helm_repo model (dont currently do)
     # TODO: investigate and potentially fix
-    helm_repos = project_subscriber&.helm_repo || project.project_subscribers.map(&:helm_repo)
-    publisher = Chart::Publisher.new(rpc_chart, Array(helm_repos))
-    publisher.publish_chart!
+    project_subscribers = Array(project_subscriber || project.project_subscribers)
+    project_subscribers.each do |project_sub|
+      repos = [ project_sub.helm_repo ]
+      chart = rpc_chart(project_subscriber: project_sub)
+      Chart::Publisher.new(chart, repos).publish_chart!
+    end
     published! unless project_subscriber&.dummy?
   end
 
