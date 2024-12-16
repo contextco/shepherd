@@ -27,7 +27,7 @@ module VersionRPC
 
   def agent_rpc_service(project_subscriber)
     Sidecar::ServiceParams.new(
-      name: "shepherd_agent",
+      name: "shepherd-agent",
       replica_count: 1,
       image: Sidecar::Image.new(
         name: "alecbarber/trust-shepherd",
