@@ -23,7 +23,7 @@ class Project::ProjectController < ApplicationController
       return render action: :new, status: :unprocessable_entity
     end
 
-    version = current_team.setup_scaffolding!(project_params[:name], project_params[:description])
+    version = current_team.setup_scaffolding!(project_params[:name], project_params[:description], project_params[:agent])
 
     flash[:notice] = "Application #{project_params[:name]} created"
     redirect_to version_path(version)
@@ -32,7 +32,7 @@ class Project::ProjectController < ApplicationController
   private
 
   def project_params
-    params.permit(:name, :description)
+    params.permit(:name, :description, :agent)
   end
 
   def fetch_application

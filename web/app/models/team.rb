@@ -12,13 +12,14 @@ class Team < ApplicationRecord
   has_many :project_subscribers, through: :projects
   has_many :non_dummy_project_subscribers, through: :projects
 
-  def setup_scaffolding!(name, description)
+  def setup_scaffolding!(name, description, agent)
     transaction do
       project = projects.create!(name:)
       version = project.project_versions.create!(
         description:,
         version: "0.0.1",
-        state: :draft
+        state: :draft,
+        agent: agent || :no
       )
 
       version

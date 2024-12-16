@@ -29,7 +29,7 @@ class Project::VersionController < ApplicationController
   end
 
   def update
-    @version.update!(description: params[:description])
+    @version.update!(description: params[:description], agent: params[:agent].to_sym)
 
     flash[:notice] = "Application version updated"
     redirect_to version_path(@version)
@@ -88,7 +88,7 @@ class Project::VersionController < ApplicationController
   private
 
   def version_params
-    params.require(:project_version).permit(:description, :version)
+    params.require(:project_version).permit(:description, :version, :agent)
   end
 
   def version_error_msg(previous_version, candidate_version)
