@@ -158,7 +158,11 @@ RSpec.describe ProjectVersion do
       it 'includes correct agent service configuration' do
         expect(mock_client).to receive(:send) do |_, request|
           expect(request.chart.services.last).to have_attributes(
-              image: Sidecar::Image.new(name: 'alecbarber/trust-shepherd', tag: 'stable'),
+              image: Sidecar::Image.new(
+                name: 'alecbarber/trust-shepherd',
+                tag: 'stable',
+                pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
+              ),
               resources: Sidecar::Resources.new(
                 cpu_cores_requested: 1,
                 cpu_cores_limit: 1,
@@ -191,7 +195,8 @@ RSpec.describe ProjectVersion do
     it 'includes correct image configuration' do
       expect(chart.services.first.image).to have_attributes(
                                               name: 'registry.example.com/org/app',
-                                              tag: 'v1.2.3'
+                                              tag: 'v1.2.3',
+                                              pull_policy: :IMAGE_PULL_POLICY_IF_NOT_PRESENT
                                             )
     end
 
