@@ -147,7 +147,7 @@ RSpec.describe ProjectVersion do
         expect(mock_client).to receive(:send) do |_, request|
           expect(request.chart.services).to contain_exactly(
             have_attributes(name: 'test-service'),
-            have_attributes(name: 'shepherd_agent')
+            have_attributes(name: 'shepherd-agent')
           )
           response
         end
