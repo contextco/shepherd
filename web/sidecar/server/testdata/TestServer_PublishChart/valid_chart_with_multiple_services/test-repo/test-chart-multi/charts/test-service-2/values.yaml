@@ -1,9 +1,9 @@
 environment:
   TEST_ENV: test-env-value
 image:
+  pullPolicy: Always
   repository: nginx
   tag: latest
-  pullPolicy: Always
 ingress:
   enabled: false
 initConfig: {}
