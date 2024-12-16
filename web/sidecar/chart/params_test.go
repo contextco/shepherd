@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"sidecar/generated/sidecar_pb"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -20,6 +21,7 @@ func TestParams_toValues(t *testing.T) {
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
 				Environment: Environment{
@@ -43,6 +45,7 @@ func TestParams_toValues(t *testing.T) {
 				"image": map[string]interface{}{
 					"repository": "test-image",
 					"tag":        "latest",
+					"pullPolicy": "IfNotPresent",
 				},
 				"replicaCount": int32(3),
 				"environment": map[string]interface{}{
@@ -87,6 +90,7 @@ func TestParams_toValues(t *testing.T) {
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
@@ -104,6 +108,7 @@ func TestParams_toValues(t *testing.T) {
 				"image": map[string]interface{}{
 					"repository": "test-image",
 					"tag":        "latest",
+					"pullPolicy": "IfNotPresent",
 				},
 				"replicaCount": int32(3),
 				"initConfig":   map[string]any{},
@@ -141,6 +146,7 @@ func TestParams_toValues(t *testing.T) {
 						Username: "user",
 						Password: "pass",
 					},
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
 				Environment: Environment{
@@ -164,6 +170,7 @@ func TestParams_toValues(t *testing.T) {
 				"image": map[string]interface{}{
 					"repository": "test-image",
 					"tag":        "latest",
+					"pullPolicy": "IfNotPresent",
 					"credential": map[string]interface{}{
 						"username": "user",
 						"password": "pass",
@@ -240,6 +247,7 @@ func TestParams_toYaml(t *testing.T) {
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
 				Services:     []*Service{{Port: 8000}},
@@ -261,6 +269,7 @@ func TestParams_toYaml(t *testing.T) {
   ENV_VAR1: value1
   ENV_VAR2: value2
 image:
+  pullPolicy: IfNotPresent
   repository: test-image
   tag: latest
 ingress:
@@ -291,6 +300,7 @@ services:
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
 				Environment:  Environment{},
@@ -303,6 +313,7 @@ services:
 				},
 			},
 			want: `image:
+  pullPolicy: IfNotPresent
   repository: test-image
   tag: latest
 ingress:
@@ -329,6 +340,7 @@ services:
 				Image: Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 					Credential: &ImageCredential{
 						Username: "user",
 						Password: "pass",
@@ -354,6 +366,7 @@ image:
   credential:
     password: pass
     username: user
+  pullPolicy: IfNotPresent
   repository: test-image
   tag: latest
 imagePullSecrets:
@@ -403,10 +416,12 @@ func TestImage_toValues(t *testing.T) {
             image: Image{
                 Name: "test-image",
                 Tag:  "latest",
+				PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_ALWAYS,
             },
             want: map[string]interface{}{
                 "repository": "test-image",
                 "tag":       "latest",
+				"pullPolicy": "Always",
             },
         },
         {
@@ -414,6 +429,7 @@ func TestImage_toValues(t *testing.T) {
             image: Image{
                 Name: "test-image",
                 Tag:  "latest",
+				PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
                 Credential: &ImageCredential{
                     Username: "user",
                     Password: "pass",
@@ -422,6 +438,7 @@ func TestImage_toValues(t *testing.T) {
             want: map[string]interface{}{
                 "repository": "test-image",
                 "tag":       "latest",
+				"pullPolicy": "IfNotPresent",
                 "credential": map[string]interface{}{
                     "username": "user",
                     "password": "pass",
