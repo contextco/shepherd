@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe ProjectVersion do
   let!(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
+  let(:project_subscriber) { project.dummy_project_subscriber }
   let(:helm_repo) { project.dummy_project_subscriber.helm_repo }
   let(:helm_user) { project.dummy_project_subscriber.helm_repo.helm_user }
   let!(:service) do
@@ -180,7 +181,7 @@ RSpec.describe ProjectVersion do
   end
 
   describe '#rpc_chart' do
-    subject(:chart) { project_version.send(:rpc_chart) }
+    subject(:chart) { project_version.send(:rpc_chart, project_subscriber:) }
 
     it 'creates chart with correct attributes' do
       expect(chart.to_h.slice(:name, :version))
