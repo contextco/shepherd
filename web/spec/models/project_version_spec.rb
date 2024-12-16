@@ -173,7 +173,7 @@ RSpec.describe ProjectVersion do
                 environment_variables: [
                   Sidecar::EnvironmentVariable.new(name: 'NAME', value: project.dummy_project_subscriber.name),
                   Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project.dummy_project_subscriber.tokens.first.token),
-                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: 'https://vpc-grpc-gateway.onrender.com')
+                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: 'vpc-grpc-gateway.onrender.com')
                 ]
               )
           )

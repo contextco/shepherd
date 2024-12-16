@@ -52,7 +52,7 @@ module VersionRPC
           ),
           Sidecar::EnvironmentVariable.new(
             name: "BACKEND_ADDR",
-            value: "https://vpc-grpc-gateway.onrender.com"
+            value: "vpc-grpc-gateway.onrender.com"
           )
         ]
       )
