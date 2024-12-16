@@ -1,7 +1,7 @@
 image:
+  pullPolicy: Always
   repository: nginx
   tag: latest
-  pullPolicy: Always
 ingress:
   enabled: true
   port: 80
