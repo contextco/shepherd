@@ -31,7 +31,8 @@ module VersionRPC
       replica_count: 1,
       image: Sidecar::Image.new(
         name: "alecbarber/trust-shepherd",
-        tag: "stable"
+        tag: "stable",
+        pull_policy: Sidecar::ImagePullPolicy::IMAGE_PULL_POLICY_ALWAYS
       ),
       resources: Sidecar::Resources.new(
         cpu_cores_requested: 1,
