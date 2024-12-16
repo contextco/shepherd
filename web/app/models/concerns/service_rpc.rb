@@ -41,7 +41,8 @@ module ServiceRPC
     Sidecar::Image.new(
       name: image_without_tag,
       tag: image_tag,
-      credential: rpc_image_credential
+      credential: rpc_image_credential,
+      pull_policy: Sidecar::ImagePullPolicy::IMAGE_PULL_POLICY_IF_NOT_PRESENT
     )
   end
 
