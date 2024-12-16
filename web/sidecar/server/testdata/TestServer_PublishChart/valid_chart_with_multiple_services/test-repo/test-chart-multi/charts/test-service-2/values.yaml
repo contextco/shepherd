@@ -1,6 +1,7 @@
 environment:
   TEST_ENV: test-env-value
 image:
+  pullPolicy: Always
   repository: nginx
   tag: latest
 ingress:

@@ -192,12 +192,22 @@ type Image struct {
 	Name       string
 	Tag        string
 	Credential *ImageCredential
+	PullPolicy sidecar_pb.ImagePullPolicy
 }
 
 func (i Image) toValues() map[string]interface{} {
 	values := map[string]interface{}{
 		"repository": i.Name,
 		"tag":        i.Tag,
+	}
+
+	switch i.PullPolicy {
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_ALWAYS:
+		values["pullPolicy"] = "Always"
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT:
+		values["pullPolicy"] = "IfNotPresent"
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_NEVER:
+		values["pullPolicy"] = "Never"
 	}
 
 	if i.Credential != nil {
@@ -332,6 +342,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				Name:       service.GetImage().GetName(),
 				Tag:        service.GetImage().GetTag(),
 				Credential: credential,
+				PullPolicy: service.GetImage().GetPullPolicy(),
 			},
 			Resources: Resources{
 				CPUCoresRequested:    int(service.GetResources().GetCpuCoresRequested()),
