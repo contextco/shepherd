@@ -92,6 +92,15 @@ RSpec.describe ProjectVersion do
       project_version.publish!
     end
 
+    it 'only creates one service (no agent)' do
+      expect(mock_client).to receive(:send) do |_, request|
+        expect(request.chart.services.length).to eq(1)
+        response
+      end
+
+      project_version.publish!
+    end
+
     context 'when calling with a specific project subscriber' do
       context 'when the project subscriber is a dummy' do
         it 'includes correct helm repo name in request' do
@@ -127,6 +136,45 @@ RSpec.describe ProjectVersion do
 
           project_version.publish!(project_subscriber:)
         end
+      end
+    end
+
+    context 'when agent is set to full' do
+      let(:project_version) { create(:project_version, project:, agent: 'full') }
+
+      it 'includes agent service' do
+        expect(mock_client).to receive(:send) do |_, request|
+          expect(request.chart.services).to contain_exactly(
+            have_attributes(name: 'test-service'),
+            have_attributes(name: 'shepherd_agent')
+          )
+          response
+        end
+
+        project_version.publish!
+      end
+
+      it 'includes correct agent service configuration' do
+        expect(mock_client).to receive(:send) do |_, request|
+          expect(request.chart.services.last).to have_attributes(
+              image: Sidecar::Image.new(name: 'alecbarber/trust-shepherd', tag: 'stable'),
+              resources: Sidecar::Resources.new(
+                cpu_cores_requested: 1,
+                cpu_cores_limit: 1,
+                memory_bytes_requested: 2.gigabytes,
+                memory_bytes_limit: 2.gigabytes
+              ),
+              environment_config: Sidecar::EnvironmentConfig.new(
+                environment_variables: [
+                  Sidecar::EnvironmentVariable.new(name: 'NAME', value: project.dummy_project_subscriber.name),
+                  Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project.dummy_project_subscriber.tokens.first.token),
+                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: 'https://vpc-grpc-gateway.onrender.com')
+                ]
+              )
+          )
+        end
+
+        project_version.publish!
       end
     end
   end
