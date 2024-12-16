@@ -60,7 +60,8 @@ RSpec.describe ProjectService do
         },
         image: {
           name: 'registry.example.com/org/app',
-          tag: 'v1.2.3'
+          tag: 'v1.2.3',
+          pull_policy: :IMAGE_PULL_POLICY_IF_NOT_PRESENT
         },
         persistent_volume_claims: [
           {
