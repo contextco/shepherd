@@ -64,6 +64,7 @@ func TestAdd_valuesFile(t *testing.T) {
 				Image: chart.Image{
 					Name: "test-image",
 					Tag:  "latest",
+					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_ALWAYS,
 				},
 				Resources: chart.Resources{
 					CPUCoresRequested:    1,

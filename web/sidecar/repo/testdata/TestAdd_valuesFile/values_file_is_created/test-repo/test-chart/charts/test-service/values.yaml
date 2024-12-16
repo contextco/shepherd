@@ -1,6 +1,7 @@
 environment:
   FOO: bar
 image:
+  pullPolicy: Always
   repository: test-image
   tag: latest
 ingress:
