@@ -86,6 +86,12 @@ enum IngressPreference {
     PREFER_INTERNAL = 1;
 }
 
+ enum ImagePullPolicy {
+    IMAGE_PULL_POLICY_ALWAYS = 0;
+    IMAGE_PULL_POLICY_IF_NOT_PRESENT = 1;
+    IMAGE_PULL_POLICY_NEVER = 2;
+ }
+
 // Next ID: 5
 message IngressParams {
     IngressPreference preference = 3;
@@ -135,6 +141,7 @@ message Image {
     string name = 1;
     string tag = 2;
     ImageCredentials credential = 3;
+    ImagePullPolicy pull_policy = 4;
 }
 
 message ImageCredentials {
