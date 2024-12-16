@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"onprem/config"
@@ -31,6 +32,10 @@ func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.
 	}
 	if config.Development() {
 		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else {
+		// Use system root certificates
+		systemCreds := credentials.NewClientTLSFromCert(nil, "")
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(systemCreds))
 	}
 	dialOpts = append(dialOpts, opts...)
 
