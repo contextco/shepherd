@@ -1,6 +1,7 @@
 image:
   repository: nginx
   tag: alpine
+  pullPolicy: Always
 ingress:
   enabled: false
 initConfig:
