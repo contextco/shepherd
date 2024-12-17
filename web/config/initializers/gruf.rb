@@ -6,6 +6,16 @@ require "service_services_pb"
 require "sidecar_pb"
 require "sidecar_services_pb"
 
+Signal.trap("TERM") do
+  puts "Received SIGTERM at #{Time.now}"
+  puts "Backtrace: #{caller.join("\n")}"
+end
+
+Signal.trap("INT") do
+  puts "Received SIGINT at #{Time.now}"
+  puts "Backtrace: #{caller.join("\n")}"
+end
+
 Rails.application.config.to_prepare do
   Gruf.configure do |c|
     c.default_client_host = "localhost:8080"
@@ -18,3 +28,5 @@ Rails.application.config.to_prepare do
     c.interceptors.use(AuthenticationInterceptor)
   end
 end
+
+puts "Configuration complete, server should start soon at #{Time.now}"
