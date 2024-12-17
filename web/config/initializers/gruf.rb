@@ -33,6 +33,7 @@
 # end
 #
 # puts "Configuration complete, server should start soon at #{Time.now}"
+
 require "gruf"
 $LOAD_PATH.unshift(File.expand_path("gen", Rails.root))
 
@@ -43,89 +44,14 @@ require "sidecar_services_pb"
 
 puts "Initializing gruf server at #{Time.now}"
 
+require "grpc/health/checker"
+require "grpc/health/v1/health_services_pb"
 
-old_term = Signal.trap("TERM") do
-  puts "\n=== Process SIGTERM Handler ==="
-  puts "Time: #{Time.now}"
-  puts "Process state:"
-  puts `ps aux | grep #{Process.pid}`
-  begin
-    puts "Open files:"
-    puts `lsof -p #{Process.pid}`
-  rescue => e
-    puts "Could not get open files: #{e.message}"
-  end
-  puts "Call stack:"
-  puts caller.join("\n")
-  puts "========================="
-
-  # Call original handler if it exists
-  old_term.call if old_term.respond_to?(:call)
-end
-
-old_quit = Signal.trap("QUIT") do
-  puts "\n=== Process SIGQUIT Handler ==="
-  puts "Time: #{Time.now}"
-  puts "Process state:"
-  puts `ps aux | grep #{Process.pid}`
-  puts "Call stack:"
-  puts caller.join("\n")
-  puts "========================="
-
-  # Call original handler if it exists
-  old_quit.call if old_term.respond_to?(:call)
-end
-
-# Enhanced signal handling for INT
-old_int = Signal.trap("INT") do
-  puts "\n=== Process SIGINT Handler ==="
-  puts "Time: #{Time.now}"
-  puts "Process state:"
-  puts `ps aux | grep #{Process.pid}`
-  puts "Call stack:"
-  puts caller.join("\n")
-  puts "========================="
-
-  # Call original handler if it exists
-  old_int.call if old_term.respond_to?(:call)
-end
-
-# Process monitoring thread
-Thread.new do
-  loop do
-    begin
-      puts "\n=== Process Status at #{Time.now} ==="
-      puts "Basic Info:"
-      puts "  PID: #{Process.pid}"
-      puts "  Parent PID: #{Process.ppid}"
-      puts "  Memory: #{`ps -o rss= -p #{Process.pid}`.to_i / 1024} MB"
-      puts "  Thread count: #{Thread.list.count}"
-
-      puts "\nEnvironment:"
-      puts "  RAILS_ENV: #{ENV['RAILS_ENV']}"
-      puts "  PORT: #{ENV['PORT']}"
-      puts "  GRPC_SERVER: #{ENV['GRPC_SERVER']}"
-
-      if File.exist?("/proc/#{Process.pid}/stat")
-        stat = File.read("/proc/#{Process.pid}/stat").split
-        utime = stat[13].to_i
-        stime = stat[14].to_i
-        puts "\nCPU Usage:"
-        puts "  User time: #{utime}"
-        puts "  System time: #{stime}"
-      end
-
-      puts "\nThread Info:"
-      Thread.list.each do |t|
-        puts "  Thread #{t.object_id}: #{t.status}"
-      end
-
-      puts "========================="
-    rescue => e
-      puts "Status check error: #{e.message}"
-      puts e.backtrace.join("\n")
-    end
-    sleep 30
+class HealthCheckService < Grpc::Health::V1::Health::Service
+  def check(health_check_request, _call)
+    Grpc::Health::V1::HealthCheckResponse.new(
+      status: Grpc::Health::V1::HealthCheckResponse::ServingStatus::SERVING
+    )
   end
 end
 
@@ -146,36 +72,10 @@ Rails.application.config.to_prepare do
       "[#{datetime}] #{severity} [#{thread_id}] #{progname}: #{msg}\n"
     end
 
-    # Request monitoring interceptor
-    c.interceptors.use(Class.new(Gruf::Interceptors::ServerInterceptor) do
-      def call
-        puts "\n=== gRPC Request at #{Time.now} ==="
-        puts "Method: #{request.method_key}"
-        puts "Thread ID: #{Thread.current.object_id}"
-        puts "Process Info:"
-        puts "  PID: #{Process.pid}"
-        puts "  Thread count: #{Thread.list.count}"
-        puts "========================="
-
-        yield
-      end
-    end)
-
     c.interceptors.use(Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor)
     c.interceptors.use(AuthenticationInterceptor)
-  end
-end
 
-# Keep-alive mechanism
-Thread.new do
-  loop do
-    begin
-      puts "Keep-alive heartbeat at #{Time.now}"
-    rescue => e
-      puts "Keep-alive error: #{e.message}"
-      puts e.backtrace.join("\n")
-    end
-    sleep 60
+    c.server_options[:services] = [ HealthCheckService.new ]
   end
 end
 
