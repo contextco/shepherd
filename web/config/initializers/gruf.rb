@@ -44,8 +44,8 @@ require "sidecar_services_pb"
 
 puts "Initializing gruf server at #{Time.now}"
 
-require 'grpc/health/checker'
-require 'grpc/health/v1/health_services_pb'
+require "grpc/health/checker"
+require "grpc/health/v1/health_services_pb"
 
 class HealthCheckService < Grpc::Health::V1::Health::Service
   def check(health_check_request, _call)
