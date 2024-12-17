@@ -21,8 +21,13 @@ Rails.application.config.to_prepare do
     c.default_client_host = "localhost:8080"
 
     c.server_binding_url = "0.0.0.0:50051"
-    c.backtrace_on_error = !Rails.env.production?
-    c.use_exception_message = !Rails.env.production?
+    # c.backtrace_on_error = !Rails.env.production?
+    # c.use_exception_message = !Rails.env.production?
+    c.backtrace_on_error = true
+    c.use_exception_message = true
+
+    c.logger = Logger.new(STDOUT)
+    c.logger.level = Logger::DEBUG
 
     c.interceptors.use(Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor)
     c.interceptors.use(AuthenticationInterceptor)
