@@ -44,7 +44,7 @@ require "sidecar_services_pb"
 puts "Initializing gruf server at #{Time.now}"
 
 
-old_term = Signal.trap('TERM') do
+old_term = Signal.trap("TERM") do
   puts "\n=== Process SIGTERM Handler ==="
   puts "Time: #{Time.now}"
   puts "Process state:"
@@ -63,8 +63,21 @@ old_term = Signal.trap('TERM') do
   old_term.call if old_term.respond_to?(:call)
 end
 
+old_quit = Signal.trap("QUIT") do
+  puts "\n=== Process SIGQUIT Handler ==="
+  puts "Time: #{Time.now}"
+  puts "Process state:"
+  puts `ps aux | grep #{Process.pid}`
+  puts "Call stack:"
+  puts caller.join("\n")
+  puts "========================="
+
+  # Call original handler if it exists
+  old_quit.call if old_term.respond_to?(:call)
+end
+
 # Enhanced signal handling for INT
-old_int = Signal.trap('INT') do
+old_int = Signal.trap("INT") do
   puts "\n=== Process SIGINT Handler ==="
   puts "Time: #{Time.now}"
   puts "Process state:"
