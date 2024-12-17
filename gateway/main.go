@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -20,6 +21,7 @@ import (
 
 var (
 	grpcServerEndpoint = os.Getenv("BACKEND_ADDRESS")
+	isBackendHealthy   atomic.Bool
 )
 
 // LoggingMiddleware wraps an http.Handler and logs request details
@@ -84,6 +86,50 @@ func checkConnection(conn *grpc.ClientConn, timeout time.Duration) error {
 	return nil
 }
 
+func startHealthCheck(ctx context.Context, logger *log.Logger, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	logger.Printf("Starting background health check with interval of %v", interval)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			dialCtx, dialCancel := context.WithTimeout(ctx, 500*time.Millisecond)
+			
+			// Create a new connection for health check
+			healthConn, err := grpc.DialContext(dialCtx, grpcServerEndpoint, opts...)
+			dialCancel()
+
+			if err != nil {
+				logger.Printf("Background health check: Failed to connect to backend: %v", err)
+				isBackendHealthy.Store(false)
+				continue
+			}
+
+			// Short timeout for connection check
+			err = checkConnection(healthConn, 500*time.Millisecond)
+			healthConn.Close()
+
+			if err != nil {
+				if isBackendHealthy.Swap(false) {
+					logger.Printf("Background health check: Backend became unhealthy: %v", err)
+				}
+			} else {
+				if !isBackendHealthy.Swap(true) {
+					logger.Printf("Background health check: Backend became healthy")
+				}
+			}
+		}
+	}
+}
+
 func run(healthCheck bool) error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -96,29 +142,26 @@ func run(healthCheck bool) error {
 		grpc.WithBlock(), // Make Dial blocking
 	}
 
-	var conn *grpc.ClientConn
 	if healthCheck {
 		logger.Printf("Attempting to connect to gRPC server at %s", grpcServerEndpoint)
 		
-		// Create connection with timeout
-		dialCtx, dialCancel := context.WithTimeout(ctx, 5*time.Second)
-		defer dialCancel()
-		
-		var err error
-		conn, err = grpc.DialContext(dialCtx, grpcServerEndpoint, opts...)
+		// Initial connection check
+		conn, err := grpc.DialContext(ctx, grpcServerEndpoint, opts...)
 		if err != nil {
 			logger.Printf("Failed to dial gRPC server: %v", err)
 			return fmt.Errorf("failed to connect to backend: %v", err)
 		}
 		defer conn.Close()
 
-		// Verify the connection
 		if err := checkConnection(conn, 5*time.Second); err != nil {
 			logger.Printf("Connection check failed: %v", err)
 			return fmt.Errorf("connection check failed: %v", err)
 		}
 		
 		logger.Printf("Successfully connected to gRPC server")
+		
+		// Start background health check
+		go startHealthCheck(ctx, logger, 10*time.Second)
 	} else {
 		logger.Printf("Skipping gRPC server connection check")
 	}
