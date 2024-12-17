@@ -1,8 +1,6 @@
 
 class AuthenticationInterceptor < Gruf::Interceptors::ServerInterceptor
   def call
-    return yield if health_check_request?
-
     authenticate!
     yield
   end

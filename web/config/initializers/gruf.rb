@@ -100,8 +100,6 @@ Rails.application.config.to_prepare do
       "[#{datetime}] #{severity} [#{thread_id}] #{progname}: #{msg}\n"
     end
 
-    c.health_check_enabled = true
-
     # Add custom interceptor for startup/shutdown logging
     c.interceptors.use(Class.new(Gruf::Interceptors::ServerInterceptor) do
       def call
