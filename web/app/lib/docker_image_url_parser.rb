@@ -23,7 +23,7 @@ class DockerImageUrlParser
 
     @registry = match[:registry]
     @image = match[:image]
-    @tag = match[:tag] || "latest"
+    @tag = match[:tag]
   end
 
   def to_s(with_tag: true)
