@@ -140,7 +140,7 @@ func TestParams_toValues(t *testing.T) {
 			name: "valid params with credentials",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
+					Name: "test-image/thing",
 					Tag:  "latest",
 					Credential: &ImageCredential{
 						Username: "user",
@@ -168,7 +168,7 @@ func TestParams_toValues(t *testing.T) {
 			},
 			want: map[string]interface{}{
 				"image": map[string]interface{}{
-					"repository": "test-image",
+					"repository": "test-image/thing",
 					"tag":        "latest",
 					"pullPolicy": "IfNotPresent",
 					"credential": map[string]interface{}{
@@ -178,7 +178,7 @@ func TestParams_toValues(t *testing.T) {
 				},
 				"imagePullSecrets": []map[string]interface{}{
 					{
-						"name": "registry-credentials",
+						"name": "registry-credentials-test-image-thing",
 					},
 				},
 				"replicaCount": int32(3),
@@ -370,7 +370,7 @@ image:
   repository: test-image
   tag: latest
 imagePullSecrets:
-- name: registry-credentials
+- name: registry-credentials-test-image
 ingress:
   enabled: false
 initConfig: {}
