@@ -85,7 +85,7 @@ type PersistentVolumeClaim struct {
 func bytesToGiString(bytes int64) string {
     gi := float64(bytes) / (1024 * 1024 * 1024)
 	roundedGi := math.Ceil(gi)
-    return fmt.Sprintf("%dGi", int(roundedGi))
+    return fmt.Sprintf("%d", int(roundedGi))
 }
 
 func (p *PersistentVolumeClaim) toValues() map[string]interface{} {
