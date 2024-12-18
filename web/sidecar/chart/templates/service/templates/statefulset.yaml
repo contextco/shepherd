@@ -77,7 +77,7 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: {{ .size }}
+            storage: {{ .size }}Gi
     {{- end }}
   {{- end }}
 {{- end }}
