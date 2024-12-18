@@ -251,9 +251,12 @@ func (p *Params) toValues() (*values.File, error) {
 	}
 
 	if p.Image.Credential != nil {
+		dockerImageRepo := strings.ReplaceAll(p.Image.Name, "/", "-")
+		imagePullSecretsName := "registry-credentials-" + dockerImageRepo
+
 		vals["imagePullSecrets"] = []map[string]interface{}{
 			{
-				"name": "registry-credentials",
+				"name": imagePullSecretsName,
 			},
 		}
 	}
