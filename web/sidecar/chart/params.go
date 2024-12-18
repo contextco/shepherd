@@ -2,6 +2,7 @@ package chart
 
 import (
 	"fmt"
+	"math"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
 	"strings"
@@ -81,10 +82,16 @@ type PersistentVolumeClaim struct {
 	Path      string
 }
 
+func bytesToGi(bytes int64) int64 {
+    gi := float64(bytes) / (1024 * 1024 * 1024)
+	roundedGi := math.Ceil(gi)
+    return int64(roundedGi)
+}
+
 func (p *PersistentVolumeClaim) toValues() map[string]interface{} {
 	return map[string]interface{}{
 		"name": p.Name,
-		"size": p.SizeBytes,
+		"size": bytesToGi(p.SizeBytes),
 		"path": p.Path,
 	}
 }
