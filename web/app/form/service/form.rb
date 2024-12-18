@@ -187,7 +187,7 @@ class Service::Form
     rescue DockerImageUrlParser::InvalidDockerImageURLError
       return errors.add(:image, "is not a valid docker image")
     end
-    return if url.tag != "latest"
+    return if url.tag.present?
 
     errors.add(:image, "must specify an image version and not latest")
   end
