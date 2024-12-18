@@ -319,7 +319,7 @@ func TestServer_PublishChart(t *testing.T) {
 							PersistentVolumeClaims: []*sidecar_pb.PersistentVolumeClaimParams{
 								{
 									Name:      "test-volume-claim",
-									SizeBytes: 1024,
+									SizeBytes: 2*1024*1024*1024,
 									Path:      "/data",
 								},
 							},
