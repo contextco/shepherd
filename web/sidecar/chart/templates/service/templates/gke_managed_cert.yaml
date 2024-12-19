@@ -7,6 +7,6 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 spec:
   domains:
-    - {{ $.Values.externalIngress.host }}
+    - {{ $.Values.ingress.external.host }}
 {{- end }}
 {{- end }}
