@@ -1,4 +1,4 @@
-{{- if $.Values.externalIngress }}
+{{- if and $.Values.ingress.enabled (eq $.Values.ingress.scheme "external") }}
 {{- if .Capabilities.APIVersions.Has "networking.gke.io/v1" }}
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
