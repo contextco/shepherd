@@ -70,6 +70,8 @@ func (i IngressConfig) toClientFacingValues() map[string]interface{} {
 
 	return map[string]interface{}{
 		"scheme": scheme,
+		"enabled": true,
+		"port":    i.Port,
 		"external": map[string]interface{}{
 			"host": "TODO: Replace this with the domain name where you will host the service. Note, this field has no effect if the ingress is internal.",
 		},

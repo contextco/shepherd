@@ -11,18 +11,22 @@
                       class: 'w-1/2 p-2' %>
 </div>
 
-<div class="flex items-center justify-between">
-  <div class="flex flex-col gap-1 max-w-96">
-    <%= form.label :agent, class: 'font-medium text-stone-800 flex-none' %>
-    <span class="text-stone-600 text-sm">
-      Include an agent in the deployment for monitoring, observability, and upgrades.
-    </span>
-  </div>
+<% if Flipper.enabled?(:agent, current_user) %>
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1 max-w-96">
+      <%= form.label :agent, class: 'font-medium text-stone-800 flex-none' %>
+      <span class="text-stone-600 text-sm">
+        Include an agent in the deployment for monitoring, observability, and upgrades.
+      </span>
+    </div>
 
-  <%= form.collection_select :agent,
-                             [['Yes', :full], ['No', :no]],
-                             :second,
-                             :first,
-                             { include_blank: false, selected: project_version&.agent },
-                             class: 'w-1/2 p-2' %>
-</div>
+    <%= form.collection_select :agent,
+                               [['Yes', :full], ['No', :no]],
+                               :second,
+                               :first,
+                               { include_blank: false, selected: project_version&.agent },
+                               class: 'w-1/2 p-2' %>
+  </div>
+<% else %>
+  <%= form.hidden_field :agent, value: 'no' %>
+<% end %>
