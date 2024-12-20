@@ -4,5 +4,5 @@ test-service:
     external:
       host: 'TODO: Replace this with the domain name where you will host the service.
         Note, this field has no effect if the ingress is internal.'
-    scheme: internal
     port: 80
+    scheme: internal
