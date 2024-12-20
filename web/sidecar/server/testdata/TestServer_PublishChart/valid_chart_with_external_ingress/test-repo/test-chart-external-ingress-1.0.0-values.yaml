@@ -1,8 +1,8 @@
 test-service:
   ingress:
     enabled: true
-    port: 80
     external:
       host: 'TODO: Replace this with the domain name where you will host the service.
         Note, this field has no effect if the ingress is internal.'
     scheme: external
+    port: 80
