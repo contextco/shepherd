@@ -1,8 +1,19 @@
 <div class="w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
   <div class="flex w-full justify-between">
-    <div class="flex flex-col">
-      <span class="text-xs sm:text-sm text-stone-400 font-medium">Edit Service</span>
-      <span class="sm:text-2xl font-medium w-fit"><%= @service.name %></span>
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-col">
+        <span class="text-xs sm:text-sm text-stone-400 font-medium">Edit Service</span>
+        <span class="sm:text-2xl font-medium w-fit"><%= @service.name %></span>
+      </div>
+      <div class="relative" data-controller="sidebar-icon">
+        <div data-action="mouseenter->sidebar-icon#showTooltip mouseleave->sidebar-icon#hideTooltip">
+          <%= render CopyTextComponent.new(snippet: @service.k8s_service_names.first) if @service.k8s_service_names.any? %>
+        </div>
+        <div class="text-nowrap transition-opacity opacity-0 pointer-events-none left-1/2 -translate-x-1/2 left-full mt-2 font-normal text-sm p-1 bg-stone-700 rounded-md text-slate-100 px-2 duration-400 absolute z-50" data-sidebar-icon-target="tooltip">
+          <div class="absolute left-0 rotate-45 bg-stone-700 -translate-y-1.5 left-1/2 -translate-x-1/2 size-1.5"></div>
+          Internal Service URL
+        </div>
+      </div>
     </div>
   </div>
 
