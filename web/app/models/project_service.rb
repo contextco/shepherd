@@ -25,7 +25,7 @@ class ProjectService < ApplicationRecord
     return [] if ports.blank?
 
     ports.map do |port|
-      "http://#{project.name}-#{name}-service:#{port}"
+      "http://#{project.name}-#{name}-service.#{project.name}.svc.cluster.local:#{port}"
     end
   end
 
