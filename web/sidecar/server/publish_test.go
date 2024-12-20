@@ -361,6 +361,8 @@ func TestServer_PublishChart(t *testing.T) {
 			values: map[string]any{
 				"test-service": map[string]any{
 					"ingress": map[string]any{
+						"enabled": true,
+						"port":    80,
 						"external": map[string]any{
 							"host": "arbitrary-host.com",
 						},
