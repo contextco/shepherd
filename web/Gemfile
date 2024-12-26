@@ -80,7 +80,7 @@ gem "rails_heroicon", "~> 2.3"
 gem "faraday", "~> 2.12"
 
 
-gem "hotwire-livereload", "~> 1.4", group: :development
+gem "hotwire-livereload", "~> 2.0", group: :development
 
 gem "appsignal", "~> 4.2"
 
