@@ -11,7 +11,7 @@
 t = Team.create!
 
 %w[alex alec].each do |name|
-  User.create_with(team: t, password: 'password', name:).find_or_create_by!(email: "#{name}@context.ai")
+  User.create_with(team: t, password: 'password', name:, role: :admin).find_or_create_by!(email: "#{name}@context.ai")
 end
 
 d = t.deployments.create!(name: 'sample deployment')
