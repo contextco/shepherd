@@ -11,6 +11,10 @@ Rails.application.routes.draw do
 
   root "project/project#index"
 
+  authenticate :user, ->(user) { user.admin? } do
+    mount Flipper::UI.app(Flipper) => "/_/flip"
+  end
+
   scope :repo do
     get "/:repo_name/:filename", to: "helm/repo#download", constraints: { filename: /.*\.tgz/ }
     get "/:repo_name/index.yaml", to: "helm/repo#index_yaml", controller: "helm/repo"
