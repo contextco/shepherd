@@ -34,7 +34,8 @@ func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.
 		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
 		// Use system root certificates
-		systemCreds := credentials.NewClientTLSFromCert(nil, "")
+		certPool := MustSystemCertPool()
+		systemCreds := credentials.NewClientTLSFromCert(certPool, "")
 		dialOpts = append(dialOpts, grpc.WithTransportCredentials(systemCreds))
 	}
 	dialOpts = append(dialOpts, opts...)
@@ -80,7 +81,8 @@ func (a *authHeader) RequireTransportSecurity() bool {
 func MustSystemCertPool() *x509.CertPool {
 	pool, err := x509.SystemCertPool()
 	if err != nil {
-		return nil
+		log.Fatalf("Warning: failed to load system certificates: %v", err)
 	}
+
 	return pool
 }
