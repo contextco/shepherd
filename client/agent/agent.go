@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"onprem/backend"
+	"onprem/cluster"
+	"onprem/generated/service_pb"
 	"onprem/periodic"
 	"time"
 
@@ -43,6 +45,18 @@ func (a *Agent) heartbeat(ctx context.Context) {
 	}
 }
 
+func (a *Agent) apply(ctx context.Context) error {
+	action, err := a.client.Apply(ctx)
+	if err != nil {
+		log.Printf("Apply error: %v", err)
+		return err
+	}
+
+	log.Printf("Apply response: %+v", action)
+
+	return nil
+}
+
 func NewAgent(name, backendAddr, bearerToken string) (*Agent, error) {
 	id := uuid.New().String()
 
@@ -61,4 +75,26 @@ func NewAgent(name, backendAddr, bearerToken string) (*Agent, error) {
 
 		client: client,
 	}, nil
+}
+
+func applyAction(ctx context.Context, action *service_pb.Action) error {
+	switch action.GetAction().(type) {
+	case *service_pb.Action_ApplyChart:
+		return applyChart(ctx, action.GetApplyChart())
+	}
+
+	return nil
+}
+
+func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error {
+	c, err := cluster.Self(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := c.Install(ctx, action.GetChart()); err != nil {
+		return err
+	}
+
+	return nil
 }

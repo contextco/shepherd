@@ -7,11 +7,15 @@ require 'google/protobuf'
 require 'google/api/annotations_pb'
 
 
-descriptor_data = "\n\rservice.proto\x1a\x1cgoogle/api/annotations.proto\"9\n\x10HeartbeatRequest\x12%\n\x08identity\x18\x01 \x01(\x0b\x32\t.IdentityR\x08identity\"\x13\n\x11HeartbeatResponse\"G\n\x08Identity\x12!\n\x0clifecycle_id\x18\x01 \x01(\tR\x0blifecycleId\x12\x12\n\x04name\x18\x03 \x01(\tR\x04nameJ\x04\x08\x02\x10\x03\x32S\n\x06OnPrem\x12I\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\"\n/heartbeat:\x01*B\x16Z\x14generated/service_pbb\x06proto3"
+descriptor_data = "\n\rservice.proto\x1a\x1cgoogle/api/annotations.proto\"9\n\x10HeartbeatRequest\x12%\n\x08identity\x18\x01 \x01(\x0b\x32\t.IdentityR\x08identity\"\x13\n\x11HeartbeatResponse\"5\n\x0c\x41pplyRequest\x12%\n\x08identity\x18\x01 \x01(\x0b\x32\t.IdentityR\x08identity\"Y\n\x06\x41\x63tion\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x35\n\x0b\x61pply_chart\x18\x02 \x01(\x0b\x32\x12.ApplyChartRequestH\x00R\napplyChartB\x08\n\x06\x61\x63tion\"0\n\rApplyResponse\x12\x1f\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x07.ActionR\x06\x61\x63tion\")\n\x11\x41pplyChartRequest\x12\x14\n\x05\x63hart\x18\x01 \x01(\x0cR\x05\x63hart\"G\n\x08Identity\x12!\n\x0clifecycle_id\x18\x01 \x01(\tR\x0blifecycleId\x12\x12\n\x04name\x18\x03 \x01(\tR\x04nameJ\x04\x08\x02\x10\x03\x32\x8e\x01\n\x06OnPrem\x12I\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\"\n/heartbeat:\x01*\x12\x39\n\x05\x41pply\x12\r.ApplyRequest\x1a\x0e.ApplyResponse\"\x11\x82\xd3\xe4\x93\x02\x0b\"\x06/apply:\x01*B\x16Z\x14generated/service_pbb\x06proto3"
 
 pool = Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
 
 HeartbeatRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("HeartbeatRequest").msgclass
 HeartbeatResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("HeartbeatResponse").msgclass
+ApplyRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ApplyRequest").msgclass
+Action = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Action").msgclass
+ApplyResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ApplyResponse").msgclass
+ApplyChartRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("ApplyChartRequest").msgclass
 Identity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Identity").msgclass
