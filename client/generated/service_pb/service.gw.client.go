@@ -11,6 +11,7 @@ import (
 // OnPremGatewayClient is the interface for OnPrem service client.
 type OnPremGatewayClient interface {
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	Apply(context.Context, *ApplyRequest) (*ApplyResponse, error)
 }
 
 func NewOnPremGatewayClient(c gateway.Client) OnPremGatewayClient {
@@ -27,4 +28,10 @@ func (c *onPremGatewayClient) Heartbeat(ctx context.Context, req *HeartbeatReque
 	gwReq := c.gwc.NewRequest("POST", "/heartbeat")
 	gwReq.SetBody(req)
 	return gateway.DoRequest[HeartbeatResponse](ctx, gwReq)
+}
+
+func (c *onPremGatewayClient) Apply(ctx context.Context, req *ApplyRequest) (*ApplyResponse, error) {
+	gwReq := c.gwc.NewRequest("POST", "/apply")
+	gwReq.SetBody(req)
+	return gateway.DoRequest[ApplyResponse](ctx, gwReq)
 }

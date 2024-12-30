@@ -11,6 +11,13 @@ service OnPrem {
             body: "*"
         };
     }
+
+    rpc Apply(ApplyRequest) returns (ApplyResponse) {
+        option (google.api.http) = {
+            post: "/apply"
+            body: "*"
+        };
+    }
 }
 
 message HeartbeatRequest {
@@ -18,6 +25,26 @@ message HeartbeatRequest {
 }
 
 message HeartbeatResponse {}
+
+message ApplyRequest {
+    Identity identity = 1;
+}
+
+message Action {
+    string id = 1;
+
+    oneof action {
+        ApplyChartRequest apply_chart = 2;
+    }
+}
+
+message ApplyResponse {
+    Action action = 1;
+}
+
+message ApplyChartRequest {
+    bytes chart = 1;
+}
 
 // Next ID: 4
 message Identity {
