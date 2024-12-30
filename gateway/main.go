@@ -33,13 +33,13 @@ type LoggingMiddleware struct {
 func (m *LoggingMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	wrappedWriter := &responseWriter{
 		ResponseWriter: w,
-		status:        http.StatusOK,
+		status:         http.StatusOK,
 	}
 
 	startTime := time.Now()
 	m.handler.ServeHTTP(wrappedWriter, r)
 	duration := time.Since(startTime)
-	
+
 	m.logger.Printf("Request: method=%s path=%s remote_addr=%s status=%d duration=%v user_agent=%s",
 		r.Method,
 		r.URL.Path,
@@ -102,7 +102,7 @@ func startHealthCheck(ctx context.Context, logger *log.Logger, interval time.Dur
 			return
 		case <-ticker.C:
 			dialCtx, dialCancel := context.WithTimeout(ctx, 500*time.Millisecond)
-			
+
 			// Create a new connection for health check
 			healthConn, err := grpc.DialContext(dialCtx, grpcServerEndpoint, opts...)
 			dialCancel()
@@ -139,12 +139,11 @@ func run(healthCheck bool) error {
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(), // Make Dial blocking
 	}
 
 	if healthCheck {
 		logger.Printf("Attempting to connect to gRPC server at %s", grpcServerEndpoint)
-		
+
 		// Initial connection check
 		conn, err := grpc.DialContext(ctx, grpcServerEndpoint, opts...)
 		if err != nil {
@@ -157,9 +156,9 @@ func run(healthCheck bool) error {
 			logger.Printf("Connection check failed: %v", err)
 			return fmt.Errorf("connection check failed: %v", err)
 		}
-		
+
 		logger.Printf("Successfully connected to gRPC server")
-		
+
 		// Start background health check
 		go startHealthCheck(ctx, logger, 10*time.Second)
 	} else {
@@ -168,7 +167,7 @@ func run(healthCheck bool) error {
 
 	// Register gRPC server endpoint
 	gwmux := runtime.NewServeMux()
-	
+
 	logger.Printf("Setting handler to gRPC server at %s", grpcServerEndpoint)
 	err := service_pb.RegisterOnPremHandlerFromEndpoint(ctx, gwmux, grpcServerEndpoint, opts)
 	if err != nil {
@@ -177,7 +176,7 @@ func run(healthCheck bool) error {
 
 	// Create a new serve mux for combining grpc-gateway and health check
 	mux := http.NewServeMux()
-	
+
 	// Add health check endpoint that verifies the connection state
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		if !healthCheck {
