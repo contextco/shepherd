@@ -49,5 +49,5 @@ func main() {
 
 	log.Println("Agent created, starting heartbeat")
 
-	agent.Start(context.Background())
+	agent.Start(context.Background(), heartbeatInterval.MustValue())
 }
