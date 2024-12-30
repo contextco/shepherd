@@ -76,6 +76,8 @@ Rails.application.config.to_prepare do
     c.interceptors.use(AuthenticationInterceptor)
 
     c.server_options[:services] = [ HealthCheckService.new ]
+
+    $stdout.sync = true
   end
 end
 
