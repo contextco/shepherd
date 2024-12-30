@@ -14,6 +14,7 @@ module OnPrem
     self.service_name = 'OnPrem'
 
     rpc :Heartbeat, ::HeartbeatRequest, ::HeartbeatResponse
+    rpc :Apply, ::ApplyRequest, ::ApplyResponse
   end
 
   Stub = Service.rpc_stub_class
