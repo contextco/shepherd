@@ -2,15 +2,12 @@ package backend
 
 import (
 	"context"
-	"crypto/x509"
 	"fmt"
 	"log"
+	"net/http"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/akuity/grpc-gateway-client/pkg/grpc/gateway"
 
-	"onprem/config"
 	service_pb "onprem/generated/service_pb"
 )
 
@@ -20,32 +17,23 @@ type Identity struct {
 }
 
 type Client struct {
-	client   service_pb.OnPremClient
-	conn     *grpc.ClientConn
+	client   service_pb.OnPremGatewayClient
 	identity Identity
 }
 
-func NewClient(addr string, bearerToken string, identity Identity, opts ...grpc.DialOption) (*Client, error) {
+func NewClient(addr string, bearerToken string, identity Identity) (*Client, error) {
 	log.Printf("Attempting to connect to gRPC server at %s", addr)
-	dialOpts := []grpc.DialOption{
-		grpc.WithPerRPCCredentials(&authHeader{bearerToken: bearerToken}),
+	client := &http.Client{
+		Transport: &defaultHeaderTransport{
+			headers: map[string]string{
+				"Authorization": fmt.Sprintf("Bearer %s", bearerToken),
+			},
+			rt: http.DefaultTransport,
+		},
 	}
-	if config.Development() {
-		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	} else {
-		// Use system root certificates
-		systemCreds := credentials.NewClientTLSFromCert(nil, "")
-		dialOpts = append(dialOpts, grpc.WithTransportCredentials(systemCreds))
-	}
-	dialOpts = append(dialOpts, opts...)
 
-	conn, err := grpc.NewClient(addr, dialOpts...)
-	if err != nil {
-		return nil, err
-	}
 	return &Client{
-		client:   service_pb.NewOnPremClient(conn),
-		conn:     conn,
+		client:   service_pb.NewOnPremGatewayClient(gateway.NewClient(addr, gateway.WithHTTPClient(client))),
 		identity: identity,
 	}, nil
 }
@@ -60,27 +48,17 @@ func (c *Client) Heartbeat(ctx context.Context) error {
 	return err
 }
 
-func (c *Client) Close() error {
-	return c.conn.Close()
+// custom transport that adds headers
+type defaultHeaderTransport struct {
+	headers map[string]string
+	rt      http.RoundTripper
 }
 
-type authHeader struct {
-	bearerToken string
-}
-
-func (a *authHeader) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	return map[string]string{"authorization": fmt.Sprintf("Bearer %s", a.bearerToken)}, nil
-}
-
-func (a *authHeader) RequireTransportSecurity() bool {
-	return false
-}
-
-// TOOD: How does this work if the system cert pool is empty? Or doesn't exist?
-func MustSystemCertPool() *x509.CertPool {
-	pool, err := x509.SystemCertPool()
-	if err != nil {
-		return nil
+func (dht *defaultHeaderTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	for key, value := range dht.headers {
+		if req.Header.Get(key) == "" { // only add if not already set
+			req.Header.Set(key, value)
+		}
 	}
-	return pool
+	return dht.rt.RoundTrip(req)
 }

@@ -11,6 +11,8 @@ class User < ApplicationRecord
   belongs_to :team, optional: true
   has_many :ssh_public_keys, class_name: "SSHPublicKey", dependent: :destroy
 
+  enum :role, { user: 0, admin: 1 }
+
   class << self
     def from_omniauth!(access_token)
       data = access_token.info

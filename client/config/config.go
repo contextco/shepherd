@@ -93,11 +93,10 @@ func parseType[T comparable](v string) (T, error) {
 	return zero, nil
 }
 
-
 func Production() bool {
-	env_value := os.Getenv("ENV")
+	env := os.Getenv("ENV")
 
-	return env_value == "production" || env_value == ""
+	return env == "production"
 }
 
 func Development() bool {
