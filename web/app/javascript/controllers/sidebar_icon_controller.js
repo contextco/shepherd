@@ -3,9 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="sidebar-icon"
 export default class extends Controller {
   static targets = [ 'tooltip']
-  connect() {
-    console.log('Connected to sidebar icon controller')
-  }
 
   showTooltip() {
     this.tooltipTarget.classList.remove('hidden')

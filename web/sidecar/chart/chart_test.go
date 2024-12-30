@@ -49,6 +49,8 @@ func TestChart_ClientFacingValuesFile(t *testing.T) {
 				"test-service": map[string]interface{}{
 					"ingress": map[string]interface{}{
 						"scheme": "external",
+						"port":   80,
+						"enabled": true,
 						"external": map[string]interface{}{
 							"host": "TODO: Replace this with the domain name where you will host the service. Note, this field has no effect if the ingress is internal.",
 						},

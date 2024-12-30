@@ -1,0 +1,8 @@
+<div class="flex items-center text-stone-900 font-medium gap-1 text-xs">
+  <span class="w-full font-mono whitespace-nowrap overflow-y-scroll scrollbar-hide"><%= snippet %></span>
+
+  <div class="cursor-pointer" data-controller="copy" data-copy-text-value="<%= snippet %>" data-action="click->copy#copy">
+    <%= heroicon 'clipboard-document', class: 'size-3', data: { 'copy-target': 'pendingIcon' } %>
+    <%= heroicon 'clipboard-document-check', class: 'size-3 hidden', data: { 'copy-target': 'doneIcon' } %>
+  </div>
+</div>

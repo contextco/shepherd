@@ -1,4 +1,5 @@
 image:
+  pullPolicy: Always
   repository: nginx
   tag: latest
 ingress:
@@ -7,7 +8,7 @@ initConfig: {}
 persistentVolumeClaims:
 - name: test-volume-claim
   path: /data
-  size: 1024
+  size: 2
 replicaCount: 1
 resources:
   limits:

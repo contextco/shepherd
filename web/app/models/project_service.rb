@@ -21,6 +21,14 @@ class ProjectService < ApplicationRecord
     ingress_port.present?
   end
 
+  def k8s_service_names
+    return [] if ports.blank?
+
+    ports.map do |port|
+      "http://#{project.name}-#{name}-service.#{project.name}.svc.cluster.local:#{port}"
+    end
+  end
+
   class Secret
     def initialize(environment_key:)
       @environment_key = environment_key

@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe ProjectVersion do
   let!(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
+  let(:project_subscriber) { project.dummy_project_subscriber }
   let(:helm_repo) { project.dummy_project_subscriber.helm_repo }
   let(:helm_user) { project.dummy_project_subscriber.helm_repo.helm_user }
   let!(:service) do
@@ -92,6 +93,15 @@ RSpec.describe ProjectVersion do
       project_version.publish!
     end
 
+    it 'only creates one service (no agent)' do
+      expect(mock_client).to receive(:send) do |_, request|
+        expect(request.chart.services.length).to eq(1)
+        response
+      end
+
+      project_version.publish!
+    end
+
     context 'when calling with a specific project subscriber' do
       context 'when the project subscriber is a dummy' do
         it 'includes correct helm repo name in request' do
@@ -129,10 +139,53 @@ RSpec.describe ProjectVersion do
         end
       end
     end
+
+    context 'when agent is set to full' do
+      let(:project_version) { create(:project_version, project:, agent: 'full') }
+
+      it 'includes agent service' do
+        expect(mock_client).to receive(:send) do |_, request|
+          expect(request.chart.services).to contain_exactly(
+            have_attributes(name: 'test-service'),
+            have_attributes(name: 'shepherd-agent')
+          )
+          response
+        end
+
+        project_version.publish!
+      end
+
+      it 'includes correct agent service configuration' do
+        expect(mock_client).to receive(:send) do |_, request|
+          expect(request.chart.services.last).to have_attributes(
+              image: Sidecar::Image.new(
+                name: 'alecbarber/trust-shepherd',
+                tag: 'stable',
+                pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
+              ),
+              resources: Sidecar::Resources.new(
+                cpu_cores_requested: 1,
+                cpu_cores_limit: 1,
+                memory_bytes_requested: 2.gigabytes,
+                memory_bytes_limit: 2.gigabytes
+              ),
+              environment_config: Sidecar::EnvironmentConfig.new(
+                environment_variables: [
+                  Sidecar::EnvironmentVariable.new(name: 'NAME', value: project.dummy_project_subscriber.name),
+                  Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project.dummy_project_subscriber.tokens.first.token),
+                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: 'vpc-grpc-gateway.onrender.com')
+                ]
+              )
+          )
+        end
+
+        project_version.publish!
+      end
+    end
   end
 
   describe '#rpc_chart' do
-    subject(:chart) { project_version.send(:rpc_chart) }
+    subject(:chart) { project_version.send(:rpc_chart, project_subscriber:) }
 
     it 'creates chart with correct attributes' do
       expect(chart.to_h.slice(:name, :version))
@@ -142,7 +195,8 @@ RSpec.describe ProjectVersion do
     it 'includes correct image configuration' do
       expect(chart.services.first.image).to have_attributes(
                                               name: 'registry.example.com/org/app',
-                                              tag: 'v1.2.3'
+                                              tag: 'v1.2.3',
+                                              pull_policy: :IMAGE_PULL_POLICY_IF_NOT_PRESENT
                                             )
     end
 

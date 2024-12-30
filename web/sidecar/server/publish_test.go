@@ -102,6 +102,8 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, map[string]any{
 				"test-service": map[string]any{
 					"ingress": map[string]any{
+						"enabled": true,
+						"scheme": "external",
 						"external": map[string]any{
 							"host": tt.host,
 						},
@@ -319,7 +321,7 @@ func TestServer_PublishChart(t *testing.T) {
 							PersistentVolumeClaims: []*sidecar_pb.PersistentVolumeClaimParams{
 								{
 									Name:      "test-volume-claim",
-									SizeBytes: 1024,
+									SizeBytes: 2*1024*1024*1024,
 									Path:      "/data",
 								},
 							},
@@ -359,6 +361,8 @@ func TestServer_PublishChart(t *testing.T) {
 			values: map[string]any{
 				"test-service": map[string]any{
 					"ingress": map[string]any{
+						"enabled": true,
+						"port":    80,
 						"external": map[string]any{
 							"host": "arbitrary-host.com",
 						},

@@ -18,7 +18,7 @@
                             value: @previous_version.version.split('.').tap { |v| v[2] = v[2].to_i + 1 }.join('.'),
                             title: 'Must be major.minor.patch format (e.g. 10.22.343).',
                             pattern: '\d+\.\d+\.\d+',
-                            class: 'w-1/2 p-2 rounded-md' %>
+                            class: 'w-1/2 p-2' %>
       </div>
 
       <div class="flex items-center justify-between">
@@ -29,8 +29,28 @@
           </span>
         </div>
 
-        <%= form.text_field :description, class: 'w-1/2 p-2 rounded-md' %>
+        <%= form.text_field :description, class: 'w-1/2 p-2' %>
       </div>
+
+      <% if Flipper.enabled?(:agent, current_user) %>
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-1 max-w-96">
+            <%= form.label :agent, class: 'font-medium text-stone-800 flex-none' %>
+            <span class="text-stone-600 text-sm">
+              Include an agent in the deployment for monitoring, observability, and upgrades.
+            </span>
+          </div>
+
+          <%= form.collection_select :agent,
+                                    [['Yes', :full], ['No', :no]],
+                                    :second,
+                                    :first,
+                                    { include_blank: false, selected: :full },
+                                    class: 'w-1/2 p-2' %>
+        </div>
+      <% else %>
+        <%= form.hidden_field :agent, value: 'no' %>
+      <% end %>
 
       <%= form.submit "Create", class: 'px-3 py-2 mt-2 bg-stone-700 rounded-md text-stone-100 cursor-pointer w-fit' %>
     </div>

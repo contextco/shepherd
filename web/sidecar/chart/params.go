@@ -2,6 +2,7 @@ package chart
 
 import (
 	"fmt"
+	"math"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
 	"strings"
@@ -69,6 +70,8 @@ func (i IngressConfig) toClientFacingValues() map[string]interface{} {
 
 	return map[string]interface{}{
 		"scheme": scheme,
+		"enabled": true,
+		"port":    i.Port,
 		"external": map[string]interface{}{
 			"host": "TODO: Replace this with the domain name where you will host the service. Note, this field has no effect if the ingress is internal.",
 		},
@@ -81,10 +84,16 @@ type PersistentVolumeClaim struct {
 	Path      string
 }
 
+func bytesToGi(bytes int64) int64 {
+    gi := float64(bytes) / (1024 * 1024 * 1024)
+	roundedGi := math.Ceil(gi)
+    return int64(roundedGi)
+}
+
 func (p *PersistentVolumeClaim) toValues() map[string]interface{} {
 	return map[string]interface{}{
 		"name": p.Name,
-		"size": p.SizeBytes,
+		"size": bytesToGi(p.SizeBytes),
 		"path": p.Path,
 	}
 }
@@ -192,12 +201,22 @@ type Image struct {
 	Name       string
 	Tag        string
 	Credential *ImageCredential
+	PullPolicy sidecar_pb.ImagePullPolicy
 }
 
 func (i Image) toValues() map[string]interface{} {
 	values := map[string]interface{}{
 		"repository": i.Name,
 		"tag":        i.Tag,
+	}
+
+	switch i.PullPolicy {
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_ALWAYS:
+		values["pullPolicy"] = "Always"
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT:
+		values["pullPolicy"] = "IfNotPresent"
+	case sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_NEVER:
+		values["pullPolicy"] = "Never"
 	}
 
 	if i.Credential != nil {
@@ -241,9 +260,12 @@ func (p *Params) toValues() (*values.File, error) {
 	}
 
 	if p.Image.Credential != nil {
+		dockerImageRepo := strings.ReplaceAll(p.Image.Name, "/", "-")
+		imagePullSecretsName := "registry-credentials-" + dockerImageRepo
+
 		vals["imagePullSecrets"] = []map[string]interface{}{
 			{
-				"name": "registry-credentials",
+				"name": imagePullSecretsName,
 			},
 		}
 	}
@@ -332,6 +354,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				Name:       service.GetImage().GetName(),
 				Tag:        service.GetImage().GetTag(),
 				Credential: credential,
+				PullPolicy: service.GetImage().GetPullPolicy(),
 			},
 			Resources: Resources{
 				CPUCoresRequested:    int(service.GetResources().GetCpuCoresRequested()),
