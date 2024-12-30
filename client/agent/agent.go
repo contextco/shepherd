@@ -17,14 +17,14 @@ type Agent struct {
 	client *backend.Client // gRPC client which sends heartbeats
 }
 
-func (a *Agent) Start(ctx context.Context) {
+func (a *Agent) Start(ctx context.Context, heartbeatInterval time.Duration) {
 	go func() {
 		fn := func() error {
 			a.heartbeat(ctx)
 			return nil
 		}
 
-		if err := periodic.RunWithJitter(ctx, fn, time.Second, time.Minute*5); err != nil {
+		if err := periodic.RunWithJitter(ctx, fn, heartbeatInterval, 500*time.Millisecond); err != nil {
 			log.Printf("Heartbeat error: %v", err)
 		}
 	}()
