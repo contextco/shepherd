@@ -73,16 +73,16 @@ gem "omniauth-rails_csrf_protection"
 gem "omniauth-google-oauth2", "~> 1.2"
 gem "mission_control-jobs"
 
-gem "view_component", "~> 3.20"
+gem "view_component", "~> 3.21"
 
 gem "rails_heroicon", "~> 2.3"
 
 gem "faraday", "~> 2.12"
 
 
-gem "hotwire-livereload", "~> 1.4", group: :development
+gem "hotwire-livereload", "~> 2.0", group: :development
 
-gem "appsignal", "~> 4.2"
+gem "appsignal", "~> 4.3"
 
 gem "flipper"
 gem "flipper-active_record"
