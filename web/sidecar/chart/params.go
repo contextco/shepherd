@@ -3,6 +3,7 @@ package chart
 import (
 	"fmt"
 	"math"
+	"onprem/cluster"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
 	"strings"
@@ -25,6 +26,8 @@ type Params struct {
 	PersistentVolumeClaims []*PersistentVolumeClaim
 
 	IngressConfig IngressConfig
+
+	MetaEnvironmentFieldsEnabled bool
 }
 
 type IngressConfig struct {
@@ -69,7 +72,7 @@ func (i IngressConfig) toClientFacingValues() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"scheme": scheme,
+		"scheme":  scheme,
 		"enabled": true,
 		"port":    i.Port,
 		"external": map[string]interface{}{
@@ -85,9 +88,9 @@ type PersistentVolumeClaim struct {
 }
 
 func bytesToGi(bytes int64) int64 {
-    gi := float64(bytes) / (1024 * 1024 * 1024)
+	gi := float64(bytes) / (1024 * 1024 * 1024)
 	roundedGi := math.Ceil(gi)
-    return int64(roundedGi)
+	return int64(roundedGi)
 }
 
 func (p *PersistentVolumeClaim) toValues() map[string]interface{} {
@@ -243,6 +246,23 @@ func (p *Params) toYaml() (string, error) {
 	return chartutil.Values(values.Values).YAML()
 }
 
+func (p *Params) MetaEnvironmentFields() []map[string]interface{} {
+	if !p.MetaEnvironmentFieldsEnabled {
+		return nil
+	}
+
+	return []map[string]interface{}{
+		{
+			"name":      cluster.HELM_RELEASE_NAME_ENV_KEY,
+			"fieldPath": "metadata.name",
+		},
+		{
+			"name":      cluster.HELM_NAMESPACE_ENV_KEY,
+			"fieldPath": "metadata.namespace",
+		},
+	}
+}
+
 func (p *Params) toValues() (*values.File, error) {
 	vals := map[string]any{
 		"replicaCount":           p.ReplicaCount,
@@ -257,6 +277,7 @@ func (p *Params) toValues() (*values.File, error) {
 		"serviceAccount": map[string]any{
 			"create": false,
 		},
+		"metaEnvironmentFields": p.MetaEnvironmentFields(),
 	}
 
 	if p.Image.Credential != nil {
