@@ -1,6 +1,4 @@
 class Dependency < ApplicationRecord
-  include ::DependencyRPC
-
   validate :name_is_known, :repo_url_is_known
 
   belongs_to :project_version
