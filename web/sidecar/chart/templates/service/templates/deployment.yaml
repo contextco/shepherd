@@ -50,11 +50,11 @@ spec:
                   key: {{ $key }}
             {{- end }}
             {{- if .Values.metaEnvironmentFields }}
-            {{- range $key, $value := .Values.metaEnvironmentFields }}
-            - name: {{ $key }}
+            {{- range .Values.metaEnvironmentFields }}
+            - name: {{ .name }}
               valueFrom:
                 fieldRef:
-                  fieldPath: {{ $value.fieldPath }}
+                  fieldPath: {{ .fieldPath }}
             {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.secrets }}
