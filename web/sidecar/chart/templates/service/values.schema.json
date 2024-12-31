@@ -246,6 +246,23 @@
         }
       }
     },
+    "metaEnvironmentFields": {
+      "type": "array",
+      "description": "Meta environment fields configuration",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the meta environment field"
+          },
+          "fieldPath": {
+            "type": "string",
+            "description": "Field path of the meta environment field"
+          }
+        }
+      }
+    },
     "global": {
       "type": "object",
       "description": "Global values"
