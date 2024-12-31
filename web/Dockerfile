@@ -5,7 +5,7 @@
 # docker run -d -p 80:80 -p 443:443 --name my-app -e RAILS_MASTER_KEY=<value from config/master.key> my-app
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.3.6
+ARG RUBY_VERSION=3.4.1
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -60,7 +60,7 @@ FROM base
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
-COPY --from=sidecar /onprem/web/sidecar /sidecar/sidecar
+COPY --from=sidecar /onprem/web/sidecar/sidecar /sidecar/sidecar
 
 # Run and own only the runtime files as a non-root user for security
 # RUN groupadd --system --gid 1000 rails && \
