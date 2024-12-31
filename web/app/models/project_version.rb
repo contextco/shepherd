@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectVersion < ApplicationRecord
-  include ::VersionRPC
-
   belongs_to :project
   has_many :services, dependent: :destroy, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy
@@ -52,8 +50,7 @@ class ProjectVersion < ApplicationRecord
     project_subscribers = Array(project_subscriber || project.project_subscribers)
     project_subscribers.each do |project_sub|
       repos = [ project_sub.helm_repo ]
-      chart = rpc_chart(project_subscriber: project_sub)
-      Chart::Publisher.new(chart, repos).publish_chart!
+      Chart::Publisher.new(self, project_sub, repos).publish_chart!
     end
     published! unless project_subscriber&.dummy?
   end
