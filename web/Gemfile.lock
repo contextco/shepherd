@@ -270,7 +270,7 @@ GEM
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.6.3)
+    logger (1.6.4)
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -525,7 +525,7 @@ GEM
     uri (1.0.2)
     useragent (0.16.11)
     version_gem (1.1.4)
-    view_component (3.20.0)
+    view_component (3.21.0)
       activesupport (>= 5.2.0, < 8.1)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
@@ -600,7 +600,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 3.0)
   turbo-rails
   tzinfo-data
-  view_component (~> 3.20)
+  view_component (~> 3.21)
   web-console
 
 BUNDLED WITH
