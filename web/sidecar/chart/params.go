@@ -383,12 +383,13 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 				MemoryBytesRequested: service.GetResources().GetMemoryBytesRequested(),
 				MemoryBytesLimit:     service.GetResources().GetMemoryBytesLimit(),
 			},
-			IngressConfig:          ingressConfig,
-			Environment:            env,
-			Secrets:                secrets,
-			Services:               services,
-			InitConfig:             initConfig,
-			PersistentVolumeClaims: persistentVolumeClaims,
+			IngressConfig:                ingressConfig,
+			Environment:                  env,
+			Secrets:                      secrets,
+			Services:                     services,
+			InitConfig:                   initConfig,
+			PersistentVolumeClaims:       persistentVolumeClaims,
+			MetaEnvironmentFieldsEnabled: service.GetEnvironmentConfig().GetMetaEnvironmentFieldsEnabled(),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("error applying params to service chart: %w", err)

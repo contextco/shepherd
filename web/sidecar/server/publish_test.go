@@ -103,7 +103,7 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 				"test-service": map[string]any{
 					"ingress": map[string]any{
 						"enabled": true,
-						"scheme": "external",
+						"scheme":  "external",
 						"external": map[string]any{
 							"host": tt.host,
 						},
@@ -321,7 +321,7 @@ func TestServer_PublishChart(t *testing.T) {
 							PersistentVolumeClaims: []*sidecar_pb.PersistentVolumeClaimParams{
 								{
 									Name:      "test-volume-claim",
-									SizeBytes: 2*1024*1024*1024,
+									SizeBytes: 2 * 1024 * 1024 * 1024,
 									Path:      "/data",
 								},
 							},
@@ -401,6 +401,29 @@ func TestServer_PublishChart(t *testing.T) {
 			values: map[string]any{
 				"test-service": map[string]any{
 					"ingress": map[string]any{},
+				},
+			},
+		},
+		{
+			name: "valid chart with meta environment fields enabled",
+			req: &sidecar_pb.PublishChartRequest{
+				RepositoryDirectory: "test-repo",
+				Chart: &sidecar_pb.ChartParams{
+					Name:    "test-chart-meta-environment-fields",
+					Version: "1.0.0",
+					Services: []*sidecar_pb.ServiceParams{
+						{
+							Name: "test-service",
+							Image: &sidecar_pb.Image{
+								Name: "nginx",
+								Tag:  "latest",
+							},
+							ReplicaCount: 1,
+							EnvironmentConfig: &sidecar_pb.EnvironmentConfig{
+								MetaEnvironmentFieldsEnabled: true,
+							},
+						},
+					},
 				},
 			},
 		},

@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  test-chart-meta-environment-fields:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-01T00:00:00Z"
+    dependencies:
+    - name: test-service
+      repository: ""
+      version: 1.0.0
+    description: A Helm chart for Kubernetes
+    name: test-chart-meta-environment-fields
+    type: application
+    urls:
+    - test-chart-meta-environment-fields-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-01-01T00:00:00Z"
