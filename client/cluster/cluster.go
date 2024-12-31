@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -16,6 +17,11 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
+)
+
+const (
+	HELM_RELEASE_NAME_ENV_KEY = "HELM_RELEASE_NAME"
+	HELM_NAMESPACE_ENV_KEY    = "HELM_NAMESPACE"
 )
 
 type Cluster struct {
@@ -37,6 +43,14 @@ func Self(ctx context.Context) (*Cluster, error) {
 	return &Cluster{clientset: clientset}, nil
 }
 
+func (c *Cluster) ReleaseName() string {
+	return os.Getenv(HELM_RELEASE_NAME_ENV_KEY)
+}
+
+func (c *Cluster) Namespace() string {
+	return os.Getenv(HELM_NAMESPACE_ENV_KEY)
+}
+
 // install a chart from the provided tar/dir/whatever (passed as []byte)
 func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 	// init helm action configuration
@@ -55,8 +69,8 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 	install := action.NewInstall(actionCfg)
 
 	// define your release name, namespace, etc.
-	install.ReleaseName = "my-release"
-	install.Namespace = "default"
+	install.ReleaseName = c.ReleaseName()
+	install.Namespace = c.Namespace()
 	install.Replace = true
 	install.CreateNamespace = true
 
