@@ -185,7 +185,7 @@ RSpec.describe ProjectVersion do
   end
 
   describe '#rpc_chart' do
-    subject(:chart) { project_version.send(:rpc_chart, project_subscriber:) }
+    subject(:chart) { Chart::Publisher.new(project_version, project_subscriber, []).send(:rpc_chart) }
 
     it 'creates chart with correct attributes' do
       expect(chart.to_h.slice(:name, :version))

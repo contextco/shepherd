@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectService < ApplicationRecord
-  include ::ServiceRPC
-
   after_create :set_pvc_name
 
   delegate :project, to: :project_version
