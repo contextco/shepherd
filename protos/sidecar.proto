@@ -120,11 +120,14 @@ message Endpoint {
     int32 port = 1;
 }
 
+// Next ID: 5
 message EnvironmentConfig {
     // Contains environment key and value pairs that are hardcoded into the chart.
     repeated EnvironmentVariable environment_variables = 1;
 
     repeated Secret secrets = 3;
+
+    bool meta_environment_fields_enabled = 4;
 }
 
 message Secret {
