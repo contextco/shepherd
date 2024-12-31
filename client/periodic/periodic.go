@@ -12,6 +12,10 @@ func Run(ctx context.Context, fn func() error, interval time.Duration) error {
 }
 
 func RunWithJitter(ctx context.Context, fn func() error, interval time.Duration, jitter time.Duration) error {
+	if err := fn(); err != nil {
+		return err
+	}
+
 	tick := time.After(interval)
 
 	for {
