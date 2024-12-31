@@ -31,6 +31,17 @@ func (a *Agent) Start(ctx context.Context, heartbeatInterval time.Duration) {
 		}
 	}()
 
+	go func() {
+		fn := func() error {
+			a.apply(ctx)
+			return nil
+		}
+
+		if err := periodic.RunWithJitter(ctx, fn, 5*time.Minute, 20*time.Second); err != nil {
+			log.Printf("Apply error: %v", err)
+		}
+	}()
+
 	<-ctx.Done()
 	log.Printf("Agent stopped: context cancelled")
 }
@@ -45,16 +56,15 @@ func (a *Agent) heartbeat(ctx context.Context) {
 	}
 }
 
-func (a *Agent) apply(ctx context.Context) error {
+func (a *Agent) apply(ctx context.Context) {
 	action, err := a.client.Apply(ctx)
 	if err != nil {
 		log.Printf("Apply error: %v", err)
-		return err
 	}
 
-	log.Printf("Apply response: %+v", action)
-
-	return nil
+	if err := applyAction(ctx, action); err != nil {
+		log.Printf("Apply error: %v", err)
+	}
 }
 
 func NewAgent(name, backendAddr, bearerToken string) (*Agent, error) {
