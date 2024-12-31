@@ -49,6 +49,14 @@ spec:
                   name: {{ $.Release.Name }}-{{ $.Chart.Name }}-config
                   key: {{ $key }}
             {{- end }}
+            {{- if .Values.metaEnvironmentFields }}
+            {{- range $key, $value := .Values.metaEnvironmentFields }}
+            - name: {{ $key }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ $value.fieldPath }}
+            {{- end }}
+            {{- end }}
             {{- range $key, $value := .Values.secrets }}
             - name: {{ $value.environmentKey }}
               valueFrom:
