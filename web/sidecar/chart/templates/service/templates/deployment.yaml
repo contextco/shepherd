@@ -16,6 +16,9 @@ spec:
       labels:
         {{- include "test.labels" . | nindent 8 }}
     spec:
+      {{- if .Values.metaEnvironmentFields }}
+      serviceAccountName: {{ include "test.fullname" . }}-agent-serviceaccount
+      {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
