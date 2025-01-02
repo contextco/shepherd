@@ -159,8 +159,8 @@ RSpec.describe ProjectVersion do
         expect(mock_client).to receive(:send) do |_, request|
           expect(request.chart.services.last).to have_attributes(
               image: Sidecar::Image.new(
-                name: 'alecbarber/trust-shepherd',
-                tag: 'stable',
+                name: "ghcr.io/contextco/onprem",
+                tag: "master",
                 pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
               ),
               resources: Sidecar::Resources.new(

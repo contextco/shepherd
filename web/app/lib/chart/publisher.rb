@@ -168,8 +168,8 @@ class Chart::Publisher
       name: "shepherd-agent",
       replica_count: 1,
       image: Sidecar::Image.new(
-        name: "alecbarber/trust-shepherd",
-        tag: "stable",
+        name: "ghcr.io/contextco/onprem",
+        tag: "master",
         pull_policy: Sidecar::ImagePullPolicy::IMAGE_PULL_POLICY_ALWAYS
       ),
       resources: Sidecar::Resources.new(
