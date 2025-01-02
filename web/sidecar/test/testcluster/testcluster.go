@@ -45,8 +45,8 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 
 	impls := []clusterImpl{
 		&kindCluster{name: name},
-		// &gkeCluster{name: name},
-		// &eksCluster{name: name},
+		&gkeCluster{name: name},
+		&eksCluster{name: name},
 	}
 
 	clusters := make([]*Cluster, len(impls))
