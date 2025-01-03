@@ -1,35 +1,24 @@
 # frozen_string_literal: true
 
 class AgentInstance < ApplicationRecord
-  HEARTBEAT_TIMEOUT = 5.minutes
+  HEALTHY_TIMEOUT = 5.minutes
 
   belongs_to :project_subscriber
   has_many :event_logs, dependent: :destroy
   has_many :heartbeat_logs, -> { heartbeat }, class_name: "EventLog", dependent: :destroy
 
-  enum :status, { healthy: 0, unresponsive: 1, terminated: 2, crashed: 3 }
-
   validates :lifecycle_id, presence: true
 
-  after_find :update_status
-
-  def last_heartbeat_time
-    @last_heartbeat_time ||= heartbeat_logs.last&.created_at
+  def healthy?
+    last_heartbeat_at.present? && last_heartbeat_at < HEALTHY_TIMEOUT.ago
   end
 
-  def unhealthy?
-    unresponsive? || crashed?
+  def self.healthy
+    where("last_heartbeat_at > ?", HEALTHY_TIMEOUT.ago)
   end
 
-  private
-
-  def update_status
-    return unless last_heartbeat_time.present?
-
-    if last_heartbeat_time < HEARTBEAT_TIMEOUT.ago
-      update!(status: :unresponsive) unless unresponsive?
-    else
-      update!(status: :healthy) unless healthy?
-    end
+  def self.healthy_and_recently_unresponsive(threshold: 1.day)
+    where("last_heartbeat_at > ?", HEALTHY_TIMEOUT.ago - threshold)
+      .order("last_heartbeat_at > ? DESC", HEALTHY_TIMEOUT.ago)
   end
 end
