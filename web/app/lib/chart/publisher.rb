@@ -190,7 +190,7 @@ class Chart::Publisher
           ),
           Sidecar::EnvironmentVariable.new(
             name: "BACKEND_ADDR",
-            value: "vpc-grpc-gateway.onrender.com"
+            value: "https://agent.trustshepherd.com"
           )
         ]
       )
