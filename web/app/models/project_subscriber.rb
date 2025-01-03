@@ -32,6 +32,10 @@ class ProjectSubscriber < ApplicationRecord
     agent_instances.group_by(&:name)
   end
 
+  def online?
+    agent_instances.any?(&:healthy?)
+  end
+
   private
 
   def setup_helm_repo
