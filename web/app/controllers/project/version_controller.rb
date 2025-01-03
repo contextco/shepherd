@@ -1,7 +1,7 @@
 
 class Project::VersionController < ApplicationController
   before_action :authenticate_user!
-  before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish preview_chart]
+  before_action :fetch_application, only: %i[new create show edit update destroy publish unpublish preview_chart toggle_agent]
   before_action :fetch_previous_version, only: %i[new create]
   before_action :check_deployable, only: %i[publish preview_chart]
 
@@ -52,6 +52,17 @@ class Project::VersionController < ApplicationController
     # Also need to make attached services not editable
 
     flash[:notice] = "Application version unpublished"
+    redirect_to version_path(@version)
+  end
+
+  def toggle_agent
+    @version.update!(agent: params[:agent].to_sym)
+
+    if @version.full_agent?
+      flash[:notice] = "Shepherd agent added to deployment."
+    else
+      flash[:notice] = "Shepherd agent removed from deployment."
+    end
     redirect_to version_path(@version)
   end
 
