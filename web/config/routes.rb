@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       post :publish, on: :member
       post :unpublish, on: :member
       get :preview_chart, on: :member
+      post :toggle_agent, on: :member
 
       resources :services, only: [ :create, :new, :show, :destroy, :update, :edit ],
                 controller: "project/service",
