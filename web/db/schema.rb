@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_27_115208) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_03_163824) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,8 +19,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_27_115208) do
     t.datetime "updated_at", null: false
     t.string "name", null: false
     t.string "lifecycle_id", null: false
-    t.integer "status", default: 0
     t.uuid "project_subscriber_id"
+    t.datetime "last_heartbeat_at"
     t.index ["project_subscriber_id"], name: "index_agent_instances_on_project_subscriber_id"
   end
 

@@ -32,6 +32,40 @@
     </div>
   </div>
 
+  <% if @subscriber.agent_instances.healthy.any? %>
+    <div class=" flex flex-col gap-4">
+      <div class="flex flex-col">
+        <div class="font-semibold">Deployments</div>
+
+        <div class="text-sm text-stone-500">
+          <span class="font-medium"><%= @subscriber.name %></span>
+          are currently running
+          <span class="font-medium"><%= pluralize(@subscriber.agent_instances.healthy.count, 'instance') %></span> of
+          <span class="font-medium"><%= @subscriber.project.name %></span>
+        </div>
+      </div>
+
+      <% if @subscriber.agent_instances.healthy.any? %>
+        <div class="bg-white border border-stone-400 flex flex-col separator-y">
+          <% @subscriber.agent_instances.healthy.each do |ai| %>
+            <div class="flex items-center gap-4 p-4">
+              <div class="rounded-full size-2 bg-green-600">
+              </div>
+              <div class="">
+                <div class="text-sm font-medium">Online</div>
+                <div class="text-xs text-stone-500">
+                  <%= ai.id %>
+                  •
+                  Last pinged <%= time_ago_in_words(ai.last_heartbeat_at) %> ago
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <% if @most_recent_published_version.present? %>
     <div class="flex flex-col gap-6">
       <div class="flex flex-col gap-2">
