@@ -7,7 +7,8 @@ module Maintenance
     end
 
     def process(element)
-      element.update!(project_version_id: element.project.project_versions.published.order(created_at: :desc).first.id)
+      project = Project.find(element.project_id)
+      element.update!(project_version_id: project.project_versions.published.order(created_at: :desc).first.id)
     end
 
     delegate :count, to: :collection
