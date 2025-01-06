@@ -33,7 +33,11 @@ class ProjectSubscriber < ApplicationRecord
   end
 
   def online?
-    agent_instances.any?(&:healthy?)
+    agent_instances.healthy.present?
+  end
+
+  def last_heartbeat_at
+    agent_instances.maximum(:last_heartbeat_at)
   end
 
   private

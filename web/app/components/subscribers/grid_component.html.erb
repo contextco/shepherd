@@ -10,8 +10,8 @@
 
       <div class="flex items-center">
         <%= link_to new_project_subscriber_path, method: :get do %>
-          <div class="p-2 cursor-pointer">
-            <%= heroicon 'plus', class: 'size-4' %>
+          <div class="p-2 cursor-pointer flex items-center gap-1 text-sm">
+            <%= heroicon 'plus', class: 'size-4' %> Create
           </div>
         <% end %>
       </div>
@@ -19,12 +19,21 @@
   </div>
   <% if subscribers.blank? %>
     <div class="flex flex-col gap-2 items-center justify-center bg-white border border-stone-300 py-20">
-      Your deployments will be visible here. <br /> <%= link_to 'Create your first deployment ->', new_project_subscriber_path, class: 'underline' %></div>
+      Your deployments will be visible here. <br /> <%= link_to 'Create your first deployment ->', new_project_subscriber_path, class: 'underline' %>
     </div>
   <% else %>
-    <ul class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(22.125rem,1fr))] [@container(min-width:87.5rem)]:grid-cols-[repeat(3,28.1666666667rem)] mt-6">
-      <% subscribers&.each do |subscriber| %>
-        <%= render Subscribers::ElementComponent.new(subscriber:) %>
+    <ul class="">
+      <% subscribers&.group_by(&:project)&.each do |project, subscribers| %>
+        <li class="flex flex-col gap-4">
+          <div class="flex items-center gap-2 text-lg">
+            <%= project.name %>
+          </div>
+          <div class="flex flex-col gap-2">
+            <% subscribers.each do |subscriber| %>
+              <%= render Subscribers::ElementComponent.new(subscriber:) %>
+            <% end %>
+          </div>
+        </li>
       <% end %>
     </ul>
   <% end %>
