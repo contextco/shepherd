@@ -15,7 +15,7 @@
           <%= render Applications::PublishButtonComponent.new(version: @version) %>
 
           <% if @version.published? %>
-            <%= link_to new_project_subscriber_path(@version.project), class: 'button flex gap-1 items-center' do %>
+            <%= link_to new_project_subscriber_path(@version.project, version_id: @version.id), class: 'button flex gap-1 items-center' do %>
               <%= heroicon :plus, class: 'w-4' %>
               Deploy to Customer
             <% end  %>
