@@ -5,7 +5,16 @@ class ProjectVersion < ApplicationRecord
   has_many :services, dependent: :destroy, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy
 
+  has_many :subscribers, dependent: :destroy, class_name: "ProjectSubscriber"
+  has_one :dummy_project_subscriber, -> { dummy }, class_name: "ProjectSubscriber"
+  has_many :non_dummy_project_subscribers, -> { non_dummy }, class_name: "ProjectSubscriber"
+
+  after_create_commit :setup_dummy_subscriber
+
   has_one :helm_chart, dependent: :destroy, as: :owner
+
+  has_many :helm_repos, through: :subscribers
+  has_many :helm_users, through: :helm_repos
 
   has_one :team, through: :project
 
@@ -47,7 +56,7 @@ class ProjectVersion < ApplicationRecord
     # some choices here, we can check to see if files are present in the bucket which will ensure we are keeping correct
     # state but could be costly (wrt latency) or we can keep track of versions in the helm_repo model (dont currently do)
     # TODO: investigate and potentially fix
-    project_subscribers = Array(project_subscriber || project.project_subscribers)
+    project_subscribers = Array(project_subscriber || subscribers)
     project_subscribers.each do |project_sub|
       repos = [ project_sub.helm_repo ]
       Chart::Publisher.new(self, project_sub, repos).publish_chart!
@@ -77,5 +86,11 @@ class ProjectVersion < ApplicationRecord
 
   def deployable?
     services.any?
+  end
+
+  private
+
+  def setup_dummy_subscriber
+    subscribers.create!(name: "Dummy", dummy: true)
   end
 end

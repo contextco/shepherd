@@ -4,38 +4,40 @@ class SubscriberController < ApplicationController
 
   def index
     @project = current_team.projects.find(params[:project_id]) if params[:project_id].present?
-    @subscribers = @project&.project_subscribers&.non_dummy || current_team.non_dummy_project_subscribers
+    @subscribers = @project&.subscribers&.non_dummy
   end
 
   def show
-    @subscriber = current_team.project_subscribers.find(params[:id])
+    @subscriber = current_team.subscribers.find(params[:id])
     @most_recent_published_version = @subscriber.project.published_versions.first
   end
 
-  def new; end
+  def new
+    @app = current_team.projects.find(params[:project_id])
+  end
 
   def create
-    @app = current_team.projects.find(subscriber_params[:project_id])
-    @app.project_subscribers.create!(subscriber_params)
+    @version = current_team.project_versions.find(subscriber_params[:project_version_id])
+    @version.subscribers.create!(subscriber_params)
 
     flash[:notice] = "Subscriber \"#{subscriber_params[:name]}\"added"
-    redirect_to project_subscriber_index_path
+    redirect_to subscribers_path
   end
 
   def edit
-    @subscriber = current_team.project_subscribers.find(params[:id])
+    @subscriber = current_team.subscribers.find(params[:id])
   end
 
   def destroy
-    @subscriber = current_team.project_subscribers.find(params[:id])
+    @subscriber = current_team.subscribers.find(params[:id])
     @subscriber.destroy!
 
     flash[:notice] = "Subscriber \"#{@subscriber.name}\" removed"
-    redirect_to project_subscriber_index_path
+    redirect_to subscribers_path
   end
 
   def client_values_yaml
-    helm_repo = current_team.project_subscribers.find(params[:id]).helm_repo
+    helm_repo = current_team.subscribers.find(params[:id]).helm_repo
     version = current_team.project_versions.find(params[:project_version_id])
 
     begin
@@ -52,13 +54,13 @@ class SubscriberController < ApplicationController
       Rails.logger.error("Error loading client_values.yaml: #{e.message}")
 
       flash[:error] = "File not found"
-      redirect_to project_subscriber_path(params[:id])
+      redirect_to subscriber_path(params[:id])
     end
   end
 
   private
 
   def subscriber_params
-    params.require(:project_subscriber).permit(:name, :project_id, :auth)
+    params.require(:project_subscriber).permit(:name, :auth, :project_version_id)
   end
 end

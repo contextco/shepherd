@@ -48,11 +48,13 @@ Rails.application.routes.draw do
 
       resources :dependencies, only: [ :index, :new, :create, :destroy, :edit, :update ], shallow: true
     end
+
+    resources :subscribers, only: [ :new, :create, :show, :destroy, :edit, :update ], shallow: true, controller: "subscriber" do
+      get "/client_values_yaml/:project_version_id", to: "subscriber#client_values_yaml", on: :member, as: :client_values_yaml
+    end
   end
 
-  resources :subscriber, only: [ :index, :new, :create, :show, :destroy, :edit, :update ], as: :project_subscriber, controller: "subscriber" do
-    get "/client_values_yaml/:project_version_id", to: "subscriber#client_values_yaml", on: :member, as: :client_values_yaml
-  end
+  resources :subscribers, only: [ :index ], controller: "subscriber"
 
   resources :team, only: [ :index, :create ]
 
