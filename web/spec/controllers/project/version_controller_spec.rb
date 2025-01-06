@@ -95,6 +95,11 @@ RSpec.describe Project::VersionController, type: :controller do
 
     it_behaves_like 'requires authentication'
 
+    it 'creates a new dummy project subscriber' do
+      subject
+      expect(ProjectVersion.last.dummy_project_subscriber).to be_present
+    end
+
     context 'with valid params' do
       it 'creates a new version' do
         expect { subject }.to change { ProjectVersion.count }.by(1)
@@ -220,7 +225,7 @@ RSpec.describe Project::VersionController, type: :controller do
       end
 
       it 'calls the Chart::Publisher' do
-        expect(Chart::Publisher).to receive(:new).with(project_version.reload, project.project_subscribers.first, [ project.project_subscribers.first.helm_repo ])
+        expect(Chart::Publisher).to receive(:new).with(project_version.reload, project_version.subscribers.first, [ project_version.subscribers.first.helm_repo ])
         expect(chart_publisher).to receive(:publish_chart!)
         subject
       end
