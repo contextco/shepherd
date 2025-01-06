@@ -11,7 +11,7 @@
   </div>
   <% if subscribers.blank? %>
     <div class="flex flex-col gap-2 items-center justify-center bg-white border border-stone-300 py-20">
-      Your deployments will be visible here. <br /> <%= link_to 'Create your first deployment ->', new_project_subscriber_path, class: 'underline' %>
+      Your deployments will be visible here when an application version is published.
     </div>
   <% else %>
     <ul class="">
