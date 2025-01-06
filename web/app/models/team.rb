@@ -9,8 +9,7 @@ class Team < ApplicationRecord
   has_many :project_versions, through: :projects
   has_many :services, dependent: :destroy, through: :project_versions, class_name: "ProjectService"
   has_many :dependencies, dependent: :destroy, through: :project_versions, class_name: "Dependency"
-  has_many :project_subscribers, through: :projects
-  has_many :non_dummy_project_subscribers, through: :projects
+  has_many :subscribers, through: :projects, class_name: "ProjectSubscriber"
 
   def setup_scaffolding!(name, description, agent)
     transaction do

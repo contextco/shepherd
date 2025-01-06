@@ -3,7 +3,8 @@
 class ProjectSubscriber < ApplicationRecord
   has_secure_token :password
 
-  belongs_to :project
+  belongs_to :project_version
+  delegate :project, to: :project_version
 
   validates :name, presence: true
 

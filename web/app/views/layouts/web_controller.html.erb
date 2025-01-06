@@ -15,7 +15,7 @@
                 associated_controllers: %w[project/project project/service project/version dependencies]
               ) %>
               <%= render Sidebar::IconComponent.new(
-                path: project_subscriber_index_path,
+                path: subscribers_path,
                 icon: 'building-office-2',
                 label: "Deployments",
                 associated_controllers: %w[subscriber]

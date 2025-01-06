@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_06_120160) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_06_140019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,14 +137,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_120160) do
   end
 
   create_table "project_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "project_id", null: false
+    t.uuid "project_id"
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "dummy", default: false, null: false
     t.string "password"
     t.boolean "auth", default: true, null: false
+    t.uuid "project_version_id"
     t.index ["project_id"], name: "index_project_subscribers_on_project_id"
+    t.index ["project_version_id"], name: "index_project_subscribers_on_project_version_id"
   end
 
   create_table "project_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -207,6 +209,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_120160) do
   add_foreign_key "helm_users", "helm_repos"
   add_foreign_key "project_services", "project_versions"
   add_foreign_key "project_subscriber_tokens", "project_subscribers"
+  add_foreign_key "project_subscribers", "project_versions"
   add_foreign_key "project_subscribers", "projects"
   add_foreign_key "project_versions", "projects"
   add_foreign_key "projects", "teams"

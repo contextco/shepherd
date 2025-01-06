@@ -13,7 +13,7 @@
       <span class="text-stone-400 text-sm">Once you delete a Deployment, it cannot be undone. Please be absolutely certain before proceeding.</span>
     </div>
 
-    <%= button_to project_subscriber_path(@subscriber), method: :delete, data: { turbo: false }, class: 'flex items-center gap-2 bg-red-800 p-2 rounded-md shadow-inner' do %>
+    <%= button_to subscriber_path(@subscriber), method: :delete, data: { turbo: false }, class: 'flex items-center gap-2 bg-red-800 p-2 rounded-md shadow-inner' do %>
       <span class="text-stone-200 text-sm cursor-pointer">Delete Deployment</span>
     <% end %>
   </div>

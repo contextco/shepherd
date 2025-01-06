@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe ProjectVersion do
   let!(:project) { create(:project, name: "my-testing-project") }
   let(:project_version) { create(:project_version, project:) }
-  let(:project_subscriber) { project.dummy_project_subscriber }
-  let(:helm_repo) { project.dummy_project_subscriber.helm_repo }
-  let(:helm_user) { project.dummy_project_subscriber.helm_repo.helm_user }
+  let(:project_subscriber) { project_version.dummy_project_subscriber }
+  let(:helm_repo) { project_subscriber.helm_repo }
+  let(:helm_user) { project_subscriber.helm_repo.helm_user }
   let!(:service) do
     create(:project_service,
            project_version:,
@@ -110,18 +110,18 @@ RSpec.describe ProjectVersion do
             response
           end
 
-          project_version.publish!(project_subscriber: project.dummy_project_subscriber)
+          project_version.publish!(project_subscriber: project_version.dummy_project_subscriber)
         end
 
         it 'does not update the state to published' do
           expect(project_version).not_to receive(:published!)
 
-          project_version.publish!(project_subscriber: project.dummy_project_subscriber)
+          project_version.publish!(project_subscriber: project_version.dummy_project_subscriber)
         end
       end
 
       context 'when the project subscriber is not a dummy' do
-        let!(:project_subscriber) { create(:project_subscriber, project:) }
+        let!(:project_subscriber) { create(:project_subscriber, project_version:) }
 
         it 'includes correct helm repo name in request' do
           expect(mock_client).to receive(:send) do |_, request|
@@ -171,8 +171,8 @@ RSpec.describe ProjectVersion do
               ),
               environment_config: Sidecar::EnvironmentConfig.new(
                 environment_variables: [
-                  Sidecar::EnvironmentVariable.new(name: 'NAME', value: project.dummy_project_subscriber.name),
-                  Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project.dummy_project_subscriber.tokens.first.token),
+                  Sidecar::EnvironmentVariable.new(name: 'NAME', value: project_version.dummy_project_subscriber.name),
+                  Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project_version.dummy_project_subscriber.tokens.first.token),
                   Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: 'https://agent.trustshepherd.com')
                 ]
               )
