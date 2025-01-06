@@ -2,9 +2,9 @@
 
 class HelmRepo < ApplicationRecord
   belongs_to :project_subscriber
+  delegate :project, to: :project_subscriber
 
   has_one :helm_user, dependent: :destroy
-  has_one :project, through: :project_subscriber
   validates :name, presence: true
 
   after_create :setup_helm_user

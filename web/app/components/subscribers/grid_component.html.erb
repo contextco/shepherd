@@ -7,14 +7,6 @@
           <div class="text-stone-400">for <%= project.name %></div>
         <% end %>
       </div>
-
-      <div class="flex items-center">
-        <%= link_to new_project_subscriber_path, method: :get do %>
-          <div class="p-2 cursor-pointer flex items-center gap-1 text-sm">
-            <%= heroicon 'plus', class: 'size-4' %> Create
-          </div>
-        <% end %>
-      </div>
     </div>
   </div>
   <% if subscribers.blank? %>

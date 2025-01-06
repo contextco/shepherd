@@ -6,7 +6,7 @@ RSpec.describe Chart::Publisher do
   describe '#validate_chart!' do
     let(:project) { create(:project, name: "my-testing-project") }
     let(:project_version) { create(:project_version, project:) }
-    let(:project_subscriber) { create(:project_subscriber, project:) }
+    let(:project_subscriber) { create(:project_subscriber, project_version:) }
     let!(:service) do
       create(:project_service,
              project_version:,
@@ -60,7 +60,7 @@ RSpec.describe Chart::Publisher do
   describe '#rpc_service' do
     let(:project) { create(:project, name: "my-testing-project") }
     let(:project_version) { create(:project_version, project:) }
-    let(:project_subscriber) { create(:project_subscriber, project:) }
+    let(:project_subscriber) { create(:project_subscriber, project_version:) }
     let!(:service) do
       create(:project_service,
              project_version:,
