@@ -1,6 +1,6 @@
 <div class="flex h-full">
   <div class="w-80 shrink-0 border-r min-h-full flex flex-col bg-stone-100 border-stone-400">
-    <div class="header p-4">
+    <div class="header p-4 flex flex-col gap-4">
       <div class="flex w-full justify-between">
         <div class="flex flex-col">
           <span class="text-xs sm:text-sm text-stone-400 font-medium">Application</span>
@@ -12,12 +12,13 @@
       </div>
 
       <div class="flex gap-2 items-center justify-between">
-        <%= link_to subscribers_path(project_id: @app.id), class: 'text-sm navigation-link' do %>
-          All Deployments ->
+        <%= link_to subscribers_path(project_id: @app.id), class: 'flex items-center gap-1 text-sm button primary-button' do %>
+          <%=  heroicon 'building-office-2', class: 'size-4' %>
+          All Deployments
         <% end %>
 
-        <%= link_to edit_project_path(@app), class: 'p-2 hover:bg-stone-100' do %>
-          <%= heroicon 'cog', variant: :outline, class: 'size-5' %>
+        <%= link_to edit_project_path(@app), class: 'flex items-center button primary-button' do %>
+          <%= heroicon 'cog', variant: :outline, class: 'size-4' %>
         <% end %>
       </div>
     </div>
