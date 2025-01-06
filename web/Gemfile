@@ -98,3 +98,5 @@ gem "groupdate", "~> 6.5.1"
 gem "rails-controller-testing"
 
 gem "google-cloud-storage", "~> 1.54"
+
+gem "maintenance_tasks", "~> 2.10"
