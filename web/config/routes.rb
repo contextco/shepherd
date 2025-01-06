@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   authenticate :user, ->(user) { user.admin? } do
     mount Flipper::UI.app(Flipper) => "/_/flip"
+    mount MaintenanceTasks::Engine, at: "/_/tasks"
   end
 
   scope :repo do
