@@ -36,7 +36,7 @@ class Helm::RepoController < ActionController::Base
     response.headers["Cache-Control"] = "no-cache"
 
     begin
-      file = @repo.index_yaml
+      file = @repo.client.index_yaml_file
       raise "File not found" if file.nil?
 
       yaml = file.download.string
