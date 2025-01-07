@@ -36,6 +36,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	// Register the Sidecar server
 	sidecar_pb.RegisterSidecarServer(grpcServer, s)
+	sidecar_pb.RegisterSidecarTestServer(grpcServer, s)
 
 	// Create a listener on TCP port 50051
 	lis, err := net.Listen("tcp", net.JoinHostPort("localhost", s.port))
