@@ -4,7 +4,7 @@ class SubscriberController < ApplicationController
 
   def index
     @project = current_team.projects.find(params[:project_id]) if params[:project_id].present?
-    @subscribers = @project&.subscribers&.non_dummy
+    @subscribers = current_team&.subscribers&.non_dummy
   end
 
   def show
