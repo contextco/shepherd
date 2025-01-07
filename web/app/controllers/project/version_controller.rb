@@ -70,7 +70,7 @@ class Project::VersionController < ApplicationController
     @version.publish!(project_subscriber: @app.dummy_project_subscriber)
     helm_repo = @app.dummy_project_subscriber.helm_repo
 
-    file = helm_repo.chart_file(@version)
+    file = helm_repo.client.chart_file(@version)
     return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
     begin
@@ -78,7 +78,7 @@ class Project::VersionController < ApplicationController
         version: :v4,
         expires: 300, # 5 minutes
         query: {
-          "response-content-disposition" => "attachment; filename=#{helm_repo.chart_filename(version)}",
+          "response-content-disposition" => "attachment; filename=#{helm_repo.client.chart_filename(version)}",
           "response-content-type" => "application/x-tar"
         }
       )

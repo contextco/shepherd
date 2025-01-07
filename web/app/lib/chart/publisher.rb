@@ -190,7 +190,7 @@ class Chart::Publisher
           ),
           Sidecar::EnvironmentVariable.new(
             name: "BACKEND_ADDR",
-            value: "https://agent.trustshepherd.com"
+            value: ENV["SHEPHERD_AGENT_API_ENDPOINT"] || "https://agent.trustshepherd.com"
           )
         ]
       )

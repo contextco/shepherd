@@ -8,7 +8,7 @@ class Helm::RepoController < ActionController::Base
       return render json: { error: "Invalid filename" }, status: :bad_request
     end
 
-    file = @repo.file(filename)
+    file = @repo.client.file(filename)
     return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
     begin
@@ -36,7 +36,7 @@ class Helm::RepoController < ActionController::Base
     response.headers["Cache-Control"] = "no-cache"
 
     begin
-      file = @repo.index_yaml
+      file = @repo.client.index_yaml_file
       raise "File not found" if file.nil?
 
       yaml = file.download.string
