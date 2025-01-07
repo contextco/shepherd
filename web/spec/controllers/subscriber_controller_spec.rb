@@ -86,7 +86,8 @@ RSpec.describe SubscriberController, type: :request do
     let(:response_body) { 'client values yaml' }
 
     before do
-      allow_any_instance_of(HelmRepo).to receive(:client_values_yaml).and_return(mock_file)
+      allow_any_instance_of(RepoClient).to receive(:client_values_yaml_file).and_return(mock_file)
+      allow(mock_file).to receive(:name).and_return('values-1.0.0.yaml')
     end
 
     context 'when the file is present' do

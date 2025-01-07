@@ -41,6 +41,10 @@ class ProjectSubscriber < ApplicationRecord
     agent_instances.healthy.present?
   end
 
+  def installable_chart
+    helm_repo.client.chart_file(project_version)
+  end
+
   def last_heartbeat_at
     agent_instances.maximum(:last_heartbeat_at)
   end

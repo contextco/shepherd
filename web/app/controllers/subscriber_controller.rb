@@ -37,17 +37,17 @@ class SubscriberController < ApplicationController
   end
 
   def client_values_yaml
-    helm_repo = current_team.subscribers.find(params[:id]).helm_repo
+    repo_client = current_team.subscribers.find(params[:id]).helm_repo.client
     version = current_team.project_versions.find(params[:project_version_id])
 
     begin
-      file = helm_repo.client_values_yaml(version:)
+      file = repo_client.client_values_yaml_file(version)
       raise NotFoundError, "File not found" if file.nil? unless file.present?
 
       yaml = file.download.string
 
       response.headers["Cache-Control"] = "no-cache"
-      response.headers["Content-Disposition"] = "attachment; filename=#{helm_repo.client_yaml_filename(version:)}"
+      response.headers["Content-Disposition"] = "attachment; filename=#{repo_client.client_values_yaml_filename(version)}"
 
       render plain: yaml, content_type: "application/x-yaml", layout: false
     rescue NotFoundError => e
