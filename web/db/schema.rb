@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_06_140019) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_06_171747) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "agent_actions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "project_subscriber_id", null: false
+    t.string "status"
+    t.string "type"
+    t.jsonb "data", default: {}
+    t.datetime "completed_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_subscriber_id"], name: "index_agent_actions_on_project_subscriber_id"
+  end
 
   create_table "agent_instances", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -202,6 +213,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_140019) do
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 
+  add_foreign_key "agent_actions", "project_subscribers"
   add_foreign_key "agent_instances", "project_subscribers"
   add_foreign_key "dependencies", "project_versions"
   add_foreign_key "event_logs", "agent_instances"
