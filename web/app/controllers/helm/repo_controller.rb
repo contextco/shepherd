@@ -8,7 +8,7 @@ class Helm::RepoController < ActionController::Base
       return render json: { error: "Invalid filename" }, status: :bad_request
     end
 
-    file = @repo.file_yaml(filename)
+    file = @repo.file(filename)
     return render json: { error: "Chart not found" }, status: :not_found if file.nil?
 
     begin

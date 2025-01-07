@@ -11,11 +11,6 @@ class ProjectVersion < ApplicationRecord
 
   after_create_commit :setup_dummy_subscriber
 
-  has_one :helm_chart, dependent: :destroy, as: :owner
-
-  has_many :helm_repos, through: :subscribers
-  has_many :helm_users, through: :helm_repos
-
   has_one :team, through: :project
 
   enum :state, { draft: 0, building: 1, published: 2, failed: 3 }
@@ -62,6 +57,9 @@ class ProjectVersion < ApplicationRecord
       Chart::Publisher.new(self, project_sub, repos).publish_chart!
     end
     published! unless project_subscriber&.dummy?
+  end
+
+  def helm_chart
   end
 
   def fork!(version_params)
