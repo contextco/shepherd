@@ -10,16 +10,16 @@ class DocsController < ActionController::Base
 
   def client_values_yaml
     version = @subscriber.most_recent_version
-    helm_repo = @subscriber.helm_repo
+    repo_client = @subscriber.helm_repo.client
 
     begin
-      file = helm_repo.client_values_yaml(version:)
+      file = repo_client.client_values_yaml_file(version)
       raise SubscriberController::NotFoundError, "File not found" if file.nil? unless file.present?
 
       yaml = file.download.string
 
       response.headers["Cache-Control"] = "no-cache"
-      response.headers["Content-Disposition"] = "attachment; filename=#{helm_repo.client_yaml_filename(version:)}"
+      response.headers["Content-Disposition"] = "attachment; filename=#{repo_client.client_values_yaml_filename(version)}"
 
       render plain: yaml, content_type: "application/x-yaml", layout: false
     rescue SubscriberController::NotFoundError => e

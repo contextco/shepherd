@@ -9,6 +9,10 @@ class HelmRepo < ApplicationRecord
 
   after_create :setup_helm_user
 
+  def client
+    RepoClient.new(name, helm_user.name)
+  end
+
   def repo_name
     # name is not necessarily unique so we need to include the user name which is SecureRandom
     "#{name}-#{helm_user.name}"
@@ -29,35 +33,11 @@ class HelmRepo < ApplicationRecord
   def install_chart_command(version:)
     version_version = version.version
     project_name = project.name
-    "helm install -f #{client_yaml_filename(version:)} --create-namespace --namespace #{project_name} #{project_name} #{name}/#{project_name} --version #{version_version}"
+    "helm install -f #{client.client_values_yaml_filename(version)} --create-namespace --namespace #{project_name} #{project_name} #{name}/#{project_name} --version #{version_version}"
   end
 
   def valid_credentials?(name, password)
     helm_user.name == name && helm_user.password == password
-  end
-
-  def index_yaml
-    bucket.file("#{repo_name}/index.yaml")
-  end
-
-  def client_values_yaml(version:)
-    bucket.file(client_values_yaml_path(version:))
-  end
-
-  def client_yaml_filename(version:)
-    "values-#{version.version}.yaml"
-  end
-
-  def file(filename)
-    bucket.file("#{repo_name}/#{filename}")
-  end
-
-  def chart_file(version)
-    file(chart_filename(version))
-  end
-
-  def chart_filename(version)
-    "#{name}-#{version.version}.tgz"
   end
 
   def public_repo?
