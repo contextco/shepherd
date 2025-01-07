@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe HeartbeatController do
+RSpec.describe AgentController do
   let(:project_subscriber) { create(:project_subscriber) }
 
   describe 'heartbeat' do
@@ -55,6 +55,41 @@ RSpec.describe HeartbeatController do
 
       it 'raises unauthenticated response' do
         expect { heartbeat }.to raise_rpc_error(GRPC::Unauthenticated)
+      end
+    end
+  end
+
+  describe 'apply' do
+    before do
+      project_subscriber
+    end
+
+    context 'when there are no pending actions' do
+      it 'returns an ApplyResponse with no action' do
+        apply_response = run_rpc(:Apply, ApplyRequest.new, **authorization_options_for(project_subscriber))
+        expect(apply_response.action).to be_nil
+      end
+    end
+
+    context 'when there is a pending action' do
+      let!(:action) { create(:apply_version_action, subscriber: project_subscriber) }
+
+      let(:bucket) { double('Google::Cloud::Storage::Bucket') }
+      let(:file) { double('Google::Cloud::Storage::File') }
+
+      before do
+        allow(GCSClient).to receive(:onprem_bucket).and_return(bucket)
+        allow(bucket).to receive(:file).and_return(file)
+        allow(file).to receive(:download).and_return("some yaml")
+      end
+
+      it 'returns an ApplyResponse with the action' do
+        apply_response = run_rpc(:Apply, ApplyRequest.new, **authorization_options_for(project_subscriber))
+        expect(apply_response).to eq(action.convert_to_proto)
+      end
+
+      it 'completes the action' do
+        expect { run_rpc(:Apply, ApplyRequest.new, **authorization_options_for(project_subscriber)) }.to change { action.reload.status }.from('pending').to('completed')
       end
     end
   end
