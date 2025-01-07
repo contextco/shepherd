@@ -28,12 +28,6 @@ RSpec.describe HelmRepo do
     end
   end
 
-  describe '#client_values_yaml_path' do
-    it 'returns the correct path' do
-      expect(helm_repo.send(:client_values_yaml_path, version: project_version)).to eq("test-repo-test-user/another-one-#{project_version.version}-values.yaml")
-    end
-  end
-
   describe '#valid_credentials?' do
     context 'when the repo is private (default)' do
       it 'returns true if the credentials are correct' do
