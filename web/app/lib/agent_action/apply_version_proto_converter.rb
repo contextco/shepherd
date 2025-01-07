@@ -11,7 +11,7 @@ class AgentAction::ApplyVersionProtoConverter
       action: Action.new(
         id: @action.id,
         apply_chart: ApplyChartRequest.new(
-          chart: helm_repo.chart_file(project_version).download,
+          chart: helm_repo.client.chart_file(project_version).download,
         ),
       )
     )
