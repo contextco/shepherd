@@ -28,6 +28,25 @@ type Cluster struct {
 	clientset *kubernetes.Clientset
 }
 
+func FromKubeConfig(ctx context.Context, kubeConfig []byte) (*Cluster, error) {
+	cfg, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	restConfig, err := cfg.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	clientset, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Cluster{clientset: clientset}, nil
+}
+
 // get in-cluster config + create your clientset
 func Self(ctx context.Context) (*Cluster, error) {
 	config, err := rest.InClusterConfig()
@@ -81,6 +100,25 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 	}
 
 	log.Printf("successfully installed release %s", rel.Name)
+	return nil
+}
+
+func (c *Cluster) Uninstall(ctx context.Context, chartData []byte) error {
+	actionCfg, err := newActionConfig()
+	if err != nil {
+		return err
+	}
+
+	client := action.NewUninstall(actionCfg)
+	client.IgnoreNotFound = true
+	client.Wait = true
+
+	_, err = client.Run(c.ReleaseName())
+	if err != nil {
+		return fmt.Errorf("failed to uninstall chart: %w", err)
+	}
+
+	log.Printf("Successfully uninstalled release %s", c.ReleaseName())
 	return nil
 }
 
