@@ -11,6 +11,25 @@ service Sidecar {
     rpc ValidateChart(ValidateChartRequest) returns (ValidateChartResponse) {}
 }
 
+service SidecarTest {
+    rpc Install(InstallRequest) returns (InstallResponse) {}
+    rpc Uninstall(UninstallRequest) returns (UninstallResponse) {}
+}
+
+message InstallRequest {
+    bytes chart = 1;
+}
+
+message InstallResponse {
+}
+
+message UninstallRequest {
+    bytes chart = 1;
+}
+
+message UninstallResponse {
+}
+
 message PublishChartRequest {
     ChartParams chart = 1;
 

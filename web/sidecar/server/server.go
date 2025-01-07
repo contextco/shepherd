@@ -17,6 +17,8 @@ import (
 
 type Server struct {
 	sidecar_pb.UnimplementedSidecarServer
+	sidecar_pb.UnimplementedSidecarTestServer
+
 	port       string
 	repoClient *repo.Client
 }
@@ -36,6 +38,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	// Register the Sidecar server
 	sidecar_pb.RegisterSidecarServer(grpcServer, s)
+	sidecar_pb.RegisterSidecarTestServer(grpcServer, s)
 
 	// Create a listener on TCP port 50051
 	lis, err := net.Listen("tcp", net.JoinHostPort("localhost", s.port))

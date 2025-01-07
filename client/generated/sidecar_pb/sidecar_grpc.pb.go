@@ -157,3 +157,143 @@ var Sidecar_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "sidecar.proto",
 }
+
+const (
+	SidecarTest_Install_FullMethodName   = "/sidecar.SidecarTest/Install"
+	SidecarTest_Uninstall_FullMethodName = "/sidecar.SidecarTest/Uninstall"
+)
+
+// SidecarTestClient is the client API for SidecarTest service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SidecarTestClient interface {
+	Install(ctx context.Context, in *InstallRequest, opts ...grpc.CallOption) (*InstallResponse, error)
+	Uninstall(ctx context.Context, in *UninstallRequest, opts ...grpc.CallOption) (*UninstallResponse, error)
+}
+
+type sidecarTestClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSidecarTestClient(cc grpc.ClientConnInterface) SidecarTestClient {
+	return &sidecarTestClient{cc}
+}
+
+func (c *sidecarTestClient) Install(ctx context.Context, in *InstallRequest, opts ...grpc.CallOption) (*InstallResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InstallResponse)
+	err := c.cc.Invoke(ctx, SidecarTest_Install_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sidecarTestClient) Uninstall(ctx context.Context, in *UninstallRequest, opts ...grpc.CallOption) (*UninstallResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UninstallResponse)
+	err := c.cc.Invoke(ctx, SidecarTest_Uninstall_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SidecarTestServer is the server API for SidecarTest service.
+// All implementations must embed UnimplementedSidecarTestServer
+// for forward compatibility.
+type SidecarTestServer interface {
+	Install(context.Context, *InstallRequest) (*InstallResponse, error)
+	Uninstall(context.Context, *UninstallRequest) (*UninstallResponse, error)
+	mustEmbedUnimplementedSidecarTestServer()
+}
+
+// UnimplementedSidecarTestServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSidecarTestServer struct{}
+
+func (UnimplementedSidecarTestServer) Install(context.Context, *InstallRequest) (*InstallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Install not implemented")
+}
+func (UnimplementedSidecarTestServer) Uninstall(context.Context, *UninstallRequest) (*UninstallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Uninstall not implemented")
+}
+func (UnimplementedSidecarTestServer) mustEmbedUnimplementedSidecarTestServer() {}
+func (UnimplementedSidecarTestServer) testEmbeddedByValue()                     {}
+
+// UnsafeSidecarTestServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SidecarTestServer will
+// result in compilation errors.
+type UnsafeSidecarTestServer interface {
+	mustEmbedUnimplementedSidecarTestServer()
+}
+
+func RegisterSidecarTestServer(s grpc.ServiceRegistrar, srv SidecarTestServer) {
+	// If the following call pancis, it indicates UnimplementedSidecarTestServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SidecarTest_ServiceDesc, srv)
+}
+
+func _SidecarTest_Install_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InstallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SidecarTestServer).Install(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SidecarTest_Install_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidecarTestServer).Install(ctx, req.(*InstallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SidecarTest_Uninstall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UninstallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SidecarTestServer).Uninstall(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SidecarTest_Uninstall_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidecarTestServer).Uninstall(ctx, req.(*UninstallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SidecarTest_ServiceDesc is the grpc.ServiceDesc for SidecarTest service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SidecarTest_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "sidecar.SidecarTest",
+	HandlerType: (*SidecarTestServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Install",
+			Handler:    _SidecarTest_Install_Handler,
+		},
+		{
+			MethodName: "Uninstall",
+			Handler:    _SidecarTest_Uninstall_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "sidecar.proto",
+}
