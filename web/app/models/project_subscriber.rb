@@ -14,12 +14,16 @@ class ProjectSubscriber < ApplicationRecord
   has_many :event_logs, through: :agent_instances
   has_many :heartbeat_logs, -> { heartbeat }, through: :agent_instances, source: :event_logs
   has_many :tokens, class_name: "ProjectSubscriber::Token", dependent: :destroy
+  has_many :agent_actions
+  has_many :apply_version_actions, class_name: "AgentAction::ApplyVersion"
 
   after_create_commit :setup_helm_repo
   after_create -> { tokens.create! }
 
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
+
+  before_update -> { apply_version_actions.create!(project_version_id:) }, if: :project_version_id_changed?
 
   def authenticate(user_password)
     password == user_password
@@ -39,6 +43,9 @@ class ProjectSubscriber < ApplicationRecord
 
   def last_heartbeat_at
     agent_instances.maximum(:last_heartbeat_at)
+  end
+
+  def assign_version!
   end
 
   private
