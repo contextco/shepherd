@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
     @current_team ||= current_user&.team
   end
 
+  helper_method :current_team
+
   private
 
   def set_layout
