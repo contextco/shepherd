@@ -20,4 +20,19 @@ module Sidecar
 
     Stub = Service.rpc_stub_class
   end
+  module SidecarTest
+    class Service
+
+      include ::GRPC::GenericService
+
+      self.marshal_class_method = :encode
+      self.unmarshal_class_method = :decode
+      self.service_name = 'sidecar.SidecarTest'
+
+      rpc :Install, ::Sidecar::InstallRequest, ::Sidecar::InstallResponse
+      rpc :Uninstall, ::Sidecar::UninstallRequest, ::Sidecar::UninstallResponse
+    end
+
+    Stub = Service.rpc_stub_class
+  end
 end
