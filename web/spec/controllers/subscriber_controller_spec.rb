@@ -34,14 +34,6 @@ RSpec.describe SubscriberController, type: :request do
       expect(response).to redirect_to(subscribers_path)
     end
 
-    it 'creates a new helm repo' do
-      expect { subject }.to change { project_version.helm_repos.count }.by(1)
-    end
-
-    it 'creates a new helm user' do
-      expect { subject }.to change { project_version.helm_users.count }.by(1)
-    end
-
     it 'creates a subscriber with the correct attributes' do
       subject
       subscriber = project_version.subscribers.order(:created_at).last

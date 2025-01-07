@@ -48,8 +48,16 @@ class HelmRepo < ApplicationRecord
     "values-#{version.version}.yaml"
   end
 
-  def file_yaml(filename)
+  def file(filename)
     bucket.file("#{repo_name}/#{filename}")
+  end
+
+  def chart_file(version)
+    file(chart_filename(version))
+  end
+
+  def chart_filename(version)
+    "#{name}-#{version.version}.tgz"
   end
 
   def public_repo?

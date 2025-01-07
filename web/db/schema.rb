@@ -16,7 +16,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_171747) do
 
   create_table "agent_actions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "project_subscriber_id", null: false
-    t.string "status"
+    t.integer "status"
     t.string "type"
     t.jsonb "data", default: {}
     t.datetime "completed_at", precision: nil
