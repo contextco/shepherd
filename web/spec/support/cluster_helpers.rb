@@ -17,6 +17,13 @@ module ClusterHelpers
     response.release_name
   end
 
+  def wait_for_agent_to_come_online(subscriber)
+    loop do
+      return if subscriber.reload.online?
+      sleep 0.5
+    end
+  end
+
   def uninstall_release(release_name)
     client.send(:uninstall, Sidecar::UninstallRequest.new(release_name: release_name))
   end
