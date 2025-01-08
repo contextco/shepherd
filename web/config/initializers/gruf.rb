@@ -57,8 +57,8 @@ end
 
 Rails.application.config.to_prepare do
   Gruf.configure do |c|
-    c.default_client_host = "localhost:8080"
-    c.server_binding_url = "0.0.0.0:50051"
+    c.default_client_host = ENV["GRUF_DEFAULT_CLIENT_HOST"] || "localhost:8080"
+    c.server_binding_url = ENV["GRUF_SERVER_BINDING_URL"] || "0.0.0.0:50051"
 
     # Enable debugging
     c.backtrace_on_error = true
