@@ -62,7 +62,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=16cpu-linux-x64,run-id=${{ github.run_id }}
 
     services:
       postgres:
@@ -87,12 +87,24 @@ jobs:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl libjemalloc2 libvips postgresql-client
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: web/sidecar/go.mod
+          cache-dependency-path: web/sidecar/go.sum
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
           working-directory: web
+
+      - name: Build sidecar
+        run: go build -o web/sidecar/sidecar web/sidecar/main.go 
+
+      - name: Run sidecar
+        run: web/sidecar/sidecar &
 
       - name: Run tests
         env:
