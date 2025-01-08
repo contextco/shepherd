@@ -1,4 +1,4 @@
-sidecar: env PORT=8081 foreman start -f Procfile.sidecar -d sidecar
+sidecar: env SIDECAR_PORT=8081 foreman start -f Procfile.sidecar -d sidecar
 funnel: $RUN_TAILSCALE_AS tailscale funnel localhost:8082
 gateway: sleep 5 && env BACKEND_ADDRESS=localhost:50052 PORT=8082 foreman start -f Procfile.gateway -d ../gateway
 grpc: env GRUF_SERVER_BINDING_URL=localhost:50052 GRUF_DEFAULT_CLIENT_HOST=localhost:8081 RAILS_ENV=test bundle exec gruf --backtrace-on-error
