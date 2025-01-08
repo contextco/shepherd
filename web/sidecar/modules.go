@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
 	"sidecar/gcs"
 	"sidecar/repo"
 	"sidecar/server"
@@ -27,6 +28,6 @@ func ModulesFromEnv(ctx context.Context) (*Modules, error) {
 
 	return &Modules{
 		Store:  store,
-		Server: server.New("8080", repoClient),
+		Server: server.New(os.Getenv("PORT"), repoClient),
 	}, nil
 }

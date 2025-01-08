@@ -1,4 +1,5 @@
 web: bin/rails server -p ${SERVER_PORT:-3000}
 css: bin/rails tailwindcss:watch
 sidecar: foreman start -f Procfile.sidecar -d sidecar
+funnel: tailscale funnel localhost:8081
 grpc: bundle exec gruf --backtrace-on-error
