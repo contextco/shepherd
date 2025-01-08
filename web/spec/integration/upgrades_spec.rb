@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Upgrades' do
   include ClusterHelpers
 
-  # If you are seeing strange behaviour in this test, this line may be a good starting point as it has some rough edges:
+  # If you are seeing strange behaviour in this test, this line may be a good starting point as "uses_transaction" has some rough edges:
   # https://github.com/rspec/rspec-rails/issues/2598#issuecomment-1109445577
   uses_transaction "requires outside interference"
 
@@ -19,6 +19,6 @@ RSpec.describe 'Upgrades' do
   end
 
   it 'upgrades a subscriber' do
-    Rails.logger.info("subscriber: #{subscriber.inspect}")
+    subscriber.project_version
   end
 end
