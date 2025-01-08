@@ -142,7 +142,10 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           SHEPHERD_AGENT_API_ENDPOINT: "https://${{ env.TAILSCALE_HOSTNAME }}.barbel-bramble.ts.net"
           # REDIS_URL: redis://localhost:6379/0
-        run: ./bin/test
+        run: |
+          ./bin/test &
+          bundle exec rails db:test:prepare spec
+
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
