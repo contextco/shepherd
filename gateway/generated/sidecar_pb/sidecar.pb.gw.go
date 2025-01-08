@@ -83,28 +83,28 @@ func local_request_Sidecar_ValidateChart_0(ctx context.Context, marshaler runtim
 
 }
 
-func request_SidecarTest_Install_0(ctx context.Context, marshaler runtime.Marshaler, client SidecarTestClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq InstallRequest
+func request_SidecarTest_GenerateAndInstall_0(ctx context.Context, marshaler runtime.Marshaler, client SidecarTestClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GenerateAndInstallRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.Install(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GenerateAndInstall(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_SidecarTest_Install_0(ctx context.Context, marshaler runtime.Marshaler, server SidecarTestServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq InstallRequest
+func local_request_SidecarTest_GenerateAndInstall_0(ctx context.Context, marshaler runtime.Marshaler, server SidecarTestServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GenerateAndInstallRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.Install(ctx, &protoReq)
+	msg, err := server.GenerateAndInstall(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -202,7 +202,7 @@ func RegisterSidecarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterSidecarTestHandlerServer(ctx context.Context, mux *runtime.ServeMux, server SidecarTestServer) error {
 
-	mux.Handle("POST", pattern_SidecarTest_Install_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_SidecarTest_GenerateAndInstall_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -210,12 +210,12 @@ func RegisterSidecarTestHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/sidecar.SidecarTest/Install", runtime.WithHTTPPathPattern("/sidecar.SidecarTest/Install"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/sidecar.SidecarTest/GenerateAndInstall", runtime.WithHTTPPathPattern("/sidecar.SidecarTest/GenerateAndInstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_SidecarTest_Install_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_SidecarTest_GenerateAndInstall_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -223,7 +223,7 @@ func RegisterSidecarTestHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_SidecarTest_Install_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_SidecarTest_GenerateAndInstall_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -390,25 +390,25 @@ func RegisterSidecarTestHandler(ctx context.Context, mux *runtime.ServeMux, conn
 // "SidecarTestClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterSidecarTestHandlerClient(ctx context.Context, mux *runtime.ServeMux, client SidecarTestClient) error {
 
-	mux.Handle("POST", pattern_SidecarTest_Install_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_SidecarTest_GenerateAndInstall_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/sidecar.SidecarTest/Install", runtime.WithHTTPPathPattern("/sidecar.SidecarTest/Install"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/sidecar.SidecarTest/GenerateAndInstall", runtime.WithHTTPPathPattern("/sidecar.SidecarTest/GenerateAndInstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_SidecarTest_Install_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_SidecarTest_GenerateAndInstall_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_SidecarTest_Install_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_SidecarTest_GenerateAndInstall_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -438,13 +438,13 @@ func RegisterSidecarTestHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_SidecarTest_Install_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"sidecar.SidecarTest", "Install"}, ""))
+	pattern_SidecarTest_GenerateAndInstall_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"sidecar.SidecarTest", "GenerateAndInstall"}, ""))
 
 	pattern_SidecarTest_Uninstall_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"sidecar.SidecarTest", "Uninstall"}, ""))
 )
 
 var (
-	forward_SidecarTest_Install_0 = runtime.ForwardResponseMessage
+	forward_SidecarTest_GenerateAndInstall_0 = runtime.ForwardResponseMessage
 
 	forward_SidecarTest_Uninstall_0 = runtime.ForwardResponseMessage
 )

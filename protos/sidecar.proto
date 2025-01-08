@@ -12,19 +12,21 @@ service Sidecar {
 }
 
 service SidecarTest {
-    rpc Install(InstallRequest) returns (InstallResponse) {}
+    rpc GenerateAndInstall(GenerateAndInstallRequest) returns (GenerateAndInstallResponse) {}
     rpc Uninstall(UninstallRequest) returns (UninstallResponse) {}
 }
 
-message InstallRequest {
-    bytes chart = 1;
+
+message GenerateAndInstallRequest {
+    ChartParams chart = 1;
 }
 
-message InstallResponse {
+message GenerateAndInstallResponse {
+    string release_name = 1;
 }
 
 message UninstallRequest {
-    bytes chart = 1;
+    string release_name = 1;
 }
 
 message UninstallResponse {
