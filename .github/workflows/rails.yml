@@ -13,6 +13,10 @@ env:
   GKE_PROJECT_ID: context-co
   GKE_ZONE: us-central1
   GKE_CLUSTER_NAME: autopilot-cluster-1
+  GRUF_SERVER_BINDING_URL: localhost:50052
+  GRUF_DEFAULT_CLIENT_HOST: localhost:8081
+  TAILSCALE_HOSTNAME: "github-ci-runner-${{ github.run_id }}"
+  RUN_TAILSCALE_AS: sudo
 
 jobs:
   scan_ruby:
@@ -67,6 +71,7 @@ jobs:
 
   test:
     runs-on: runs-on,runner=16cpu-linux-x64,run-id=${{ github.run_id }}
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -107,18 +112,27 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
           working-directory: web
+        
+      - name: Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          tags: tag:ci
+          hostname: ${{ env.TAILSCALE_HOSTNAME }}
 
       - name: Build sidecar
         run: go build
         working-directory: web/sidecar
 
-      - name: Run sidecar
-        run: ./sidecar/sidecar &
+      - name: Run supporting services
+        run: ./bin/test &
 
       - name: Run tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          SHEPHERD_AGENT_API_ENDPOINT: "https://${{ env.TAILSCALE_HOSTNAME }}.barbel-bramble.ts.net"
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare spec
 
