@@ -26,8 +26,13 @@ func ModulesFromEnv(ctx context.Context) (*Modules, error) {
 		return nil, fmt.Errorf("failed to create repo client: %w", err)
 	}
 
+	port := os.Getenv("SIDECAR_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	return &Modules{
 		Store:  store,
-		Server: server.New(os.Getenv("PORT"), repoClient),
+		Server: server.New(port, repoClient),
 	}, nil
 }
