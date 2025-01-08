@@ -3,22 +3,36 @@ package server
 import (
 	"context"
 	"onprem/cluster"
-	sidecar_pb "sidecar/generated/sidecar_pb"
+	"sidecar/chart"
 	"sidecar/test/testcluster"
 	"testing"
+
+	sidecar_pb "sidecar/generated/sidecar_pb"
 )
 
-func (s *Server) Install(ctx context.Context, req *sidecar_pb.InstallRequest) (*sidecar_pb.InstallResponse, error) {
+func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.GenerateAndInstallRequest) (*sidecar_pb.GenerateAndInstallResponse, error) {
 	c, err := testCluster(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := c.Install(ctx, req.Chart); err != nil {
+	chart, err := chart.NewFromProto(req.GetChart().GetName(), req.GetChart().GetVersion(), req.GetChart())
+	if err != nil {
 		return nil, err
 	}
 
-	return &sidecar_pb.InstallResponse{}, nil
+	archive, err := chart.Archive()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := c.Install(ctx, archive.Data); err != nil {
+		return nil, err
+	}
+
+	return &sidecar_pb.GenerateAndInstallResponse{
+		ReleaseName: c.ReleaseName(),
+	}, nil
 }
 
 func (s *Server) Uninstall(ctx context.Context, req *sidecar_pb.UninstallRequest) (*sidecar_pb.UninstallResponse, error) {
@@ -27,7 +41,7 @@ func (s *Server) Uninstall(ctx context.Context, req *sidecar_pb.UninstallRequest
 		return nil, err
 	}
 
-	if err := c.Uninstall(ctx, req.Chart); err != nil {
+	if err := c.Uninstall(ctx, req.ReleaseName); err != nil {
 		return nil, err
 	}
 

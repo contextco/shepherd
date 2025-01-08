@@ -103,7 +103,7 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 	return nil
 }
 
-func (c *Cluster) Uninstall(ctx context.Context, chartData []byte) error {
+func (c *Cluster) Uninstall(ctx context.Context, releaseName string) error {
 	actionCfg, err := newActionConfig()
 	if err != nil {
 		return err
@@ -113,12 +113,12 @@ func (c *Cluster) Uninstall(ctx context.Context, chartData []byte) error {
 	client.IgnoreNotFound = true
 	client.Wait = true
 
-	_, err = client.Run(c.ReleaseName())
+	_, err = client.Run(releaseName)
 	if err != nil {
 		return fmt.Errorf("failed to uninstall chart: %w", err)
 	}
 
-	log.Printf("Successfully uninstalled release %s", c.ReleaseName())
+	log.Printf("Successfully uninstalled release %s", releaseName)
 	return nil
 }
 
