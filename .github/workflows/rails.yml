@@ -71,6 +71,7 @@ jobs:
 
   test:
     runs-on: runs-on,runner=16cpu-linux-x64,run-id=${{ github.run_id }}
+    timeout-minutes: 15
 
     services:
       postgres:
