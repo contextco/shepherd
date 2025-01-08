@@ -2,12 +2,15 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"onprem/cluster"
 	"sidecar/chart"
 	"sidecar/test/testcluster"
 	"testing"
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
+
+	"github.com/google/uuid"
 )
 
 func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.GenerateAndInstallRequest) (*sidecar_pb.GenerateAndInstallResponse, error) {
@@ -26,12 +29,14 @@ func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.Generat
 		return nil, err
 	}
 
-	if err := c.Install(ctx, archive.Data); err != nil {
-		return nil, err
+	releaseName := generateReleaseName()
+
+	if err := c.Install(ctx, archive.Data, releaseName, "sidecartest"); err != nil {
+		return nil, fmt.Errorf("failed to install chart: %w", err)
 	}
 
 	return &sidecar_pb.GenerateAndInstallResponse{
-		ReleaseName: c.ReleaseName(),
+		ReleaseName: releaseName,
 	}, nil
 }
 
@@ -62,4 +67,8 @@ func testCluster(ctx context.Context) (*cluster.Cluster, error) {
 	}
 
 	return c, nil
+}
+
+func generateReleaseName() string {
+	return fmt.Sprintf("sidecar-%s", uuid.New().String())
 }

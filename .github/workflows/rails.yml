@@ -9,6 +9,10 @@ defaults:
   run:
     working-directory: web
 
+env:
+  GKE_PROJECT_ID: context-co
+  GKE_ZONE: us-central1
+  GKE_CLUSTER_NAME: autopilot-cluster-1
 
 jobs:
   scan_ruby:
@@ -62,7 +66,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=16cpu-linux-x64,run-id=${{ github.run_id }}
 
     services:
       postgres:
@@ -84,8 +88,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl libjemalloc2 libvips postgresql-client
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: web/sidecar/go.mod
+          cache-dependency-path: web/sidecar/go.sum
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -93,6 +107,13 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
           working-directory: web
+
+      - name: Build sidecar
+        run: go build
+        working-directory: web/sidecar
+
+      - name: Run sidecar
+        run: ./sidecar/sidecar &
 
       - name: Run tests
         env:
