@@ -16,17 +16,17 @@ RSpec.describe Project::ProjectController, type: :controller do
 
       it 'creates a new project' do
         subject
-        expect(response).to redirect_to(version_path(Project.last.latest_project_version))
+        expect(response).to redirect_to(version_path(team.projects.first.latest_project_version))
       end
 
       it 'creates a new project version' do
         subject
-        expect(Project.last.project_versions.count).to eq(1)
+        expect(team.projects.first.project_versions.count).to eq(1)
       end
 
       it 'creates a project version with the correct attributes' do
         subject
-        expect(Project.last.project_versions.last.attributes).to include('description' => 'test', 'agent' => 'full')
+        expect(team.projects.first.latest_project_version.attributes).to include('description' => 'test', 'agent' => 'full')
       end
 
       it 'does not call publish! on the project version' do
