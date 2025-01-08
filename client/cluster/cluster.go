@@ -12,7 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
@@ -25,7 +24,7 @@ const (
 )
 
 type Cluster struct {
-	clientset *kubernetes.Clientset
+	config *rest.Config
 }
 
 func FromKubeConfig(ctx context.Context, kubeConfig []byte) (*Cluster, error) {
@@ -39,12 +38,7 @@ func FromKubeConfig(ctx context.Context, kubeConfig []byte) (*Cluster, error) {
 		return nil, err
 	}
 
-	clientset, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Cluster{clientset: clientset}, nil
+	return &Cluster{config: restConfig}, nil
 }
 
 // get in-cluster config + create your clientset
@@ -54,28 +48,23 @@ func Self(ctx context.Context) (*Cluster, error) {
 		return nil, err
 	}
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Cluster{clientset: clientset}, nil
+	return &Cluster{config: config}, nil
 }
 
-func (c *Cluster) ReleaseName() string {
+func CurrentReleaseName() string {
 	return os.Getenv(HELM_RELEASE_NAME_ENV_KEY)
 }
 
-func (c *Cluster) Namespace() string {
+func CurrentNamespace() string {
 	return os.Getenv(HELM_NAMESPACE_ENV_KEY)
 }
 
 // install a chart from the provided tar/dir/whatever (passed as []byte)
-func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
+func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, namespace string) error {
 	// init helm action configuration
-	actionCfg, err := newActionConfig()
+	actionCfg, err := c.newActionConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create action config: %w", err)
 	}
 
 	// parse the chart from bytes
@@ -88,8 +77,8 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 	install := action.NewInstall(actionCfg)
 
 	// define your release name, namespace, etc.
-	install.ReleaseName = c.ReleaseName()
-	install.Namespace = c.Namespace()
+	install.ReleaseName = releaseName
+	install.Namespace = namespace
 	install.Replace = true
 	install.CreateNamespace = true
 
@@ -104,9 +93,9 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte) error {
 }
 
 func (c *Cluster) Uninstall(ctx context.Context, releaseName string) error {
-	actionCfg, err := newActionConfig()
+	actionCfg, err := c.newActionConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create action config: %w", err)
 	}
 
 	client := action.NewUninstall(actionCfg)
@@ -123,17 +112,13 @@ func (c *Cluster) Uninstall(ctx context.Context, releaseName string) error {
 }
 
 // newActionConfig: build an action.Configuration from in-cluster config
-func newActionConfig() (*action.Configuration, error) {
-	cfg, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	rcg := &myRestClientGetter{config: cfg}
-
+func (c *Cluster) newActionConfig() (*action.Configuration, error) {
 	var a action.Configuration
+
+	rcg := &myRestClientGetter{config: c.config}
+
 	// third param is the helm driver (configmap, secret, memory, etc.)
-	err = a.Init(rcg, "default", "secrets", log.Printf)
+	err := a.Init(rcg, "default", "secrets", log.Printf)
 	if err != nil {
 		return nil, err
 	}

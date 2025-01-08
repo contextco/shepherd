@@ -35,6 +35,8 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
 RSpec.configure do |config|
   # TODO: Remove when Devise fixes https://github.com/heartcombo/devise/issues/5705
   config.before(:each, type: :controller) do
@@ -49,7 +51,6 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :system
 
   config.include AuthorizationHelpers
-
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
