@@ -13,6 +13,8 @@ env:
   GKE_PROJECT_ID: context-co
   GKE_ZONE: us-central1
   GKE_CLUSTER_NAME: autopilot-cluster-1
+  GRUF_SERVER_BINDING_URL: localhost:50052
+  GRUF_DEFAULT_CLIENT_HOST: localhost:8081
 
 jobs:
   scan_ruby:
@@ -107,13 +109,20 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
           working-directory: web
+        
+      - name: Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          tags: tag:ci
 
       - name: Build sidecar
         run: go build
         working-directory: web/sidecar
 
-      - name: Run sidecar
-        run: ./sidecar/sidecar &
+      - name: Run supporting services
+        run: ./bin/test &
 
       - name: Run tests
         env:
