@@ -9,6 +9,10 @@ defaults:
   run:
     working-directory: web
 
+env:
+  GKE_PROJECT_ID: context-co
+  GKE_ZONE: us-central1
+  GKE_CLUSTER_NAME: autopilot-cluster-1
 
 jobs:
   scan_ruby:
@@ -83,6 +87,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl libjemalloc2 libvips postgresql-client
