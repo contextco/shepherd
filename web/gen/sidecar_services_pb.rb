@@ -29,7 +29,7 @@ module Sidecar
       self.unmarshal_class_method = :decode
       self.service_name = 'sidecar.SidecarTest'
 
-      rpc :Install, ::Sidecar::InstallRequest, ::Sidecar::InstallResponse
+      rpc :GenerateAndInstall, ::Sidecar::GenerateAndInstallRequest, ::Sidecar::GenerateAndInstallResponse
       rpc :Uninstall, ::Sidecar::UninstallRequest, ::Sidecar::UninstallResponse
     end
 
