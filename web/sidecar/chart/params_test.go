@@ -19,8 +19,8 @@ func TestParams_toValues(t *testing.T) {
 			name: "valid params",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
-					Tag:  "latest",
+					Name:       "test-image",
+					Tag:        "latest",
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
@@ -81,6 +81,9 @@ func TestParams_toValues(t *testing.T) {
 				"serviceAccount": map[string]any{
 					"create": false,
 				},
+				"metaEnvironmentFields": map[string]interface{}{
+					"enabled": false,
+				},
 			},
 			wantErr: false,
 		},
@@ -88,8 +91,8 @@ func TestParams_toValues(t *testing.T) {
 			name: "empty environment",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
-					Tag:  "latest",
+					Name:       "test-image",
+					Tag:        "latest",
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
@@ -132,6 +135,9 @@ func TestParams_toValues(t *testing.T) {
 				},
 				"serviceAccount": map[string]any{
 					"create": false,
+				},
+				"metaEnvironmentFields": map[string]interface{}{
+					"enabled": false,
 				},
 			},
 			wantErr: false,
@@ -215,6 +221,9 @@ func TestParams_toValues(t *testing.T) {
 				"serviceAccount": map[string]any{
 					"create": false,
 				},
+				"metaEnvironmentFields": map[string]interface{}{
+					"enabled": false,
+				},
 			},
 			wantErr: false,
 		},
@@ -245,8 +254,8 @@ func TestParams_toYaml(t *testing.T) {
 			name: "valid params",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
-					Tag:  "latest",
+					Name:       "test-image",
+					Tag:        "latest",
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
@@ -279,6 +288,8 @@ initConfig:
   - command:
     - ls
     name: init-command-0
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 3
 resources:
   limits:
@@ -298,8 +309,8 @@ services:
 			name: "empty environment",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
-					Tag:  "latest",
+					Name:       "test-image",
+					Tag:        "latest",
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
 				ReplicaCount: 3,
@@ -319,6 +330,8 @@ services:
 ingress:
   enabled: false
 initConfig: {}
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 3
 resources:
   limits:
@@ -338,8 +351,8 @@ services:
 			name: "with image credentials",
 			params: &Params{
 				Image: Image{
-					Name: "test-image",
-					Tag:  "latest",
+					Name:       "test-image",
+					Tag:        "latest",
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 					Credential: &ImageCredential{
 						Username: "user",
@@ -374,6 +387,8 @@ imagePullSecrets:
 ingress:
   enabled: false
 initConfig: {}
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 3
 resources:
   limits:
@@ -406,53 +421,53 @@ services:
 }
 
 func TestImage_toValues(t *testing.T) {
-    tests := []struct {
-        name  string
-        image Image
-        want  map[string]interface{}
-    }{
-        {
-            name: "without credentials",
-            image: Image{
-                Name: "test-image",
-                Tag:  "latest",
+	tests := []struct {
+		name  string
+		image Image
+		want  map[string]interface{}
+	}{
+		{
+			name: "without credentials",
+			image: Image{
+				Name:       "test-image",
+				Tag:        "latest",
 				PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_ALWAYS,
-            },
-            want: map[string]interface{}{
-                "repository": "test-image",
-                "tag":       "latest",
+			},
+			want: map[string]interface{}{
+				"repository": "test-image",
+				"tag":        "latest",
 				"pullPolicy": "Always",
-            },
-        },
-        {
-            name: "with credentials",
-            image: Image{
-                Name: "test-image",
-                Tag:  "latest",
+			},
+		},
+		{
+			name: "with credentials",
+			image: Image{
+				Name:       "test-image",
+				Tag:        "latest",
 				PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
-                Credential: &ImageCredential{
-                    Username: "user",
-                    Password: "pass",
-                },
-            },
-            want: map[string]interface{}{
-                "repository": "test-image",
-                "tag":       "latest",
+				Credential: &ImageCredential{
+					Username: "user",
+					Password: "pass",
+				},
+			},
+			want: map[string]interface{}{
+				"repository": "test-image",
+				"tag":        "latest",
 				"pullPolicy": "IfNotPresent",
-                "credential": map[string]interface{}{
-                    "username": "user",
-                    "password": "pass",
-                },
-            },
-        },
-    }
+				"credential": map[string]interface{}{
+					"username": "user",
+					"password": "pass",
+				},
+			},
+		},
+	}
 
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            got := tt.image.toValues()
-            if diff := cmp.Diff(got, tt.want); diff != "" {
-                t.Errorf("toValues() = %v, want %v, diff = %s", got, tt.want, diff)
-            }
-        })
-    }
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.image.toValues()
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("toValues() = %v, want %v, diff = %s", got, tt.want, diff)
+			}
+		})
+	}
 }
