@@ -5,6 +5,8 @@ image:
 ingress:
   enabled: false
 initConfig: {}
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 1
 resources:
   limits:
