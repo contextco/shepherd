@@ -258,7 +258,7 @@ func (p *Params) MetaEnvironmentFields() map[string]interface{} {
 		"fields": []map[string]interface{}{
 			{
 				"name":      cluster.HELM_RELEASE_NAME_ENV_KEY,
-				"fieldPath": "metadata.name",
+				"fieldPath": "metadata.labels['app.kubernetes.io/instance']",
 			},
 			{
 				"name":      cluster.HELM_NAMESPACE_ENV_KEY,

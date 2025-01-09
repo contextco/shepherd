@@ -22,6 +22,7 @@ import (
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -481,7 +482,7 @@ func TestServer_PublishChart(t *testing.T) {
 
 			t.Logf("Dumped store to %s", dir)
 
-			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, tt.values); err != nil {
+			if err := clusters.Install(ctx, c.Chart, "sidecar-test-"+randomNamespace(t), tt.values); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
 			defer clusters.Uninstall(ctx, c.Chart)
@@ -491,6 +492,12 @@ func TestServer_PublishChart(t *testing.T) {
 			}
 		})
 	}
+}
+
+func randomNamespace(t *testing.T) string {
+	t.Helper()
+
+	return strings.Split(uuid.New().String(), "-")[0]
 }
 
 func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {
