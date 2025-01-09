@@ -23,7 +23,14 @@ class ProjectSubscriber < ApplicationRecord
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
 
-  before_update -> { apply_version_actions.create!(project_version_id:) }, if: :project_version_id_changed?
+  def assign_to_new_version!(new_version)
+    assert_charts_in_repo!(new_version)
+
+    transaction do
+      apply_version_actions.create!(project_version_id: new_version.id)
+      update!(project_version: new_version)
+    end
+  end
 
   def authenticate(user_password)
     password == user_password
@@ -49,18 +56,14 @@ class ProjectSubscriber < ApplicationRecord
     agent_instances.maximum(:last_heartbeat_at)
   end
 
-  def assign_version!
-  end
-
   private
 
   def setup_helm_repo
     create_helm_repo!(name: project.name)
+    assert_charts_in_repo!(project_version)
+  end
 
-    project.project_versions.each do |version|
-      next unless version.published?
-      # TODO: this condition is a smell that we should be using a "fake" publisher in tests
-      version.publish!(project_subscriber: self) unless Rails.env.test?
-    end
+  def assert_charts_in_repo!(version)
+    version.publish!(self)
   end
 end

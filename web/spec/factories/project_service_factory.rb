@@ -16,4 +16,11 @@ FactoryBot.define do
 
     project_version { association :project_version, **{ team: team }.compact_blank }
   end
+
+  factory :nginx_service, class: 'ProjectService' do
+    name { 'nginx' }
+    image { 'nginx:1.26-alpine' }
+    cpu_cores { 1 }
+    memory_bytes { 2.gigabytes }
+  end
 end
