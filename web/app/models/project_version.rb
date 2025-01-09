@@ -44,26 +44,17 @@ class ProjectVersion < ApplicationRecord
     versions[versions.find_index(self) + 1]
   end
 
-  def publish!(project_subscriber: nil)
+  def publish!(project_subscriber)
     # do not update state of the version if we are publishing a dummy version
     building! unless project_subscriber&.dummy?
-    # could we do this more elegantly by keeping track in helm_repo model of already published versions?
-    # some choices here, we can check to see if files are present in the bucket which will ensure we are keeping correct
-    # state but could be costly (wrt latency) or we can keep track of versions in the helm_repo model (dont currently do)
-    # TODO: investigate and potentially fix
-    project_subscribers = Array(project_subscriber || subscribers)
-    project_subscribers.each do |project_sub|
-      Chart::Publisher.new(project_sub).publish_chart!
-    end
+    Chart::Publisher.publish!(self, project_subscriber)
     published! unless project_subscriber&.dummy?
-  end
-
-  def helm_chart
   end
 
   def fork!(version_params)
     transaction do
-      new_version = project.project_versions.new(version_params)
+      new_version = dup
+      new_version.assign_attributes(version_params)
       new_version.save!
       services.each do |service|
         service = service.dup
@@ -77,7 +68,7 @@ class ProjectVersion < ApplicationRecord
         dependency.save!
       end
 
-      new_version
+      new_version.reload
     end
   end
 

@@ -15,15 +15,17 @@ spec:
     metadata:
       labels:
         {{- include "test.labels" . | nindent 8 }}
+        release: {{ .Release.Name }}
     spec:
       {{- if .Values.metaEnvironmentFields.enabled }}
       serviceAccountName: {{ include "test.fullname" . }}-agent-serviceaccount
+      {{- else }}
+      serviceAccountName: {{ include "test.serviceAccountName" . }}
       {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "test.serviceAccountName" . }}
       {{- if and .Values.initConfig (gt (len .Values.initConfig.initCommands) 0) }}
       initContainers:
         {{- range .Values.initConfig.initCommands }}

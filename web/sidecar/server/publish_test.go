@@ -22,6 +22,7 @@ import (
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -97,9 +98,10 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 				t.Fatalf("Failed to load chart from archive: %v", err)
 			}
 
-			_ = tt.cluster.Uninstall(ctx, c.Chart)
+			releaseName := "sidecar-test-" + randomNamespace(t)
+			_ = tt.cluster.Uninstall(ctx, c.Chart, releaseName)
 
-			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, map[string]any{
+			if err := tt.cluster.Install(ctx, c.Chart, req.Chart.Name, releaseName, map[string]any{
 				"test-service": map[string]any{
 					"ingress": map[string]any{
 						"enabled": true,
@@ -112,7 +114,7 @@ func TestServerPublishChart_ExternalIngress(t *testing.T) {
 			}); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
-			defer tt.cluster.Uninstall(ctx, c.Chart)
+			defer tt.cluster.Uninstall(ctx, c.Chart, releaseName)
 
 			log.Printf("waiting for ingress %s", tt.host)
 			if err := tt.cluster.WaitForIngress(ctx, tt.host); err != nil {
@@ -481,16 +483,24 @@ func TestServer_PublishChart(t *testing.T) {
 
 			t.Logf("Dumped store to %s", dir)
 
-			if err := clusters.Install(ctx, c.Chart, tt.req.Chart.Name, tt.values); err != nil {
+			releaseName := "sidecar-test-" + randomNamespace(t)
+
+			if err := clusters.Install(ctx, c.Chart, "sidecar-test-"+randomNamespace(t), releaseName, tt.values); err != nil {
 				t.Fatalf("Failed to install chart: %v", err)
 			}
-			defer clusters.Uninstall(ctx, c.Chart)
+			defer clusters.Uninstall(ctx, c.Chart, releaseName)
 
 			if err := waitForPods(t, ctx, clusters, tt.req.Chart); err != nil {
 				t.Fatalf("failed to wait for pods: %v", err)
 			}
 		})
 	}
+}
+
+func randomNamespace(t *testing.T) string {
+	t.Helper()
+
+	return strings.Split(uuid.New().String(), "-")[0]
 }
 
 func verifyChartFiles(t *testing.T, ctx context.Context, store *store.MemoryStore, chartParams *sidecar_pb.ChartParams) error {
