@@ -225,7 +225,7 @@ RSpec.describe Project::VersionController, type: :controller do
       end
 
       it 'calls the Chart::Publisher' do
-        expect(Chart::Publisher).to receive(:new).with(project_version.subscribers.first, [ project_version.subscribers.first.helm_repo ])
+        expect(Chart::Publisher).to receive(:new).with(project_version.subscribers.first)
         expect(chart_publisher).to receive(:publish_chart!)
         subject
       end
