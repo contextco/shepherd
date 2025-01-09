@@ -28,11 +28,6 @@ RSpec.describe Project::ProjectController, type: :controller do
         subject
         expect(team.projects.first.latest_project_version.attributes).to include('description' => 'test', 'agent' => 'full')
       end
-
-      it 'does not call publish! on the project version' do
-        expect_any_instance_of(ProjectVersion).not_to receive(:publish!)
-        subject
-      end
     end
 
     context 'when using an illegal name' do

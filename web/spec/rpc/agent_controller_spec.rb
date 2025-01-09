@@ -80,7 +80,7 @@ RSpec.describe AgentController do
       before do
         allow(GCSClient).to receive(:onprem_bucket).and_return(bucket)
         allow(bucket).to receive(:file).and_return(file)
-        allow(file).to receive(:download).and_return("some yaml")
+        allow(file).to receive(:download).and_return(StringIO.new("some yaml"))
       end
 
       it 'returns an ApplyResponse with the action' do

@@ -57,10 +57,10 @@ func All(t *testing.T, ctx context.Context) *ClusterSet {
 	return &ClusterSet{clusters: clusters}
 }
 
-func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string, values map[string]any) error {
+func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace string, releaseName string, values map[string]any) error {
 	return runInParallel(ctx, func(cluster *Cluster) error {
-		_ = cluster.Uninstall(ctx, ch)
-		err := cluster.Install(ctx, ch, namespace, values)
+		_ = cluster.Uninstall(ctx, ch, releaseName)
+		err := cluster.Install(ctx, ch, namespace, releaseName, values)
 		if err != nil {
 			return fmt.Errorf("failed to install chart in %s: %w", cluster.impl.source(), err)
 		}
@@ -68,9 +68,9 @@ func (c *ClusterSet) Install(ctx context.Context, ch *chart.Chart, namespace str
 	}, c.clusters)
 }
 
-func (c *ClusterSet) Uninstall(ctx context.Context, ch *chart.Chart) error {
+func (c *ClusterSet) Uninstall(ctx context.Context, ch *chart.Chart, releaseName string) error {
 	return runInParallel(ctx, func(cluster *Cluster) error {
-		return cluster.Uninstall(ctx, ch)
+		return cluster.Uninstall(ctx, ch, releaseName)
 	}, c.clusters)
 }
 
@@ -100,7 +100,7 @@ type clusterImpl interface {
 	source() string
 }
 
-func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string, values map[string]any) error {
+func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string, releaseName string, values map[string]any) error {
 	kubeConfig, err := c.impl.getKubeConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get kubeconfig: %w", err)
@@ -113,7 +113,7 @@ func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string
 
 	client := action.NewInstall(actionConfig)
 	client.Namespace = namespace
-	client.ReleaseName = ch.ReleaseName()
+	client.ReleaseName = releaseName
 	client.Replace = true
 	client.CreateNamespace = true
 
@@ -127,7 +127,7 @@ func (c *Cluster) Install(ctx context.Context, ch *chart.Chart, namespace string
 	return nil
 }
 
-func (c *Cluster) Uninstall(ctx context.Context, ch *chart.Chart) error {
+func (c *Cluster) Uninstall(ctx context.Context, ch *chart.Chart, releaseName string) error {
 	kubeConfig, err := c.impl.getKubeConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get kubeconfig: %w", err)
@@ -142,12 +142,12 @@ func (c *Cluster) Uninstall(ctx context.Context, ch *chart.Chart) error {
 	client.IgnoreNotFound = true
 	client.Wait = true
 
-	_, err = client.Run(ch.ReleaseName())
+	_, err = client.Run(releaseName)
 	if err != nil {
 		return fmt.Errorf("failed to uninstall chart: %w", err)
 	}
 
-	log.Printf("Successfully uninstalled release %s", ch.ReleaseName())
+	log.Printf("Successfully uninstalled release %s", releaseName)
 	return nil
 }
 

@@ -38,7 +38,7 @@ class Project::VersionController < ApplicationController
   def edit; end
 
   def publish
-    @version.publish!
+    @version.published!
 
     flash[:notice] = "Application version published"
     redirect_to version_path(@version)
