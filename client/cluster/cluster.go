@@ -107,10 +107,14 @@ func (c *Cluster) Upgrade(ctx context.Context, chartData []byte, releaseName, na
 	upgrade.Namespace = namespace
 	upgrade.CleanupOnFail = true
 
+	log.Printf("upgrading release %q in namespace %q", releaseName, namespace)
+
 	_, err = upgrade.RunWithContext(ctx, releaseName, ch, map[string]any{})
 	if err != nil {
 		return fmt.Errorf("failed to upgrade chart: %w", err)
 	}
+
+	log.Printf("successfully upgraded release %q in namespace %q", releaseName, namespace)
 
 	return nil
 }
