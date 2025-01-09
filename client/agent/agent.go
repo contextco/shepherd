@@ -93,10 +93,13 @@ func applyAction(ctx context.Context, action *service_pb.Action) error {
 		return applyChart(ctx, action.GetApplyChart())
 	}
 
+	log.Printf("No action to take.")
+
 	return nil
 }
 
 func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error {
+	log.Printf("Applying chart action.")
 	c, err := cluster.Self(ctx)
 	if err != nil {
 		return err
@@ -105,6 +108,8 @@ func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error
 	if err := c.Upgrade(ctx, action.GetChart(), cluster.CurrentReleaseName(), cluster.CurrentNamespace()); err != nil {
 		return err
 	}
+
+	log.Printf("Chart applied.")
 
 	return nil
 }
