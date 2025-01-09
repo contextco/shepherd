@@ -7,6 +7,8 @@ ingress:
   port: 80
   scheme: internal
 initConfig: {}
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 1
 resources:
   limits:

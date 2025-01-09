@@ -16,7 +16,7 @@ spec:
       labels:
         {{- include "test.labels" . | nindent 8 }}
     spec:
-      {{- if .Values.metaEnvironmentFields }}
+      {{- if .Values.metaEnvironmentFields.enabled }}
       serviceAccountName: {{ include "test.fullname" . }}-agent-serviceaccount
       {{- end }}
       {{- with .Values.imagePullSecrets }}
@@ -35,7 +35,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             {{- range .Values.services }}
             - name: {{ .name }}
@@ -52,8 +52,8 @@ spec:
                   name: {{ $.Release.Name }}-{{ $.Chart.Name }}-config
                   key: {{ $key }}
             {{- end }}
-            {{- if .Values.metaEnvironmentFields }}
-            {{- range .Values.metaEnvironmentFields }}
+            {{- if .Values.metaEnvironmentFields.enabled }}
+            {{- range .Values.metaEnvironmentFields.fields }}
             - name: {{ .name }}
               valueFrom:
                 fieldRef:

@@ -246,19 +246,24 @@ func (p *Params) toYaml() (string, error) {
 	return chartutil.Values(values.Values).YAML()
 }
 
-func (p *Params) MetaEnvironmentFields() []map[string]interface{} {
+func (p *Params) MetaEnvironmentFields() map[string]interface{} {
 	if !p.MetaEnvironmentFieldsEnabled {
-		return nil
+		return map[string]interface{}{
+			"enabled": false,
+		}
 	}
 
-	return []map[string]interface{}{
-		{
-			"name":      cluster.HELM_RELEASE_NAME_ENV_KEY,
-			"fieldPath": "metadata.name",
-		},
-		{
-			"name":      cluster.HELM_NAMESPACE_ENV_KEY,
-			"fieldPath": "metadata.namespace",
+	return map[string]interface{}{
+		"enabled": true,
+		"fields": []map[string]interface{}{
+			{
+				"name":      cluster.HELM_RELEASE_NAME_ENV_KEY,
+				"fieldPath": "metadata.name",
+			},
+			{
+				"name":      cluster.HELM_NAMESPACE_ENV_KEY,
+				"fieldPath": "metadata.namespace",
+			},
 		},
 	}
 }

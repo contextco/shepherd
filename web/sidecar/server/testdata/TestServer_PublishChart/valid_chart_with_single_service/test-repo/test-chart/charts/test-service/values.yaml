@@ -9,6 +9,8 @@ initConfig:
   - command:
     - ls
     name: init-command-0
+metaEnvironmentFields:
+  enabled: false
 replicaCount: 1
 resources:
   limits:

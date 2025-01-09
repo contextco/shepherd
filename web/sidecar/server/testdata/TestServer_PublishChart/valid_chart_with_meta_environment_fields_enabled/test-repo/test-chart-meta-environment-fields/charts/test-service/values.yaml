@@ -6,10 +6,12 @@ ingress:
   enabled: false
 initConfig: {}
 metaEnvironmentFields:
-- fieldPath: metadata.name
-  name: HELM_RELEASE_NAME
-- fieldPath: metadata.namespace
-  name: HELM_NAMESPACE
+  enabled: true
+  fields:
+  - fieldPath: metadata.name
+    name: HELM_RELEASE_NAME
+  - fieldPath: metadata.namespace
+    name: HELM_NAMESPACE
 replicaCount: 1
 resources:
   limits:
