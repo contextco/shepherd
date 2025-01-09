@@ -53,8 +53,7 @@ class ProjectVersion < ApplicationRecord
     # TODO: investigate and potentially fix
     project_subscribers = Array(project_subscriber || subscribers)
     project_subscribers.each do |project_sub|
-      repos = [ project_sub.helm_repo ]
-      Chart::Publisher.new(project_sub, repos).publish_chart!
+      Chart::Publisher.new(project_sub).publish_chart!
     end
     published! unless project_subscriber&.dummy?
   end
