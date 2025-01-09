@@ -6,6 +6,7 @@ import (
 	"onprem/cluster"
 	"sidecar/chart"
 	"sidecar/test/testcluster"
+	"strings"
 	"testing"
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
@@ -31,7 +32,7 @@ func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.Generat
 
 	releaseName := generateReleaseName()
 
-	if err := c.Install(ctx, archive.Data, releaseName, "sidecartest"); err != nil {
+	if err := c.Install(ctx, archive.Data, releaseName, "sidecartest", true); err != nil {
 		return nil, fmt.Errorf("failed to install chart: %w", err)
 	}
 
@@ -70,5 +71,5 @@ func testCluster(ctx context.Context) (*cluster.Cluster, error) {
 }
 
 func generateReleaseName() string {
-	return fmt.Sprintf("sidecar-%s", uuid.New().String())
+	return fmt.Sprintf("sidecar-%s", strings.Split(uuid.New().String(), "-")[0])
 }

@@ -102,7 +102,7 @@ func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error
 		return err
 	}
 
-	if err := c.Install(ctx, action.GetChart(), cluster.CurrentReleaseName(), cluster.CurrentNamespace()); err != nil {
+	if err := c.Upgrade(ctx, action.GetChart(), cluster.CurrentReleaseName(), cluster.CurrentNamespace()); err != nil {
 		return err
 	}
 
