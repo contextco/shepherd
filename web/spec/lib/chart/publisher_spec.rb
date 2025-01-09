@@ -36,7 +36,7 @@ RSpec.describe Chart::Publisher do
     it 'calls validate_chart with correct parameters' do
       expect(client).to receive(:send) do |method, request|
         expect(method).to eq(:validate_chart)
-        expect(request.chart).to eq(publisher.send(:rpc_chart))
+        expect(request.chart).to eq(publisher.chart_proto)
         resp
       end
 
