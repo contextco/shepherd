@@ -28,6 +28,7 @@ RSpec.describe ProjectVersion do
   let(:mock_client) { double(:sidecar_client) }
 
   before do
+    ENV['USE_LIVE_PUBLISHER'] = 'true'
     allow(SidecarClient).to receive(:client).and_return(mock_client)
   end
 
@@ -81,7 +82,7 @@ RSpec.describe ProjectVersion do
         response
       end
 
-      project_version.publish!
+      project_version.publish!(project_subscriber)
     end
 
     it 'includes correct helm repo name in request' do
@@ -90,7 +91,7 @@ RSpec.describe ProjectVersion do
         response
       end
 
-      project_version.publish!
+      project_version.publish!(project_subscriber)
     end
 
     it 'only creates one service (no agent)' do
@@ -99,7 +100,7 @@ RSpec.describe ProjectVersion do
         response
       end
 
-      project_version.publish!
+      project_version.publish!(project_subscriber)
     end
 
     context 'when calling with a specific project subscriber' do
@@ -110,13 +111,13 @@ RSpec.describe ProjectVersion do
             response
           end
 
-          project_version.publish!(project_subscriber: project_version.dummy_project_subscriber)
+          project_version.publish!(project_version.dummy_project_subscriber)
         end
 
         it 'does not update the state to published' do
           expect(project_version).not_to receive(:published!)
 
-          project_version.publish!(project_subscriber: project_version.dummy_project_subscriber)
+          project_version.publish!(project_version.dummy_project_subscriber)
         end
       end
 
@@ -129,13 +130,13 @@ RSpec.describe ProjectVersion do
             response
           end
 
-          project_version.publish!(project_subscriber: project_subscriber)
+          project_version.publish!(project_subscriber)
         end
 
         it 'updates the state to published' do
           expect(project_version).to receive(:published!)
 
-          project_version.publish!(project_subscriber:)
+          project_version.publish!(project_subscriber)
         end
       end
     end
@@ -152,7 +153,7 @@ RSpec.describe ProjectVersion do
           response
         end
 
-        project_version.publish!
+        project_version.publish!(project_subscriber)
       end
 
       it 'includes correct agent service configuration' do
@@ -179,13 +180,13 @@ RSpec.describe ProjectVersion do
           )
         end
 
-        project_version.publish!
+        project_version.publish!(project_subscriber)
       end
     end
   end
 
   describe '#rpc_chart' do
-    subject(:chart) { Chart::Publisher.new(project_subscriber).send(:rpc_chart) }
+    subject(:chart) { Chart::Publisher.new(project_subscriber).chart_proto }
 
     it 'creates chart with correct attributes' do
       expect(chart.to_h.slice(:name, :version))
