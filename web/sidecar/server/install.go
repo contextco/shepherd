@@ -14,6 +14,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	namespace = "sidecartest"
+)
+
 func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.GenerateAndInstallRequest) (*sidecar_pb.GenerateAndInstallResponse, error) {
 	c, err := testCluster(ctx)
 	if err != nil {
@@ -32,7 +36,7 @@ func (s *Server) GenerateAndInstall(ctx context.Context, req *sidecar_pb.Generat
 
 	releaseName := generateReleaseName()
 
-	if err := c.Install(ctx, archive.Data, releaseName, "sidecartest", true); err != nil {
+	if err := c.Install(ctx, archive.Data, releaseName, namespace, true); err != nil {
 		return nil, fmt.Errorf("failed to install chart: %w", err)
 	}
 
@@ -47,7 +51,7 @@ func (s *Server) Uninstall(ctx context.Context, req *sidecar_pb.UninstallRequest
 		return nil, err
 	}
 
-	if err := c.Uninstall(ctx, req.ReleaseName); err != nil {
+	if err := c.Uninstall(ctx, req.ReleaseName, namespace); err != nil {
 		return nil, err
 	}
 
