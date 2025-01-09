@@ -4,9 +4,8 @@ class Chart::Publisher
   include AgentProto
   class ChartValidationError < StandardError; end
 
-  def initialize(version, subscriber, helm_repos)
+  def initialize(subscriber, helm_repos)
     @client = SidecarClient.client
-    @version = version
     @subscriber = subscriber
     @helm_repos = helm_repos
   end
@@ -30,16 +29,17 @@ class Chart::Publisher
 
   private
 
-  attr_reader :subscriber, :version
-  delegate :project, to: :version
+  attr_reader :subscriber
+  delegate :project_version, to: :subscriber
+  delegate :project, to: :project_version
 
   def rpc_chart
     services_params = rpc_services
-    services_params << agent_proto_definition(subscriber) if version.full_agent?
+    services_params << agent_proto_definition(subscriber) if project_version.full_agent?
 
     Sidecar::ChartParams.new(
       name: project.name,
-      version: version.version,
+      version: project_version.version,
       services: services_params,
       dependencies: rpc_dependencies
     )
@@ -157,10 +157,10 @@ class Chart::Publisher
 
 
   def rpc_services
-    version.services.map { |service| rpc_service(service) }
+    project_version.services.map { |service| rpc_service(service) }
   end
 
   def rpc_dependencies
-    version.dependencies.map { |dep| rpc_dependency(dep) }
+    project_version.dependencies.map { |dep| rpc_dependency(dep) }
   end
 end
