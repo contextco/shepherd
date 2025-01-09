@@ -60,7 +60,7 @@ func CurrentNamespace() string {
 }
 
 // install a chart from the provided tar/dir/whatever (passed as []byte)
-func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, namespace string) error {
+func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, namespace string, createNamespace bool) error {
 	// init helm action configuration
 	actionCfg, err := c.newActionConfig()
 	if err != nil {
@@ -80,7 +80,7 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, na
 	install.ReleaseName = releaseName
 	install.Namespace = namespace
 	install.Replace = true
-	install.CreateNamespace = true
+	install.CreateNamespace = createNamespace
 
 	// actually install
 	rel, err := install.RunWithContext(ctx, ch, map[string]any{})
@@ -89,6 +89,29 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, na
 	}
 
 	log.Printf("successfully installed release %s", rel.Name)
+	return nil
+}
+
+func (c *Cluster) Upgrade(ctx context.Context, chartData []byte, releaseName, namespace string) error {
+	actionCfg, err := c.newActionConfig()
+	if err != nil {
+		return fmt.Errorf("failed to create action config: %w", err)
+	}
+
+	ch, err := loader.LoadArchive(bytes.NewReader(chartData))
+	if err != nil {
+		return fmt.Errorf("failed to load chart: %w", err)
+	}
+
+	upgrade := action.NewUpgrade(actionCfg)
+	upgrade.Namespace = namespace
+	upgrade.CleanupOnFail = true
+
+	_, err = upgrade.RunWithContext(ctx, releaseName, ch, map[string]any{})
+	if err != nil {
+		return fmt.Errorf("failed to upgrade chart: %w", err)
+	}
+
 	return nil
 }
 
