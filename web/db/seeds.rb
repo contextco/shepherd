@@ -18,5 +18,5 @@ v = t.setup_scaffolding!('sample', 'sample project description', :full)
 v.services.create!(name: 'web', image: 'nginx:alpine', cpu_cores: 2, memory_bytes: 2.gigabytes)
 rand(10..15).times do
   v = v.fork!(description: FFaker::Lorem.sentence, version: FFaker::SemVer.next(v.version))
-  v.publish! if rand(10) > 5
+  v.published! if rand(10) > 5
 end

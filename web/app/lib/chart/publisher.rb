@@ -4,13 +4,14 @@ class Chart::Publisher
   include AgentProto
   class ChartValidationError < StandardError; end
 
-  def initialize(subscriber)
+  def initialize(version, subscriber)
     @client = SidecarClient.client
+    @project_version = version
     @subscriber = subscriber
   end
 
   def validate_chart!
-    req = Sidecar::ValidateChartRequest.new(chart: rpc_chart)
+    req = Sidecar::ValidateChartRequest.new(chart: chart_proto)
     resp = @client.send(:validate_chart, req)
 
     errors = resp.errors.map { |error| "SideCar Validation Error: #{error}" }.join("\n")
@@ -20,17 +21,13 @@ class Chart::Publisher
   end
 
   def publish_chart!
-    req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory: subscriber.helm_repo.repo_name)
+    return if ENV["USE_LIVE_PUBLISHER"].blank?
+
+    req = Sidecar::PublishChartRequest.new(chart: chart_proto, repository_directory: subscriber.helm_repo.repo_name)
     @client.send(:publish_chart, req)
   end
 
-  private
-
-  attr_reader :subscriber
-  delegate :project_version, to: :subscriber
-  delegate :project, to: :project_version
-
-  def rpc_chart
+  def chart_proto
     services_params = rpc_services
     services_params << agent_proto_definition(subscriber) if project_version.full_agent?
 
@@ -41,6 +38,17 @@ class Chart::Publisher
       dependencies: rpc_dependencies
     )
   end
+
+  class << self
+    def publish!(version, subscriber)
+      new(version, subscriber).publish_chart!
+    end
+  end
+
+  private
+
+  attr_reader :subscriber, :project_version
+  delegate :project, to: :project_version
 
   def rpc_service(service)
     Sidecar::ServiceParams.new(
