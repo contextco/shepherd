@@ -4,10 +4,9 @@ class Chart::Publisher
   include AgentProto
   class ChartValidationError < StandardError; end
 
-  def initialize(subscriber, helm_repos)
+  def initialize(subscriber)
     @client = SidecarClient.client
     @subscriber = subscriber
-    @helm_repos = helm_repos
   end
 
   def validate_chart!
@@ -21,10 +20,8 @@ class Chart::Publisher
   end
 
   def publish_chart!
-    repository_directories.each do |repository_directory|
-      req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory:)
-      @client.send(:publish_chart, req)
-    end
+    req = Sidecar::PublishChartRequest.new(chart: rpc_chart, repository_directory: subscriber.helm_repo.repo_name)
+    @client.send(:publish_chart, req)
   end
 
   private
@@ -131,11 +128,6 @@ class Chart::Publisher
         path: service.pvc_mount_path
       )
     ]
-  end
-
-
-  def repository_directories
-    @repository_directories ||= @helm_repos.map(&:repo_name)
   end
 
   def rpc_dependency(dependency)
