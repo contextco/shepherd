@@ -35,6 +35,12 @@ var (
 		30*time.Second,
 		"The interval at which to send heartbeats",
 	)
+
+	planInterval = config.Define(
+		"plan-interval",
+		time.Minute,
+		"The interval at which to plan",
+	)
 )
 
 func main() {
@@ -49,5 +55,5 @@ func main() {
 
 	log.Println("Agent created, starting heartbeat")
 
-	agent.Start(context.Background(), heartbeatInterval.MustValue())
+	agent.Start(context.Background(), heartbeatInterval.MustValue(), planInterval.MustValue())
 }
