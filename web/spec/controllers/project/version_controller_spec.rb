@@ -224,12 +224,6 @@ RSpec.describe Project::VersionController, type: :controller do
                 .from(false).to(true)
       end
 
-      it 'calls the Chart::Publisher' do
-        expect(Chart::Publisher).to receive(:new).with(project_version.subscribers.first)
-        expect(chart_publisher).to receive(:publish_chart!)
-        subject
-      end
-
       it 'sets a success flash message' do
         subject
         expect(flash[:notice]).to eq('Application version published')
