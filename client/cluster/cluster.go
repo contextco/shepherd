@@ -62,7 +62,7 @@ func CurrentNamespace() string {
 // install a chart from the provided tar/dir/whatever (passed as []byte)
 func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, namespace string, createNamespace bool) error {
 	// init helm action configuration
-	actionCfg, err := c.newActionConfig()
+	actionCfg, err := c.newActionConfig(namespace)
 	if err != nil {
 		return fmt.Errorf("failed to create action config: %w", err)
 	}
@@ -93,7 +93,7 @@ func (c *Cluster) Install(ctx context.Context, chartData []byte, releaseName, na
 }
 
 func (c *Cluster) Upgrade(ctx context.Context, chartData []byte, releaseName, namespace string) error {
-	actionCfg, err := c.newActionConfig()
+	actionCfg, err := c.newActionConfig(namespace)
 	if err != nil {
 		return fmt.Errorf("failed to create action config: %w", err)
 	}
@@ -119,8 +119,8 @@ func (c *Cluster) Upgrade(ctx context.Context, chartData []byte, releaseName, na
 	return nil
 }
 
-func (c *Cluster) Uninstall(ctx context.Context, releaseName string) error {
-	actionCfg, err := c.newActionConfig()
+func (c *Cluster) Uninstall(ctx context.Context, releaseName, namespace string) error {
+	actionCfg, err := c.newActionConfig(namespace)
 	if err != nil {
 		return fmt.Errorf("failed to create action config: %w", err)
 	}
@@ -139,13 +139,13 @@ func (c *Cluster) Uninstall(ctx context.Context, releaseName string) error {
 }
 
 // newActionConfig: build an action.Configuration from in-cluster config
-func (c *Cluster) newActionConfig() (*action.Configuration, error) {
+func (c *Cluster) newActionConfig(namespace string) (*action.Configuration, error) {
 	var a action.Configuration
 
 	rcg := &myRestClientGetter{config: c.config}
 
 	// third param is the helm driver (configmap, secret, memory, etc.)
-	err := a.Init(rcg, "default", "secrets", log.Printf)
+	err := a.Init(rcg, namespace, "secrets", log.Printf)
 	if err != nil {
 		return nil, err
 	}
