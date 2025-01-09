@@ -5,6 +5,8 @@ image:
 ingress:
   enabled: false
 initConfig: {}
+metaEnvironmentFields:
+  enabled: false
 persistentVolumeClaims:
 - name: test-volume-claim
   path: /data
