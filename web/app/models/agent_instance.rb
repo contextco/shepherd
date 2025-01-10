@@ -3,7 +3,7 @@
 class AgentInstance < ApplicationRecord
   HEALTHY_TIMEOUT = 5.minutes
 
-  belongs_to :project_subscriber
+  belongs_to :subscriber, class_name: "ProjectSubscriber", foreign_key: "project_subscriber_id"
   has_many :event_logs, dependent: :destroy
   has_many :heartbeat_logs, -> { heartbeat }, class_name: "EventLog", dependent: :destroy
 
