@@ -37,5 +37,7 @@ RSpec.describe 'Upgrades' do
     new_version.published!
 
     subscriber.assign_to_new_version!(new_version)
+
+    wait_for_agent_to_come_online(subscriber)
   end
 end
