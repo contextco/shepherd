@@ -17,6 +17,7 @@ module AgentProto
         memory_bytes_limit: 2.gigabytes
       ),
       environment_config: Sidecar::EnvironmentConfig.new(
+        meta_environment_fields_enabled: true,
         environment_variables: [
           Sidecar::EnvironmentVariable.new(
             name: "NAME",
