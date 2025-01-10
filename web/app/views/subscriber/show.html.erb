@@ -1,4 +1,4 @@
-<div class="h-full w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+<div class="h-full w-full flex flex-col gap-6 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
   <div class="flex w-full justify-between items-center">
     <div class="flex flex-col gap-2">
       <div class="flex flex-col">
@@ -32,42 +32,68 @@
     </div>
   </div>
 
-  <% if @subscriber.agent_instances.healthy.any? %>
-    <div class=" flex flex-col gap-4">
-      <div class="flex flex-col">
-        <div class="font-semibold">Deployments</div>
-
-        <div class="text-sm text-stone-500">
+  <div class="flex flex-col gap-4 bg-white p-4 border">
+    <div class="flex flex-col gap-2">
+      <div class="font-semibold">Deployments</div>
+      <% if @subscriber.project_version.no_agent? %>
+        <div class="text-sm">
+          This deployment can not be administered as the Shepherd agent is not included in the service definition.
+        </div>
+      <% elsif @subscriber.agent_instances.healthy.any? %>
+        <div class="text-sm">
           <span class="font-medium"><%= @subscriber.name %></span>
           are currently running
           <span class="font-medium"><%= pluralize(@subscriber.agent_instances.healthy.count, 'instance') %></span> of
           <span class="font-medium"><%= @subscriber.project.name %></span>
         </div>
-      </div>
-
-      <% if @subscriber.agent_instances.healthy.any? %>
-        <div class="bg-white border border-stone-400 flex flex-col separator-y">
-          <% @subscriber.agent_instances.healthy.each do |ai| %>
-            <div class="flex items-center gap-4 p-4">
-              <div class="rounded-full size-2 bg-green-600">
-              </div>
-              <div class="">
-                <div class="text-sm font-medium">Online</div>
-                <div class="text-xs text-stone-500">
-                  <%= ai.id %>
-                  •
-                  Last pinged <%= time_ago_in_words(ai.last_heartbeat_at) %> ago
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
       <% end %>
     </div>
-  <% end %>
+
+    <% if @subscriber.agent_instances.healthy.any? %>
+      <div class="bg-white border border-stone-300 flex flex-col gap-2">
+        <% @subscriber.agent_instances.healthy.each do |ai| %>
+          <div class="" data-controller="ui--accordion">
+            <div class="flex items-center gap-4 p-4 justify-between hover:shadow cursor-pointer" data-action="click->ui--accordion#toggle">
+              <div class="flex items-center gap-4">
+                <div class="rounded-full size-2 bg-green-600">
+                </div>
+                <div class="">
+                  <div class="text-sm font-medium">Online</div>
+                  <div class="text-xs text-stone-500">
+                    <%= ai.id %>
+                    •
+                    Last pinged <%= time_ago_in_words(ai.last_heartbeat_at) %> ago
+                  </div>
+                </div>
+              </div>
+              <div class="right">
+                <%= heroicon 'chevron-down', class: 'size-4' %>
+              </div>
+            </div>
+            <div class="bg-stone-100 p-4 hidden" data-ui--accordion-target="panel">
+
+              <div class="flex flex-col">
+                <div class="text-sm font-medium">
+                  Deploy new version
+                </div>
+
+                <div class="text-xs">
+                  Currently running version <%= link_to @subscriber.heartbeat_logs.most_recent.project_version.version, version_path(@subscriber.heartbeat_logs.most_recent.project_version), class: 'font-medium underline' %>
+                </div>
+              </div>
+
+              <% @subscriber.agent_actions.order(created_at: :desc).each do |aa| %>
+                <%= aa.inspect %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 
   <% if @most_recent_published_version.present? %>
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-4 bg-white p-4 border">
       <div class="flex flex-col gap-2">
         <div class="font-semibold">Customer Documentation</div>
         <div class="flex flex-col gap-1">
