@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AgentProto
-  def agent_proto_definition(subscriber)
+  def agent_proto_definition(project_version, subscriber)
     Sidecar::ServiceParams.new(
       name: "shepherd-agent",
       replica_count: 1,
@@ -19,6 +19,9 @@ module AgentProto
       environment_config: Sidecar::EnvironmentConfig.new(
         meta_environment_fields_enabled: true,
         environment_variables: [
+          # It would be really nice to encapsulate all of this into a single signed env var.
+          # This would mean the interface is simpler (with only 1 var) and provides guarantees it hasn't been tampered
+          # with by the client.
           Sidecar::EnvironmentVariable.new(
             name: "NAME",
             value: subscriber.name
@@ -30,6 +33,10 @@ module AgentProto
           Sidecar::EnvironmentVariable.new(
             name: "BACKEND_ADDR",
             value: ENV["SHEPHERD_AGENT_API_ENDPOINT"] || "https://agent.trustshepherd.com"
+          ),
+          Sidecar::EnvironmentVariable.new(
+            name: "SHEPHERD_PROJECT_VERSION_ID",
+            value: project_version.id.to_s
           )
         ]
       )
