@@ -8,7 +8,7 @@ initConfig: {}
 metaEnvironmentFields:
   enabled: true
   fields:
-  - fieldPath: metadata.name
+  - fieldPath: metadata.labels['app.kubernetes.io/instance']
     name: HELM_RELEASE_NAME
   - fieldPath: metadata.namespace
     name: HELM_NAMESPACE
