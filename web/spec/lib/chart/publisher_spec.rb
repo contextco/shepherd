@@ -24,7 +24,7 @@ RSpec.describe Chart::Publisher do
     let(:client) { double('client') }
     let(:resp) { double('resp', errors: [], valid: true) }
 
-    let(:publisher) { Chart::Publisher.new(project_subscriber) }
+    let(:publisher) { Chart::Publisher.new(project_version, project_subscriber) }
 
     subject(:validate) { publisher.validate_chart! }
 
@@ -81,7 +81,7 @@ RSpec.describe Chart::Publisher do
       )
     end
 
-    let(:rpc_service) { Chart::Publisher.new(project_subscriber).send(:rpc_service, service) }
+    let(:rpc_service) { Chart::Publisher.new(project_version, project_subscriber).send(:rpc_service, service) }
 
     it 'returns a Sidecar::ServiceParams object' do
       expect(rpc_service).to be_a(Sidecar::ServiceParams)
