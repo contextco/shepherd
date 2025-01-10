@@ -67,12 +67,8 @@ Rails.application.config.to_prepare do
     # Enhanced logging
     c.logger = Logger.new(STDOUT)
     c.logger.level = Logger::DEBUG
-    c.logger.formatter = proc do |severity, datetime, progname, msg|
-      thread_id = Thread.current.object_id
-      "[#{datetime}] #{severity} [#{thread_id}] #{progname}: #{msg}\n"
-    end
 
-    c.interceptors.use(Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor)
+    c.interceptors.use(Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor, log_parameters: true)
     c.interceptors.use(AuthenticationInterceptor)
 
     c.server_options[:services] = [ HealthCheckService.new ]
