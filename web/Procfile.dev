@@ -3,3 +3,4 @@ css: bin/rails tailwindcss:watch
 sidecar: foreman start -f Procfile.sidecar -d sidecar
 funnel: tailscale funnel localhost:8081
 grpc: bundle exec gruf --backtrace-on-error
+gateway: sleep 5 && BACKEND_ADDRESS=localhost:50051 PORT=8081 foreman start -f Procfile.gateway -d ../gateway
