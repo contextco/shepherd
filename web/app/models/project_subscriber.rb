@@ -56,6 +56,10 @@ class ProjectSubscriber < ApplicationRecord
     agent_instances.maximum(:last_heartbeat_at)
   end
 
+  def currently_running_version
+    heartbeat_logs.most_recent&.project_version
+  end
+
   private
 
   def setup_helm_repo
