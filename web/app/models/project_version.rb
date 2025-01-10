@@ -54,7 +54,7 @@ class ProjectVersion < ApplicationRecord
   def fork!(version_params)
     transaction do
       new_version = dup
-      new_version.assign_attributes(version_params)
+      new_version.assign_attributes(version_params.merge(state: :draft))
       new_version.save!
       services.each do |service|
         service = service.dup
