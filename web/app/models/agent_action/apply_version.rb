@@ -8,4 +8,8 @@ class AgentAction::ApplyVersion < AgentAction
   def project_version
     ProjectVersion.find(project_version_id)
   end
+
+  def target_version
+    project_version
+  end
 end
