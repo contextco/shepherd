@@ -175,7 +175,8 @@ RSpec.describe ProjectVersion do
                 environment_variables: [
                   Sidecar::EnvironmentVariable.new(name: 'NAME', value: project_version.dummy_project_subscriber.name),
                   Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project_version.dummy_project_subscriber.tokens.first.token),
-                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: ENV['SHEPHERD_AGENT_API_ENDPOINT'] || 'https://agent.trustshepherd.com')
+                  Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: ENV['SHEPHERD_AGENT_API_ENDPOINT'] || 'https://agent.trustshepherd.com'),
+                  Sidecar::EnvironmentVariable.new(name: 'SHEPHERD_PROJECT_VERSION_ID', value: project_version.id.to_s)
                 ]
               )
           )

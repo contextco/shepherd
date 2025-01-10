@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Note! You need to be a little careful here since you may think that subscriber.project_version == project_version,
+# but that is not guaranteed to be true! Indeed, we create the chart for a subscriber's new project_version before the
+# subscriber changes its project_version_id. This is to prevent issues where the subscriber's project_version_id is updated
+# but the chart creation fails, leaving the subscriber in a bad state.
 class Chart::Publisher
   include AgentProto
   class ChartValidationError < StandardError; end
@@ -29,7 +33,7 @@ class Chart::Publisher
 
   def chart_proto
     services_params = rpc_services
-    services_params << agent_proto_definition(subscriber) if project_version.full_agent?
+    services_params << agent_proto_definition(project_version, subscriber) if project_version.full_agent?
 
     Sidecar::ChartParams.new(
       name: project.name,

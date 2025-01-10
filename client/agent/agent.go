@@ -14,19 +14,31 @@ import (
 
 type Agent struct {
 	LifecycleID string
-	Name        string
 
 	client *backend.Client // gRPC client which sends heartbeats
+
+	cfg AgentConfig
 }
 
-func (a *Agent) Start(ctx context.Context, heartbeatInterval time.Duration, planInterval time.Duration) {
+type AgentConfig struct {
+	Name string
+
+	BackendAddr string
+	BearerToken string
+
+	HeartbeatInterval time.Duration
+	PlanInterval      time.Duration
+	VersionID         string
+}
+
+func (a *Agent) Start(ctx context.Context) {
 	go func() {
 		fn := func() error {
 			a.heartbeat(ctx)
 			return nil
 		}
 
-		if err := periodic.RunWithJitter(ctx, fn, heartbeatInterval, 500*time.Millisecond); err != nil {
+		if err := periodic.RunWithJitter(ctx, fn, a.cfg.HeartbeatInterval, 500*time.Millisecond); err != nil {
 			log.Printf("Heartbeat error: %v", err)
 		}
 	}()
@@ -37,7 +49,7 @@ func (a *Agent) Start(ctx context.Context, heartbeatInterval time.Duration, plan
 			return nil
 		}
 
-		if err := periodic.RunWithJitter(ctx, fn, planInterval, 20*time.Second); err != nil {
+		if err := periodic.RunWithJitter(ctx, fn, a.cfg.PlanInterval, 20*time.Second); err != nil {
 			log.Printf("Apply error: %v", err)
 		}
 	}()
@@ -47,7 +59,7 @@ func (a *Agent) Start(ctx context.Context, heartbeatInterval time.Duration, plan
 }
 
 func (a *Agent) heartbeat(ctx context.Context) {
-	log.Printf("Sending heartbeat for %s", a.Name)
+	log.Printf("Sending heartbeat for %s", a.cfg.Name)
 	log.Printf("Lifecycle ID: %s", a.LifecycleID)
 
 	if err := a.client.Heartbeat(ctx); err != nil {
@@ -67,13 +79,14 @@ func (a *Agent) apply(ctx context.Context) {
 	}
 }
 
-func NewAgent(name, backendAddr, bearerToken string) (*Agent, error) {
+func NewAgent(cfg AgentConfig) (*Agent, error) {
 	id := uuid.New().String()
 
-	log.Printf("Creating client with backend address %s, and token: %s", backendAddr, bearerToken)
-	client, err := backend.NewClient(backendAddr, bearerToken, backend.Identity{
+	log.Printf("Creating client with backend address %s, and token: %s", cfg.BackendAddr, cfg.BearerToken)
+	client, err := backend.NewClient(cfg.BackendAddr, cfg.BearerToken, backend.Identity{
 		LifecycleID: id,
-		Name:        name,
+		Name:        cfg.Name,
+		VersionID:   cfg.VersionID,
 	})
 	if err != nil {
 		return nil, err
@@ -81,9 +94,8 @@ func NewAgent(name, backendAddr, bearerToken string) (*Agent, error) {
 
 	return &Agent{
 		LifecycleID: id,
-		Name:        name,
-
-		client: client,
+		client:      client,
+		cfg:         cfg,
 	}, nil
 }
 

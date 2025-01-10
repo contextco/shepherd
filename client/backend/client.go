@@ -14,6 +14,7 @@ import (
 type Identity struct {
 	LifecycleID string
 	Name        string
+	VersionID   string
 }
 
 type Client struct {
@@ -43,6 +44,7 @@ func (c *Client) Apply(ctx context.Context) (*service_pb.Action, error) {
 		Identity: &service_pb.Identity{
 			LifecycleId: c.identity.LifecycleID,
 			Name:        c.identity.Name,
+			VersionId:   c.identity.VersionID,
 		},
 	})
 	if err != nil {
@@ -57,6 +59,7 @@ func (c *Client) Heartbeat(ctx context.Context) error {
 		Identity: &service_pb.Identity{
 			LifecycleId: c.identity.LifecycleID,
 			Name:        c.identity.Name,
+			VersionId:   c.identity.VersionID,
 		},
 	})
 	return err
