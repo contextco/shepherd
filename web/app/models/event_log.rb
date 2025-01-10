@@ -7,6 +7,10 @@ class EventLog < ApplicationRecord
 
   store_accessor :payload, :project_version_id
 
+  def project_version
+    ProjectVersion.find(project_version_id)
+  end
+
   def self.most_recent
     order(created_at: :desc).first
   end
