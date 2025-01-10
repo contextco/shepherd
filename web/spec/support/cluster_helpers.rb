@@ -14,7 +14,7 @@ module ClusterHelpers
 
   def wait_for_agent_to_come_online(subscriber)
     loop do
-      return if subscriber.reload.online?
+      return if subscriber.reload.online? && subscriber.heartbeat_logs.most_recent&.project_version_id == subscriber.project_version_id
       sleep 0.5
     end
   end
