@@ -16,7 +16,7 @@
       <%= heroicon 'chevron-down', class: 'size-4' %>
     </div>
   </div>
-  <div class="bg-stone-100 p-4 hidden" data-ui--accordion-target="panel">
+  <div class="bg-stone-100 p-4 flex flex-col gap-4" data-ui--accordion-target="panel">
 
     <div class="flex flex-col gap-2">
 
@@ -40,14 +40,59 @@
         </div>
         <div class="text-xs text-stone-600">
           Currently running version
-          <%= link_to subscriber.currently_running_version.version,
-                      version_path(subscriber.currently_running_version), class: 'font-medium underline' %>
-          according to logs received <%= time_ago_in_words(subscriber.heartbeat_logs.most_recent.created_at) %> ago.
+          <%= link_to agent_instance.currently_running_version.version,
+                      version_path(agent_instance.currently_running_version), class: 'font-medium underline' %>
+          according to logs received <%= time_ago_in_words(agent_instance.heartbeat_logs.most_recent.created_at) %> ago.
         </div>
       <% end %>
     </div>
 
-    <% subscriber.agent_actions.order(created_at: :desc).each do |aa| %>
-    <% end %>
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
+        <div class="text-sm font-medium">
+          Deploy Logs
+        </div>
+      </div>
+      <div class="border flex-col flex divide-y bg-white border-stone-400">
+        <% subscriber.apply_version_actions.order(created_at: :desc).limit(5).each do |aa| %>
+          <div class="p-2 px-4 flex gap-4 justify-between items-center">
+            <div class="flex gap-4">
+              <div class="flex items-center gap-2">
+                <% if aa.completed? %>
+                  <%= heroicon :check, class: 'size-4' %>
+                <% else %>
+                  <%= heroicon :clock, class: 'size-4' %>
+                <% end %>
+              </div>
+              <div class="item">
+                <div class="text-sm font-medium">Change Version</div>
+                <div class="flex items-center gap-1 text-stone-500 text-xs">
+                  <div class="">
+                    <%= time_ago_in_words(aa.created_at) %> ago
+                  </div>
+                  •
+                  <div class="">
+                    Deployed version
+                    <%= link_to aa.project_version.version,
+                                version_path(aa.project_version), class: 'font-medium underline' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="right">
+              <% if subscriber.eligible_for_new_action? && subscriber.project_version != aa.target_version %>
+                <%= button_to assign_new_version_subscriber_path(subscriber),
+                              params: { project_version_id: aa.target_version },
+                    class: 'primary-button flex items-center gap-1 !text-xs px-4' do %>
+                  <%= heroicon 'arrow-uturn-left', class: 'size-3' %>
+                  Rollback
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

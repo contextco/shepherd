@@ -32,6 +32,12 @@ class ProjectSubscriber < ApplicationRecord
     end
   end
 
+  def eligible_for_new_action?
+    return true if agent_actions.blank?
+
+    agent_actions.most_recent.completed?
+  end
+
   def authenticate(user_password)
     password == user_password
   end
