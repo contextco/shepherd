@@ -1,0 +1,24 @@
+<li class="bg-white border-stone-400 border p-4 relative <%= 'has-[:disabled]:opacity-80 cursor-not-allowed z-10' if project_version.published? %>">
+  <%= form_with url: toggle_agent_version_path(project_version),
+                data: { controller: 'auto-form', action: 'change->auto-form#submitForm' } do |f| %>
+    <%= f.label :agent, class: [{'cursor-not-allowed': project_version.published? }] do %>
+      <div class="flex items-center gap-2 justify-between">
+        <div class="flex items-center gap-2">
+          <%= f.check_box :agent, {
+            checked: project_version.full_agent?,
+            disabled: project_version.published?,
+            class: 'disabled:opacity-50'
+          }, :full, :no %>
+          <span class="semibold">
+            Shepherd Agent
+          </span>
+          <%= heroicon :rss, class: 'size-4' %>
+
+        </div>
+      </div>
+      <div class="text-sm mt-2 text-stone-500">
+        Add the Shepherd Agent to this version to enable support for automatic upgrades, health checks, and monitoring.
+      </div>
+    <% end %>
+  <% end %>
+</li>
