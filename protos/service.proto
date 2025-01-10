@@ -46,7 +46,7 @@ message ApplyChartRequest {
     bytes chart = 1;
 }
 
-// Next ID: 4
+// Next ID: 5
 message Identity {
     reserved 2;
 
@@ -56,4 +56,7 @@ message Identity {
     // Human-readable name for the identity. This is provided by the vendor as a friendly name to identify a container type.
     // Eg: "worker", "web", "db", etc.
     string name = 3;
+
+    // The version of the shepherd project that this deployment represents.
+    string version_id = 4;
 }
