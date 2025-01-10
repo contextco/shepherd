@@ -1,4 +1,4 @@
-<div class="" data-controller="ui--accordion">
+<div class="bg-white border border-stone-300" data-controller="ui--accordion">
   <div class="flex items-center gap-4 p-4 justify-between hover:shadow cursor-pointer" data-action="click->ui--accordion#toggle">
     <div class="flex items-center gap-4">
       <div class="rounded-full size-2 bg-green-600">
@@ -18,18 +18,36 @@
   </div>
   <div class="bg-stone-100 p-4 hidden" data-ui--accordion-target="panel">
 
-    <div class="flex flex-col">
-      <div class="text-sm font-medium">
-        Deploy new version
+    <div class="flex flex-col gap-2">
+
+      <div class="flex flex-col gap-1">
+        <div class="text-sm font-medium">
+          Deploy new version
+        </div>
+        <div class="text-xs text-stone-600">Note: This will be immediately deployed to the <%= subscriber.name %> deployment.</div>
       </div>
 
-      <div class="text-xs">
-        Currently running version <%= link_to subscriber.currently_running_version.version, version_path(subscriber.currently_running_version), class: 'font-medium underline' %>
-      </div>
+      <%= form_with url: assign_new_version_subscriber_path, method: :post, class: 'flex flex-col gap-1 items-start' do |form| %>
+        <div class="flex gap-4 items-center">
+          <%= form.collection_select :project_version_id,
+              subscriber.project.project_versions.published,
+              :id,
+              :version
+          %>
+          <%= form.button :submit, class: 'bg-white p-2 px-3 border border-stone-500 hover:shadow hover:bg-stone-50' do %>
+            Deploy ->
+          <% end  %>
+        </div>
+        <div class="text-xs text-stone-600">
+          Currently running version
+          <%= link_to subscriber.currently_running_version.version,
+                      version_path(subscriber.currently_running_version), class: 'font-medium underline' %>
+          according to logs received <%= time_ago_in_words(subscriber.heartbeat_logs.most_recent.created_at) %> ago.
+        </div>
+      <% end %>
     </div>
 
     <% subscriber.agent_actions.order(created_at: :desc).each do |aa| %>
-      <%= aa.inspect %>
     <% end %>
   </div>
 </div>

@@ -12,6 +12,16 @@ class SubscriberController < ApplicationController
     @most_recent_published_version = @subscriber.project.published_versions.first
   end
 
+  def assign_new_version
+    @version = current_team.project_versions.find(params[:project_version_id])
+    @subscriber = current_team.subscribers.find(params[:id])
+
+    @subscriber.assign_to_new_version!(@version)
+
+    flash[:notice] = "#{@subscriber.name} deploying to version #{@version.version}."
+    redirect_to subscriber_path(@subscriber)
+  end
+
   def new
     @app = current_team.projects.find(params[:project_id])
   end
