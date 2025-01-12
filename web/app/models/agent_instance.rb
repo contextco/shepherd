@@ -10,7 +10,7 @@ class AgentInstance < ApplicationRecord
   validates :lifecycle_id, presence: true
 
   def healthy?
-    last_heartbeat_at.present? && last_heartbeat_at < HEALTHY_TIMEOUT.ago
+    last_heartbeat_at.present? && last_heartbeat_at > HEALTHY_TIMEOUT.ago
   end
 
   def self.healthy
@@ -20,6 +20,10 @@ class AgentInstance < ApplicationRecord
   def self.healthy_and_recently_unresponsive(threshold: 1.day)
     where("last_heartbeat_at > ?", HEALTHY_TIMEOUT.ago - threshold)
       .order("last_heartbeat_at > ? DESC", HEALTHY_TIMEOUT.ago)
+  end
+
+  def self.most_recently_active
+    EventLog.heartbeat.where(agent_instance: all).order(created_at: :desc).first&.agent_instance
   end
 
   def currently_running_version
