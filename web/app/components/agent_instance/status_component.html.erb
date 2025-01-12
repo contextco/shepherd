@@ -3,7 +3,6 @@
     <div class="flex items-center gap-4">
       <% if agent_instance.healthy? %>
         <div class="rounded-full size-2 bg-green-600">
-        <% console %>
       <% else %>
         <div class="rounded-full size-2 bg-stone-400">
       <% end %>
@@ -86,6 +85,16 @@
                       <%= link_to aa.project_version.version,
                                   version_path(aa.project_version), class: 'font-medium underline' %>
                     </div>
+
+                    <% if aa.created_by.present? %>
+                      •
+                      <div class="flex items-center gap-1">
+                        Performed by
+                        <%= aa.created_by.name %>
+                      </div>
+                    <% end %>
+
+
                   </div>
                 </div>
               </div>

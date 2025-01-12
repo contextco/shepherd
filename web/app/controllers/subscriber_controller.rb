@@ -16,7 +16,7 @@ class SubscriberController < ApplicationController
     @version = current_team.project_versions.find(params[:project_version_id])
     @subscriber = current_team.subscribers.find(params[:id])
 
-    @subscriber.assign_to_new_version!(@version)
+    @subscriber.assign_to_new_version!(@version, created_by: current_user)
 
     flash[:notice] = "#{@subscriber.name} deploying to version #{@version.version}."
     redirect_to subscriber_path(@subscriber)
