@@ -1,4 +1,4 @@
-<div class="h-full w-full flex flex-col gap-6 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+<div class="h-full w-full flex flex-col gap-6 sm:px-20 px-8 py-8 max-w-6xl mx-auto mb-12">
   <div class="flex w-full justify-between items-center">
     <div class="flex flex-col gap-2">
       <div class="flex flex-col">
@@ -46,15 +46,25 @@
           <span class="font-medium"><%= pluralize(@subscriber.agent_instances.healthy.count, 'instance') %></span> of
           <span class="font-medium"><%= @subscriber.project.name %></span>
         </div>
+      <% elsif @subscriber.agent_instances.present? %>
+        <div class="text-sm">
+          <span class="font-medium"><%= @subscriber.name %></span>
+          are currently running
+          <span class="font-medium"><%= pluralize(@subscriber.agent_instances.healthy.count, 'instance') %></span> of
+          <span class="font-medium"><%= @subscriber.project.name %></span>
+        </div>
+        <% else %>
+        <div class="text-sm">
+          <span class="font-medium"><%= @subscriber.name %></span>
+          are not currently running any instances of
+          <span class="font-medium"><%= @subscriber.project.name %></span>.
+          When they have deployed an instance, it can be administered here.
+        </div>
       <% end %>
     </div>
 
-    <% if @subscriber.agent_instances.healthy.any? %>
-      <div class="flex flex-col gap-2">
-        <% @subscriber.agent_instances.healthy.each do |ai| %>
-          <%= render AgentInstance::StatusComponent.new(agent_instance: ai) %>
-        <% end %>
-      </div>
+    <% if @subscriber.agent_instances.most_recently_active.present? %>
+      <%= render AgentInstance::StatusComponent.new(agent_instance: @subscriber.agent_instances.most_recently_active) %>
     <% end %>
   </div>
 
