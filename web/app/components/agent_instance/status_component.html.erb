@@ -1,10 +1,15 @@
 <div class="bg-white border border-stone-300" data-controller="ui--accordion">
   <div class="flex items-center gap-4 p-4 justify-between hover:shadow cursor-pointer" data-action="click->ui--accordion#toggle">
     <div class="flex items-center gap-4">
-      <div class="rounded-full size-2 bg-green-600">
+      <% if agent_instance.healthy? %>
+        <div class="rounded-full size-2 bg-green-600">
+        <% console %>
+      <% else %>
+        <div class="rounded-full size-2 bg-stone-400">
+      <% end %>
       </div>
       <div class="">
-        <div class="text-sm font-medium">Online</div>
+        <div class="text-sm font-medium"><%= agent_instance.healthy? ? 'Online' : 'Offline' %></div>
         <div class="text-xs text-stone-500">
           <%= agent_instance.id %>
           •
@@ -36,7 +41,9 @@
               {},
               class: 'p-1 pl-2 pr-8 min-w-32'
           %>
-          <%= form.button :submit, class: 'bg-white p-1 px-2 border border-stone-500 hover:shadow hover:bg-stone-50' do %>
+          <%= form.button :submit,
+                          class: 'bg-white p-1 px-2 border border-stone-500 hover:shadow hover:bg-stone-50',
+                          disabled: !subscriber.eligible_for_new_action? do %>
             Deploy ->
           <% end  %>
         </div>
