@@ -23,11 +23,11 @@ class ProjectSubscriber < ApplicationRecord
   scope :dummy, -> { where(dummy: true) }
   scope :non_dummy, -> { where(dummy: false) }
 
-  def assign_to_new_version!(new_version)
+  def assign_to_new_version!(new_version, created_by: nil)
     assert_charts_in_repo!(new_version)
 
     transaction do
-      apply_version_actions.create!(project_version_id: new_version.id)
+      apply_version_actions.create!(project_version_id: new_version.id, created_by:)
       update!(project_version: new_version)
     end
   end
