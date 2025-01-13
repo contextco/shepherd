@@ -3,7 +3,8 @@
 
 FactoryBot.define do
   factory :apply_version_action, class: 'AgentAction::ApplyVersion' do
-    project_version_id { create(:project_version).id }
+    target_version_id { create(:project_version).id }
+    source_version_id { create(:project_version).id }
     status { 'pending' }
   end
 end
