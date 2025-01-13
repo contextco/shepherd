@@ -14,7 +14,7 @@ RSpec.describe ProjectSubscriber, type: :model do
 
       it 'creates an agent action with the correct version_id' do
         assign
-        expect(subscriber.apply_version_actions.last.project_version_id).to eq(new_project_version.id)
+        expect(subscriber.apply_version_actions.last.target_version_id).to eq(new_project_version.id)
       end
     end
   end
