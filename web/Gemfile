@@ -64,7 +64,7 @@ group :test do
   gem "database_cleaner-active_record"
 end
 
-gem "tailwindcss-rails", "~> 3.1"
+gem "tailwindcss-rails", "~> 3.2"
 
 gem "devise", "~> 4.9.4"
 
