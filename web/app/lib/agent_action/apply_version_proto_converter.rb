@@ -19,5 +19,9 @@ class AgentAction::ApplyVersionProtoConverter
 
   private
 
-  delegate :helm_repo, :project_version, to: :@action
+  def project_version
+    @action.target_version
+  end
+
+  delegate :helm_repo, to: :@action
 end

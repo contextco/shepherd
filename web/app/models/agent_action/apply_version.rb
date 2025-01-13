@@ -1,15 +1,15 @@
 class AgentAction::ApplyVersion < AgentAction
   include ActionProtoConvertible
 
-  store_accessor :data, :project_version_id
+  store_accessor :data, :source_version_id, :target_version_id
 
   delegate :helm_repo, to: :subscriber
 
-  def project_version
-    ProjectVersion.find(project_version_id)
+  def source_version
+    ProjectVersion.find(source_version_id)
   end
 
   def target_version
-    project_version
+    ProjectVersion.find(target_version_id)
   end
 end

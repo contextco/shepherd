@@ -27,7 +27,11 @@ class ProjectSubscriber < ApplicationRecord
     assert_charts_in_repo!(new_version)
 
     transaction do
-      apply_version_actions.create!(project_version_id: new_version.id, created_by:)
+      apply_version_actions.create!(
+        source_version_id: project_version.id,
+        target_version_id: new_version.id,
+        created_by:
+      )
       update!(project_version: new_version)
     end
   end
