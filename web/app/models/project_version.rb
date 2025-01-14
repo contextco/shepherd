@@ -9,8 +9,6 @@ class ProjectVersion < ApplicationRecord
   has_one :dummy_project_subscriber, -> { dummy }, class_name: "ProjectSubscriber"
   has_many :non_dummy_project_subscribers, -> { non_dummy }, class_name: "ProjectSubscriber"
 
-  after_create_commit :setup_dummy_subscriber
-
   has_one :team, through: :project
 
   enum :state, { draft: 0, building: 1, published: 2, failed: 3 }
@@ -74,11 +72,5 @@ class ProjectVersion < ApplicationRecord
 
   def deployable?
     services.any?
-  end
-
-  private
-
-  def setup_dummy_subscriber
-    subscribers.create!(name: "Dummy", dummy: true)
   end
 end
