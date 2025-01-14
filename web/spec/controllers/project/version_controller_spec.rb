@@ -95,11 +95,6 @@ RSpec.describe Project::VersionController, type: :controller do
 
     it_behaves_like 'requires authentication'
 
-    it 'creates a new dummy project subscriber' do
-      subject
-      expect(ProjectVersion.last.dummy_project_subscriber).to be_present
-    end
-
     context 'with valid params' do
       it 'creates a new version' do
         expect { subject }.to change { ProjectVersion.count }.by(1)

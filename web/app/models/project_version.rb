@@ -42,13 +42,6 @@ class ProjectVersion < ApplicationRecord
     versions[versions.find_index(self) + 1]
   end
 
-  def publish!(project_subscriber)
-    # do not update state of the version if we are publishing a dummy version
-    building! unless project_subscriber&.dummy?
-    Chart::Publisher.publish!(self, project_subscriber)
-    published! unless project_subscriber&.dummy?
-  end
-
   def fork!(version_params)
     transaction do
       new_version = dup
