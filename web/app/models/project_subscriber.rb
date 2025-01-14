@@ -17,7 +17,7 @@ class ProjectSubscriber < ApplicationRecord
   has_many :agent_actions
   has_many :apply_version_actions, class_name: "AgentAction::ApplyVersion"
 
-  after_create_commit :setup_helm_repo
+  # after_create_commit :setup_helm_repo
   after_create -> { tokens.create! }
 
   scope :dummy, -> { where(dummy: true) }
@@ -70,14 +70,14 @@ class ProjectSubscriber < ApplicationRecord
     heartbeat_logs.most_recent&.project_version
   end
 
-  private
-
-  def setup_helm_repo
+  def setup_helm_repo!
     create_helm_repo!(name: project.name)
     assert_charts_in_repo!(project_version)
   end
 
+  private
+
   def assert_charts_in_repo!(version)
-    version.publish!(self)
+    Chart::Publisher.publish!(version, self)
   end
 end

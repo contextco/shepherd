@@ -72,7 +72,7 @@ RSpec.describe AgentController do
     end
 
     context 'when there is a pending action' do
-      let!(:action) { create(:apply_version_action, subscriber: project_subscriber) }
+      let(:action) { create(:apply_version_action, subscriber: project_subscriber) }
 
       let(:bucket) { double('Google::Cloud::Storage::Bucket') }
       let(:file) { double('Google::Cloud::Storage::File') }
@@ -81,6 +81,10 @@ RSpec.describe AgentController do
         allow(GCSClient).to receive(:onprem_bucket).and_return(bucket)
         allow(bucket).to receive(:file).and_return(file)
         allow(file).to receive(:download).and_return(StringIO.new("some yaml"))
+
+        project_subscriber.setup_helm_repo!
+
+        action
       end
 
       it 'returns an ApplyResponse with the action' do
