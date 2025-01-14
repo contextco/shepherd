@@ -14,6 +14,7 @@ RSpec.describe 'Upgrades' do
   let(:subscriber) { create(:project_subscriber, project_version: version) }
 
   around do |example|
+    subscriber.setup_helm_repo!
     nginx
     ENV['USE_LIVE_PUBLISHER'] = 'true'
 
