@@ -16,6 +16,7 @@ module Sidecar
 
       rpc :PublishChart, ::Sidecar::PublishChartRequest, ::Sidecar::PublishChartResponse
       rpc :ValidateChart, ::Sidecar::ValidateChartRequest, ::Sidecar::ValidateChartResponse
+      rpc :GenerateChart, ::Sidecar::GenerateChartRequest, ::Sidecar::GenerateChartResponse
     end
 
     Stub = Service.rpc_stub_class
