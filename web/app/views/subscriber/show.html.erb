@@ -35,7 +35,7 @@
   <div class="flex flex-col gap-4 bg-white p-4 border">
     <div class="flex flex-col gap-2">
       <div class="font-semibold">Deployments</div>
-      <% if @subscriber.project_version.no_agent? %>
+      <% if @subscriber.no_agent? %>
         <div class="text-sm">
           This deployment can not be administered as the Shepherd agent is not included in the service definition.
         </div>
