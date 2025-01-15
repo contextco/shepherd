@@ -25,6 +25,7 @@
   <div class="bg-stone-100 p-4 flex flex-col gap-4" data-ui--accordion-target="panel">
 
     <div class="flex flex-col gap-2">
+      <% if subscriber.project.project_versions.published.count > 1 %>
       <div class="flex flex-col gap-1">
         <div class="text-sm font-medium">
           Deploy new version
@@ -52,6 +53,28 @@
           <%= link_to agent_instance.currently_running_version.version,
                       version_path(agent_instance.currently_running_version), class: 'font-medium underline' %>
           according to logs received <%= time_ago_in_words(agent_instance.heartbeat_logs.most_recent.created_at) %> ago.
+        </div>
+      <% end %>
+      <% else %>
+        <div class="flex flex-col gap-1">
+          <div class="text-sm font-medium">
+            Deploy new version
+          </div>
+        </div>
+        <div class="text-xs text-stone-600">
+          Currently running version
+          <%= link_to agent_instance.currently_running_version.version,
+                      version_path(agent_instance.currently_running_version), class: 'font-medium underline' %>
+          according to logs received <%= time_ago_in_words(agent_instance.heartbeat_logs.most_recent.created_at) %> ago.
+        </div>
+
+        <div class="text-stone-600 text-sm flex flex-col gap-1">
+          <p>
+            No versions of <span class="italic"><%= subscriber.project.name %></span> can currently be deployed to <span class="italic"><%= subscriber.name %></span>. <br />
+          </p>
+          <p>
+            <%= link_to 'Publish a new version', version_path(subscriber.project_version), class: 'underline' %> to make it available for deployment.
+          </p>
         </div>
       <% end %>
     </div>
