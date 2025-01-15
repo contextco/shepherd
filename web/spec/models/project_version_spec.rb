@@ -41,7 +41,7 @@ RSpec.describe ProjectVersion do
   end
 
   describe '#rpc_chart' do
-    subject(:chart) { Chart::Publisher.new(project_version, project_subscriber).chart_proto }
+    subject(:chart) { Chart::Publisher.new(project_version, subscriber: project_subscriber).chart_proto }
 
     it 'creates chart with correct attributes' do
       expect(chart.to_h.slice(:name, :version))

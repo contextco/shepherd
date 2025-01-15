@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AgentProto
-  def agent_proto_definition(project_version, subscriber)
+  def agent_proto_definition
     Sidecar::ServiceParams.new(
       name: "shepherd-agent",
       replica_count: 1,
@@ -24,11 +24,11 @@ module AgentProto
           # with by the client.
           Sidecar::EnvironmentVariable.new(
             name: "NAME",
-            value: subscriber.name
+            value: subscriber&.name || "unknown"
           ),
           Sidecar::EnvironmentVariable.new(
             name: "BEARER_TOKEN",
-            value: subscriber.tokens.first.token
+            value: subscriber&.tokens&.first&.token || "placeholder"
           ),
           Sidecar::EnvironmentVariable.new(
             name: "BACKEND_ADDR",
