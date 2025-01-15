@@ -12,7 +12,6 @@ class ProjectVersion < ApplicationRecord
   has_one :team, through: :project
 
   enum :state, { draft: 0, building: 1, published: 2, failed: 3 }
-  enum :agent, { no: 0, full: 1 }, suffix: true
 
   validates :version, uniqueness: { scope: :project_id }
 
