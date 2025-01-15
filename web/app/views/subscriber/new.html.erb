@@ -38,11 +38,11 @@
           <div class="flex flex-col gap-1 max-w-96">
             <span class="font-medium text-stone-800 flex-none">Shepherd Agent</span>
             <span class="text-stone-600 text-sm">
-              Add the Shepherd Agent to this deployment to enable support for automatic upgrades, health checks, and monitoring.
+              Add the Shepherd Agent to enable support for automatic upgrades, health checks, and monitoring.
             </span>
           </div>
 
-          <%= form.check_box :agent, { checked: true, class: 'ring-0 focus:ring-0' }, :full, :no %>
+          <%= form.check_box :agent, { checked: true, class: 'ring-0 focus:ring-0 size-5' }, :full, :no %>
         </div>
       <% end %>
 
