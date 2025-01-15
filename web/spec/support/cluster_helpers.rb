@@ -4,7 +4,7 @@ module ClusterHelpers
   include AgentProto
 
   def install_agent(subscriber)
-    publisher = Chart::Publisher.new(subscriber.project_version, subscriber)
+    publisher = Chart::Publisher.new(subscriber.project_version, subscriber:)
     req = Sidecar::GenerateAndInstallRequest.new(chart: publisher.chart_proto)
 
     response = client.send(:generate_and_install, req)
