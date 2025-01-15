@@ -9,9 +9,9 @@ RSpec.describe 'Upgrades' do
   # https://github.com/rspec/rspec-rails/issues/2598#issuecomment-1109445577
   uses_transaction "requires outside interference"
 
-  let(:version) { create(:project_version, version: '0.0.1', agent: :full) }
+  let(:version) { create(:project_version, version: '0.0.1') }
   let(:nginx) { create(:nginx_service, project_version: version) }
-  let(:subscriber) { create(:project_subscriber, project_version: version) }
+  let(:subscriber) { create(:project_subscriber, project_version: version, agent: :full) }
 
   around do |example|
     subscriber.setup_helm_repo!
