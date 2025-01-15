@@ -67,31 +67,9 @@ class Project::VersionController < ApplicationController
   end
 
   def preview_chart
-    @version.publish!(@version.dummy_project_subscriber)
-    helm_repo = @version.dummy_project_subscriber.helm_repo
+    chart_bytes = Chart::Publisher.new(@version).generate
 
-    file = helm_repo.client.chart_file(@version)
-    return render json: { error: "Chart not found" }, status: :not_found if file.nil?
-
-    begin
-      signed_url = file.signed_url(
-        version: :v4,
-        expires: 300, # 5 minutes
-        query: {
-          "response-content-disposition" => "attachment; filename=#{helm_repo.client.chart_filename(@version)}",
-          "response-content-type" => "application/x-tar"
-        }
-      )
-
-      redirect_to signed_url, allow_other_host: true, status: :temporary_redirect
-    rescue Google::Cloud::Storage::SignedUrlUnavailable => e
-      Rails.logger.error("SignedUrlUnavailable error: #{e.message}")
-      render json: { error: "Missing credentials for signed URL" }, status: :internal_server_error
-    rescue StandardError => e
-      Rails.logger.error("Error generating signed URL: #{e.class}: #{e.message}")
-      Rails.logger.error(e.backtrace&.join("\n"))
-      render json: { error: "Could not generate download URL" }, status: :internal_server_error
-    end
+    send_data(chart_bytes, filename: "chart.tar.gz", type: "application/x-gzip")
   end
 
   private
