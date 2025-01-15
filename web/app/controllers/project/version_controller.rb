@@ -29,7 +29,7 @@ class Project::VersionController < ApplicationController
   end
 
   def update
-    @version.update!(description: params[:description], agent: params[:agent].to_sym)
+    @version.update!(description: params[:description])
 
     flash[:notice] = "Application version updated"
     redirect_to version_path(@version)
