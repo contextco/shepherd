@@ -11,14 +11,13 @@ class Team < ApplicationRecord
   has_many :dependencies, dependent: :destroy, through: :project_versions, class_name: "Dependency"
   has_many :subscribers, through: :projects, class_name: "ProjectSubscriber"
 
-  def setup_scaffolding!(name, description, agent)
+  def setup_scaffolding!(name, description)
     transaction do
       project = projects.create!(name:)
       version = project.project_versions.create!(
         description:,
         version: "0.0.1",
-        state: :draft,
-        agent: agent || :no
+        state: :draft
       )
 
       version

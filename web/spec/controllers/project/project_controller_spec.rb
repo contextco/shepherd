@@ -12,7 +12,7 @@ RSpec.describe Project::ProjectController, type: :controller do
     end
 
     context 'when the project is created successfully' do
-      subject { post :create, params: { name: 'test', team_id: team.id, description: 'test', agent: 'full' } }
+      subject { post :create, params: { name: 'test', team_id: team.id, description: 'test' } }
 
       it 'creates a new project' do
         subject
@@ -26,7 +26,7 @@ RSpec.describe Project::ProjectController, type: :controller do
 
       it 'creates a project version with the correct attributes' do
         subject
-        expect(team.projects.first.latest_project_version.attributes).to include('description' => 'test', 'agent' => 'full')
+        expect(team.projects.first.latest_project_version.attributes).to include('description' => 'test')
       end
     end
 
