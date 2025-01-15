@@ -6,6 +6,8 @@ class ProjectSubscriber < ApplicationRecord
   belongs_to :project_version
   delegate :project, to: :project_version
 
+  enum :agent, { no: 0, full: 1 }, suffix: true
+
   validates :name, presence: true
 
   has_one :helm_repo, dependent: :destroy
