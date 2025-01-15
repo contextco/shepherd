@@ -14,7 +14,7 @@ t = Team.create!
   User.create_with(team: t, password: 'password', name:, role: :admin).find_or_create_by!(email: "#{name}@context.ai")
 end
 
-v = t.setup_scaffolding!('sample', 'sample project description', :full)
+v = t.setup_scaffolding!('sample', 'sample project description')
 v.services.create!(name: 'web', image: 'nginx:alpine', cpu_cores: 2, memory_bytes: 2.gigabytes)
 rand(10..15).times do
   v = v.fork!(description: FFaker::Lorem.sentence, version: FFaker::SemVer.next(v.version))
