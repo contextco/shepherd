@@ -31,9 +31,6 @@
     </div>
   <% else %>
     <ul class="grid gap-6">
-      <% if Flipper.enabled?(:shepherd_agent, current_user) && !Flipper.enabled?(:subscriber_agent, current_user) %>
-        <%= render ProjectVersion::AgentSelectorComponent.new(project_version:) %>
-      <% end %>
       <% services.each do |service| %>
         <%= render Services::ElementComponent.new(service:, version: project_version) %>
       <% end %>
