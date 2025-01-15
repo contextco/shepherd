@@ -41,48 +41,48 @@ RSpec.describe Chart::Publisher do
     end
 
     context 'when agent is set to full' do
-    let(:project_version) { create(:project_version, agent: 'full') }
+      let(:project_subscriber) { create(:project_subscriber, project_version:, agent: 'full') }
 
-    it 'includes agent service' do
-      expect(client).to receive(:send) do |_, request|
-        expect(request.chart.services).to contain_exactly(
-                                            have_attributes(name: 'test-service'),
-                                            have_attributes(name: 'shepherd-agent')
-                                          )
-        response
+      it 'includes agent service' do
+        expect(client).to receive(:send) do |_, request|
+          expect(request.chart.services).to contain_exactly(
+                                              have_attributes(name: 'test-service'),
+                                              have_attributes(name: 'shepherd-agent')
+                                            )
+          response
+        end
+
+        publish
       end
 
-      publish
-    end
-
-    it 'includes correct agent service configuration' do
-      expect(client).to receive(:send) do |_, request|
-        expect(request.chart.services.last).to have_attributes(
-                                                 image: Sidecar::Image.new(
-                                                   name: "ghcr.io/contextco/onprem",
-                                                   tag: "master",
-                                                   pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
-                                                 ),
-                                                 resources: Sidecar::Resources.new(
-                                                   cpu_cores_requested: 1,
-                                                   cpu_cores_limit: 1,
-                                                   memory_bytes_requested: 2.gigabytes,
-                                                   memory_bytes_limit: 2.gigabytes
-                                                 ),
-                                                 environment_config: Sidecar::EnvironmentConfig.new(
-                                                   meta_environment_fields_enabled: true,
-                                                   environment_variables: [
-                                                     Sidecar::EnvironmentVariable.new(name: 'NAME', value: project_subscriber.name),
-                                                     Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project_subscriber.tokens.first.token),
-                                                     Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: ENV['SHEPHERD_AGENT_API_ENDPOINT'] || 'https://agent.trustshepherd.com'),
-                                                     Sidecar::EnvironmentVariable.new(name: 'SHEPHERD_PROJECT_VERSION_ID', value: project_version.id.to_s)
-                                                   ]
+      it 'includes correct agent service configuration' do
+        expect(client).to receive(:send) do |_, request|
+          expect(request.chart.services.last).to have_attributes(
+                                                   image: Sidecar::Image.new(
+                                                     name: "ghcr.io/contextco/onprem",
+                                                     tag: "master",
+                                                     pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
+                                                   ),
+                                                   resources: Sidecar::Resources.new(
+                                                     cpu_cores_requested: 1,
+                                                     cpu_cores_limit: 1,
+                                                     memory_bytes_requested: 2.gigabytes,
+                                                     memory_bytes_limit: 2.gigabytes
+                                                   ),
+                                                   environment_config: Sidecar::EnvironmentConfig.new(
+                                                     meta_environment_fields_enabled: true,
+                                                     environment_variables: [
+                                                       Sidecar::EnvironmentVariable.new(name: 'NAME', value: project_subscriber.name),
+                                                       Sidecar::EnvironmentVariable.new(name: 'BEARER_TOKEN', value: project_subscriber.tokens.first.token),
+                                                       Sidecar::EnvironmentVariable.new(name: 'BACKEND_ADDR', value: ENV['SHEPHERD_AGENT_API_ENDPOINT'] || 'https://agent.trustshepherd.com'),
+                                                       Sidecar::EnvironmentVariable.new(name: 'SHEPHERD_PROJECT_VERSION_ID', value: project_version.id.to_s)
+                                                     ]
+                                                   )
                                                  )
-                                               )
-      end
+        end
 
-      publish
-    end
+        publish
+      end
     end
 
     it 'calls publish_chart twice with correct parameters' do
@@ -180,7 +180,7 @@ RSpec.describe Chart::Publisher do
     end
 
     context 'when agent is set to full' do
-      let(:project_version) { create(:project_version, agent: 'full') }
+      let(:project_subscriber) { create(:project_subscriber, project_version:, agent: 'full') }
 
       it 'includes agent service' do
         expect(client).to receive(:send) do |_, request|

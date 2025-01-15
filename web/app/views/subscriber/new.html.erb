@@ -33,6 +33,19 @@
                                    class: 'w-7/12 p-2' %>
       </div>
 
+      <% if Flipper.enabled?(:shepherd_agent, current_user) && Flipper.enabled?(:subscriber_agent, current_user) %>
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-1 max-w-96">
+            <span class="font-medium text-stone-800 flex-none">Shepherd Agent</span>
+            <span class="text-stone-600 text-sm">
+              Add the Shepherd Agent to enable support for automatic upgrades, health checks, and monitoring.
+            </span>
+          </div>
+
+          <%= form.check_box :agent, { checked: true, class: 'ring-0 focus:ring-0 size-5' }, :full, :no %>
+        </div>
+      <% end %>
+
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1 max-w-96">
           <span class="font-medium text-stone-800 flex-none">Publicly Accessible</span>
@@ -46,7 +59,8 @@
                                     :second,
                                     :first,
                                     {
-                                     required: true,
+                                     include_blank: false,
+                                     selected: true,
                                    },
                                     class: 'w-7/12 p-2' %>
       </div>
