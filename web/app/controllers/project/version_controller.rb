@@ -64,7 +64,7 @@ class Project::VersionController < ApplicationController
   private
 
   def version_params
-    params.require(:project_version).permit(:description, :version, :agent)
+    params.require(:project_version).permit(:description, :version)
   end
 
   def version_error_msg(previous_version, candidate_version)
