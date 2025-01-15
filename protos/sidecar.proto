@@ -9,6 +9,7 @@ package sidecar;
 service Sidecar {
     rpc PublishChart(PublishChartRequest) returns (PublishChartResponse) {}
     rpc ValidateChart(ValidateChartRequest) returns (ValidateChartResponse) {}
+    rpc GenerateChart(GenerateChartRequest) returns (GenerateChartResponse) {}
 }
 
 service SidecarTest {
@@ -16,6 +17,13 @@ service SidecarTest {
     rpc Uninstall(UninstallRequest) returns (UninstallResponse) {}
 }
 
+message GenerateChartRequest {
+    ChartParams chart = 1;
+}
+
+message GenerateChartResponse {
+    bytes chart = 1;
+}
 
 message GenerateAndInstallRequest {
     ChartParams chart = 1;
