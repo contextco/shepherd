@@ -23,7 +23,7 @@ RSpec.describe SubscriberController, type: :request do
   end
 
   describe 'POST #create' do
-    subject { post project_subscribers_path(project), params: { project_subscriber: { name: 'test', project_version_id: project_version.id, auth: true } } }
+    subject { post project_subscribers_path(project), params: { project_subscriber: { name: 'test', project_version_id: project_version.id, auth: true, agent: 'full' } } }
 
     it 'creates a new subscriber' do
       expect { subject }.to change { project_version.subscribers.count }.by(1)
@@ -39,6 +39,17 @@ RSpec.describe SubscriberController, type: :request do
       subscriber = project_version.subscribers.order(:created_at).last
       expect(subscriber.name).to eq('test')
       expect(subscriber.auth).to eq(true)
+      expect(subscriber.full_agent?).to be true
+    end
+
+    context 'when agent is false' do
+      subject { post project_subscribers_path(project), params: { project_subscriber: { name: 'test', project_version_id: project_version.id, auth: true, agent: 'no' } } }
+
+      it 'does not add an agent' do
+        subject
+        subscriber = project_version.subscribers.order(:created_at).last
+        expect(subscriber.full_agent?).to be false
+      end
     end
 
     context 'when auth is false' do
