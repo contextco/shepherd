@@ -39,7 +39,7 @@ class Chart::Publisher
 
   def chart_proto
     services_params = rpc_services
-    services_params << agent_proto_definition if project_version.full_agent?
+    services_params << agent_proto_definition if subscriber.full_agent?
 
     Sidecar::ChartParams.new(
       name: project.name,
