@@ -6,12 +6,13 @@
 # but the chart creation fails, leaving the subscriber in a bad state.
 class Chart::Publisher
   include AgentProto
+  include ActiveModel::Model
   class ChartValidationError < StandardError; end
 
-  def initialize(version, subscriber)
-    @client = SidecarClient.client
+  def initialize(version, subscriber: nil)
     @project_version = version
     @subscriber = subscriber
+    @client = SidecarClient.client
   end
 
   def validate_chart!
@@ -31,9 +32,14 @@ class Chart::Publisher
     @client.send(:publish_chart, req)
   end
 
+  def generate
+    req = Sidecar::GenerateChartRequest.new(chart: chart_proto)
+    @client.send(:generate_chart, req).chart
+  end
+
   def chart_proto
     services_params = rpc_services
-    services_params << agent_proto_definition(project_version, subscriber) if project_version.full_agent?
+    services_params << agent_proto_definition if project_version.full_agent?
 
     Sidecar::ChartParams.new(
       name: project.name,
@@ -45,7 +51,7 @@ class Chart::Publisher
 
   class << self
     def publish!(version, subscriber)
-      new(version, subscriber).publish_chart!
+      new(version, subscriber:).publish_chart!
     end
   end
 
