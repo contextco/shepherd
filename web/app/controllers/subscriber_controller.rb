@@ -71,6 +71,6 @@ class SubscriberController < ApplicationController
   private
 
   def subscriber_params
-    params.require(:project_subscriber).permit(:name, :auth, :project_version_id)
+    params.require(:project_subscriber).permit(:name, :auth, :project_version_id, :agent)
   end
 end
