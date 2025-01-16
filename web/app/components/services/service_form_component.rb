@@ -4,6 +4,7 @@ class Services::ServiceFormComponent < ApplicationComponent
   attribute :service_form_object
   attribute :form_method, default: :post
   attribute :version # hack, we can def remove this somehow.
+  attribute :disabled, default: false
 
   def service_object
     @service_object ||= service_form_object || Service::Form.empty
