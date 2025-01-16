@@ -3,8 +3,4 @@
 class Services::DependencyElementComponent < ApplicationComponent
   attribute :dependency
   attribute :version
-
-  def enabled?
-    version.draft?
-  end
 end

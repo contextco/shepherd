@@ -7,7 +7,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/dependencies/new.html.erb",
-      "line": 9,
+      "line": 10,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(action => Chart::Dependency.from_name!(params[:name]).form_component.new(:dependency_info => Chart::Dependency.from_name!(params[:name]), :version => current_team.dependencies.find(params[:id]).project_version), {})",
       "render_path": [
@@ -37,19 +37,19 @@
     {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
-      "fingerprint": "396799b9218f7d616d69c59006a6377170309f759e949f8897aa99cb2fc3a83a",
+      "fingerprint": "ad057d2a4e6d6c3006b0d2dee399aabfd320c4ee84e12696e1712d0efd9d6372",
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/dependencies/edit.html.erb",
-      "line": 11,
+      "line": 13,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(action => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form.from_dependency(current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id])), :dependency_info => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info, :form_method => :patch), {})",
+      "code": "render(action => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form.from_dependency(current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id])), :dependency_info => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info, :form_method => :patch, :disabled => current_team.dependencies.find(params[:id]).project_version.published?), {})",
       "render_path": [
         {
           "type": "controller",
           "class": "DependenciesController",
           "method": "edit",
-          "line": 39,
+          "line": 40,
           "file": "app/controllers/dependencies_controller.rb",
           "rendered": {
             "name": "dependencies/edit",
@@ -69,6 +69,5 @@
       "note": ""
     }
   ],
-  "updated": "2024-12-02 10:50:00 +0000",
-  "brakeman_version": "6.2.2"
+  "brakeman_version": "7.0.0"
 }

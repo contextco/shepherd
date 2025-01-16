@@ -1,5 +1,5 @@
 <%= form_with model: dependency_instance, scope: :dependency, method: form_method, url:, class: 'flex flex-col gap-6' do |form| %>
-  <%= form.hidden_field :name, value: dependency_info.name %>
+  <%= form.hidden_field :name, disabled:, value: dependency_info.name %>
 
   <% if update? %>
     <div class="flex flex-col gap-6">
@@ -12,7 +12,7 @@
     <%= config_form.hidden_field :app_version, value: dependency_info.variants.first.version %>
 
     <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
+      <div class="flex flex-col gap-1 w-4/12">
         <%= config_form.label :max_memory_policy, class: 'font-medium text-stone-800 flex-none' %>
         <span class="text-stone-600 text-sm">
         Version of the dependency to use
@@ -24,16 +24,23 @@
                                         :first,
                                         :last,
                                         {},
-                                        class: 'w-1/2 p-2' %>
+                                        disabled:,
+                                        class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': disabled }] %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
       form: config_form,
       disk_options: Dependencies::RedisForm::DISK_OPTIONS,
       cpu_options: Dependencies::RedisForm::CPU_CORES_OPTIONS,
-      memory_options: Dependencies::RedisForm::MEMORY_OPTIONS
+      memory_options: Dependencies::RedisForm::MEMORY_OPTIONS,
+      disabled:
     ) %>
   <% end %>
 
-  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
+  <%= form.submit update_create_text,
+                  disabled:,
+                  class: [
+                    'px-3 py-2 mt-2 text-stone-100 w-fit',
+                    { 'cursor-pointer bg-stone-700': !disabled, 'cursor-not-allowed bg-stone-500 opacity-90': disabled }
+                  ] %>
 <% end %>
