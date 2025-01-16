@@ -23,4 +23,18 @@ class Services::ServiceFormComponent < ApplicationComponent
   def update?
     form_method == :patch
   end
+
+  def enforces_version_consistency?
+    # fields like name cannot change between versions
+    # It can be updated if this is the first version where it exists and is unpublished
+    return true if disabled
+
+    previous_version = version.previous_version
+    return false if previous_version.nil?
+
+    # if previous version has a service with the same name, then we can't update
+    return true if previous_version.services.any? { |s| s.name == service_object.name }
+
+    false
+  end
 end

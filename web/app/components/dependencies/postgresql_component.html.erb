@@ -22,8 +22,8 @@
                                  :version,
                                  -> (v) { "Version #{v.human_visible_version}" },
                                  {},
-                                 disabled: disabled || update?,
-                                 class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90':  disabled || update? }] %>
+                                 disabled: enforces_version_consistency?,
+                                 class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90':  enforces_version_consistency? }] %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -37,8 +37,8 @@
       <%= config_form.text_field :db_name,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          disabled: disabled || update?,
-                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': disabled || update? }] %>
+                          disabled: enforces_version_consistency?,
+                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': enforces_version_consistency? }] %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -52,8 +52,8 @@
       <%= config_form.text_field :db_user,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          disabled: disabled || update?,
-                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': disabled || update? }] %>
+                          disabled: enforces_version_consistency?,
+                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': enforces_version_consistency? }] %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
