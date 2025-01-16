@@ -1,3 +1,5 @@
+![Github Card (3)](https://github.com/user-attachments/assets/1658fc7b-e2d6-460f-bb40-0cb63eb532b5)
+
 # Shepherd - Easily Manage Self-Hosted Deployments 
 
 Shepherd helps software vendors easily manage self-hosted deployments. The product is MIT licensed, and provides:
