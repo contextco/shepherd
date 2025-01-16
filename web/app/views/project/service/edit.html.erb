@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.from_service(@service), form_method: :patch, disabled: @disabled) %>
+  <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.from_service(@service), form_method: :patch, version: @version, disabled: @disabled) %>
 
   <% unless @disabled %>
     <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
