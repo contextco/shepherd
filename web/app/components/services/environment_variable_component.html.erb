@@ -3,11 +3,11 @@
   <%= form.hidden_field :templated, value: '0' %>
   <%= form.text_field :name,
                       placeholder: 'ENVIRONMENT_VARIABLE',
-                      class: 'w-2/6 text-input'
+                      class: 'text-sm w-2/6 text-input'
   %>
   <%= form.text_field :value,
                       placeholder: 'value',
-                      class: 'w-4/6 text-input'
+                      class: 'text-sm w-4/6 text-input'
   %>
     <%= heroicon "minus-circle", class: 'flex-none size-6 text-red-600 cursor-pointer', data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } %>
 </div>
