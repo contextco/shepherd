@@ -1,5 +1,5 @@
 <div class="flex items-center justify-between">
-  <div class="flex flex-col gap-1 max-w-96">
+  <div class="flex flex-col gap-1 w-4/12">
     <span class="font-medium text-stone-800 flex-none">Name</span>
     <span class="text-stone-600 text-sm">
       Application name. This cannot be changed after creation. Will match the Helm Chart repository name.
@@ -9,5 +9,5 @@
   <%= form.text_field :name,
                       required: true,
                       value: application&.name,
-                      class: 'w-1/2 p-2' %>
+                      class: 'text-sm w-7/12 p-2' %>
 </div>
