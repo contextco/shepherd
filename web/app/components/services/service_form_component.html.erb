@@ -1,7 +1,7 @@
 <%= form_with model: service_object, url:, method: form_method do |form| %>
   <%= form.hidden_field :service_id, value: service_object.service_id  %>
   <div class="flex flex-col gap-6">
-    <%= render UI::FormTextFieldComponent.new(title: 'Name', disabled: disabled || update?) do |component| %>
+    <%= render UI::FormTextFieldComponent.new(title: 'Name', disabled: enforces_version_consistency?) do |component| %>
       <%= component.with_label do %>
         Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces. Cannot change in future versions.
       <% end %>
@@ -9,10 +9,10 @@
         <%= form.text_field :name,
                             placeholder: 'my-service',
                             required: true,
-                            disabled: disabled || update?,
+                            disabled: enforces_version_consistency?,
                             'data-1p-ignore': true,
                             'data-lpignore': true,
-                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed': disabled || update? }] %>
+                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed': enforces_version_consistency? }] %>
       <% end %>
     <% end %>
 
