@@ -2,6 +2,7 @@
 
 class Services::FormDiskComponent < ApplicationComponent
   attribute :form
+  attribute :disabled, default: false
 
   DEFAULT_OPTIONS = [
     1.gigabytes, 5.gigabytes, 10.gigabytes, 50.gigabytes, 100.gigabytes, 500.gigabytes

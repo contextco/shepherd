@@ -26,9 +26,16 @@ class Project::ServiceController < ApplicationController
     redirect_to version_path(@version)
   end
 
-  def edit; end
+  def edit
+    @disabled = @version.published?
+  end
 
   def update
+    if @version.published?
+      flash[:error] = "Service #{@service.name} cannot be updated"
+      return redirect_to edit_project_service_path(@version)
+    end
+
     unless form.valid?
       flash[:error] = form.errors.full_messages.first
       @service = form.build_service
