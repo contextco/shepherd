@@ -6,4 +6,5 @@ class UI::FormResourcesComponent < ApplicationComponent
   attribute :memory_options
   attribute :cpu_options
   attribute :fields, default: %i[cpu memory disk]
+  attribute :disabled, default: false
 end

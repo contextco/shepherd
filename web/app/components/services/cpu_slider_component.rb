@@ -2,6 +2,7 @@
 
 class Services::CPUSliderComponent < ApplicationComponent
   attribute :form
+  attribute :disabled, default: false
 
   DEFAULT_OPTIONS = [
     1, 2, 4, 8, 16, 32
