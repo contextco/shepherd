@@ -1,5 +1,5 @@
 <div class="flex items-center justify-between">
-  <div class="flex flex-col gap-1 max-w-96">
+  <div class="flex flex-col gap-1 w-4/12">
     <div class="flex flex-col items-baseline">
       <span class="font-medium text-stone-800 flex-none"><%= title %></span>
       <% if caveat.present? %>
@@ -11,7 +11,7 @@
     </span>
   </div>
 
-  <div class="w-7/12 text-input focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
+  <div class="text-sm w-7/12 text-input focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
     <%= field %>
   </div>
 </div>
