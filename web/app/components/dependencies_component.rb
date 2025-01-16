@@ -5,6 +5,7 @@ class DependenciesComponent < ApplicationComponent
   attribute :dependency_info
   attribute :version
   attribute :form_method, default: :post
+  attribute :disabled, default: false
 
   def initialize(**args)
     super
