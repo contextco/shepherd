@@ -11,7 +11,7 @@
         <div class="text-md">No dependencies eligible to be added.</div>
       <% end %>
       <% @dependencies.each do |dep| %>
-        <%= link_to new_version_dependency_path(name: dep.name), class: 'p-6 hover:bg-stone-50 duration-200 flex items-baseline gap-4 border border-stone-300' do %>
+        <%= link_to new_version_dependency_path(name: dep.name), class: 'bg-white p-6 hover:shadow hover:border-stone-300 duration-200 flex items-baseline gap-4 border border-stone-300' do %>
           <div class="size-5 text-stone-600"><%= heroicon dep.icon, class: 'w-full' %></div>
           <div class="flex flex-col gap-1 grow">
             <div class="text-lg font-semibold capitalize"><%= dep.human_visible_name %></div>
