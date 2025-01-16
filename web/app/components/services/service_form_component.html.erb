@@ -35,19 +35,23 @@
 
     <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory]) %>
 
+    <hr class="border-stone-300 my-2">
+
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Environment Variables',
       caveat: :optional,
       form:,
       association_name: :environment_variables,
+      vertical: true,
       model_class: Service::Form::EnvironmentVariableForm,
       child_component: Services::EnvironmentVariableComponent,
       ) do |component| %>
       <%= component.with_label do %>
-        <span>Configuration values necessary to configure your service.</span>
-        <span>Do not include sensitive values, for these you should use secrets.</span>
+        <span>Configuration values necessary to configure your service. Do not include sensitive values, for these you should use secrets.</span>
       <% end %>
     <% end %>
+
+    <hr class="border-stone-300 my-2">
 
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Secrets',
@@ -62,6 +66,8 @@
         <span>For example, API keys, database passwords, and encryption keys.</span>
       <% end %>
     <% end %>
+
+    <hr class="border-stone-300 my-2">
 
     <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command', caveat: :optional) do |component| %>
       <%= component.with_label do %>

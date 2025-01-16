@@ -11,9 +11,7 @@ RSpec.describe Project::VersionController, type: :controller do
     {
       project_id: project.id,
       id: project_version.id,
-      description: 'New description',
-      agent: 'full'
-    }
+      description: 'New description'    }
   end
 
   before do
@@ -86,8 +84,7 @@ RSpec.describe Project::VersionController, type: :controller do
       {
         project_version: {
           version: '1.0.0',
-          description: 'New version',
-          agent: 'full'
+          description: 'New version'
         },
         project_id: project.id
       }
@@ -108,11 +105,6 @@ RSpec.describe Project::VersionController, type: :controller do
       it 'sets a success flash message' do
         subject
         expect(flash[:notice]).to eq('Application version created')
-      end
-
-      it 'sets agent to full' do
-        subject
-        expect(ProjectVersion.order(:created_at).last.full_agent?).to be_truthy
       end
 
       context 'when the previous version has services' do
@@ -188,11 +180,6 @@ RSpec.describe Project::VersionController, type: :controller do
       it 'sets a success flash message' do
         subject
         expect(flash[:notice]).to eq('Application version updated')
-      end
-
-      it 'updates the agent' do
-        subject
-        expect(project_version.reload.full_agent?).to be_truthy
       end
     end
   end

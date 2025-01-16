@@ -5,6 +5,7 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   attribute :form
   attribute :association_name
   attribute :model_class
+  attribute :vertical, default: false
 
   attribute :caveat, default: nil
 

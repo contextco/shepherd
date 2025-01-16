@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_15_113029) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_15_152201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -150,7 +150,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_113029) do
   end
 
   create_table "project_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "project_id"
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -159,7 +158,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_113029) do
     t.boolean "auth", default: true, null: false
     t.uuid "project_version_id"
     t.integer "agent", default: 0
-    t.index ["project_id"], name: "index_project_subscribers_on_project_id"
     t.index ["project_version_id"], name: "index_project_subscribers_on_project_version_id"
   end
 
@@ -170,7 +168,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_113029) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "project_id"
-    t.integer "agent", default: 0
     t.index ["project_id"], name: "index_project_versions_on_project_id"
   end
 
@@ -226,7 +223,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_113029) do
   add_foreign_key "project_services", "project_versions"
   add_foreign_key "project_subscriber_tokens", "project_subscribers"
   add_foreign_key "project_subscribers", "project_versions"
-  add_foreign_key "project_subscribers", "projects"
   add_foreign_key "project_versions", "projects"
   add_foreign_key "projects", "teams"
   add_foreign_key "ssh_public_keys", "users"
