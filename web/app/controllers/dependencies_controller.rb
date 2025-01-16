@@ -36,6 +36,7 @@ class DependenciesController < ApplicationController
     @dependency = @version.dependencies.find(params[:id])
     @dependency_info = @dependency.info
     @dependency_instance = @dependency_info.form.from_dependency(@dependency)
+    @disabled = @version.published?
   end
 
   def destroy
