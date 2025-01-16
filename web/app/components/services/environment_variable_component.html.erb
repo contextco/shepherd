@@ -1,13 +1,17 @@
 <div class="dynamic-element flex gap-4 items-center">
   <%# hidden value for now as we will not support this yet %>
-  <%= form.hidden_field :templated, value: '0' %>
+  <%= form.hidden_field :templated, disabled:, value: '0' %>
   <%= form.text_field :name,
-                      placeholder: 'ENVIRONMENT_VARIABLE',
-                      class: 'text-sm w-2/6 text-input'
+                      placeholder: disabled ? nil : 'ENVIRONMENT_VARIABLE',
+                      disabled:,
+                      class: ['text-sm w-2/6 text-input', { '!bg-stone-100 opacity-90 cursor-not-allowed': disabled }]
   %>
   <%= form.text_field :value,
-                      placeholder: 'value',
-                      class: 'text-sm w-4/6 text-input'
+                      placeholder: disabled ? nil : 'value',
+                      disabled:,
+                      class: ['text-sm w-4/6 text-input', { '!bg-stone-100 opacity-90 cursor-not-allowed': disabled }]
   %>
-    <%= heroicon "minus-circle", class: 'flex-none size-6 text-red-600 cursor-pointer', data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } %>
+  <%= heroicon "minus-circle",
+               class: 'flex-none size-6 text-red-600 cursor-pointer',
+               data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } unless disabled %>
 </div>

@@ -17,15 +17,17 @@
     </div>
   </div>
 
-  <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.from_service(@service), form_method: :patch) %>
+  <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.from_service(@service), form_method: :patch, disabled: @disabled) %>
 
-  <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
-    <div class="flex flex-col gap-1">
-      <span class="font-medium text-lg">Service Deletion</span>
-      <span class="text-stone-600 text-sm">Once you delete an Service, it cannot be undone. Please be absolutely certain before proceeding.</span>
+  <% unless @disabled %>
+    <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
+      <div class="flex flex-col gap-1">
+        <span class="font-medium text-lg">Service Deletion</span>
+        <span class="text-stone-600 text-sm">Once you delete an Service, it cannot be undone. Please be absolutely certain before proceeding.</span>
+      </div>
+      <%= button_to project_service_path(@service), method: :delete, class: 'button-destructive' do %>
+        Delete Service
+      <% end %>
     </div>
-    <%= button_to project_service_path(@service), method: :delete, class: 'button-destructive' do %>
-      Delete Service
-    <% end %>
-  </div>
+  <% end %>
 </div>

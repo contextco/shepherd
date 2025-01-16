@@ -1,16 +1,24 @@
 <div class="dynamic-element flex gap-16 items-center">
   <div class="flex gap-8 items-center w-full">
     <%= form.text_field :port,
-                        placeholder: '80',
+                        disabled:,
+                        placeholder: disabled ? nil : '80',
                         pattern: '\d*',
                         title: 'Port must be a number between 1 and 65535',
                         min: 1,
                         max: 65535,
-                        class: 'text-sm text-input w-full' %>
+                        class: ['text-sm text-input w-full', { '!bg-stone-100 opacity-90 cursor-not-allowed': disabled }] %>
     <%= form.check_box :ingress,
+                       disabled:,
                        data: { "singular-checkbox-target": "checkbox", action: "change->singular-checkbox#check" },
-                       class: 'ring-0 focus:ring-0' %>
+                       class: ['ring-0 focus:ring-0', { '!bg-stone-100 opacity-90 cursor-not-allowed': disabled }] %>
   </div>
 
-  <%= heroicon "minus-circle", class: 'flex-none size-6 text-red-600 cursor-pointer', data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } %>
+  <% if disabled %>
+    <div class="size-6"></div>
+  <% else %>
+    <%= heroicon "minus-circle",
+                 class: 'flex-none size-6 text-red-600 cursor-pointer',
+                 data: { action: 'click->dynamic-nested-form-form-component#removeSubform' } %>
+  <% end %>
 </div>

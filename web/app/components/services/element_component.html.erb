@@ -1,9 +1,6 @@
 <li class="grid items-stretch">
   <% block_content = capture do %>
-    <%= content_tag :div, class: ['w-full border border-solid border-stone-400 p-4 duration-200 flex flex-col gap-4 bg-white z-2', {
-      'cursor-pointer hover:shadow-md': enabled?,
-      'cursor-not-allowed opacity-70': !enabled?
-    }] do %>
+    <%= content_tag :div, class: 'cursor-pointer hover:shadow-md w-full border border-solid border-stone-400 p-4 duration-200 flex flex-col gap-4 bg-white z-2' do %>
       <div class="flex justify-between items-center">
         <h6 class="flex items-center gap-2">
           <%= heroicon "squares-2x2", class: "size-4" %>
@@ -27,11 +24,7 @@
     <% end %>
   <% end %>
 
-  <% if enabled? %>
-    <%= link_to edit_project_service_path(service), class: '' do %>
-      <%= block_content %>
-    <% end %>
-  <% else %>
+  <%= link_to edit_project_service_path(service), class: '' do %>
     <%= block_content %>
   <% end %>
 </li>
