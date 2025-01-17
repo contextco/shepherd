@@ -23,7 +23,7 @@
         maximum_subforms: 10,
         ) do |component| %>
         <% component.with_subform_content do |secret_form| %>
-          <%= render child_component.new(form: secret_form) %>
+          <%= render child_component.new(form: secret_form, disabled:) %>
         <% end %>
       <% end %>
 
@@ -35,7 +35,7 @@
             + Add
           </div>
         <% end %>
-      <% end %>
+      <% end unless disabled %>
     </div>
   </div>
 </div>

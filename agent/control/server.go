@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"sync"
 
-	"onprem/control/components/home"
-	"onprem/process"
-	"onprem/ssh"
+	"agent/control/components/home"
+	"agent/process"
+	"agent/ssh"
 
 	"github.com/a-h/templ"
 	"github.com/google/uuid"

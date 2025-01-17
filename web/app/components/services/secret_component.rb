@@ -2,4 +2,5 @@
 
 class Services::SecretComponent < ApplicationComponent
   attribute :form
+  attribute :disabled, default: false
 end

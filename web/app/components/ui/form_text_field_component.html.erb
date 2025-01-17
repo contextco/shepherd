@@ -11,7 +11,7 @@
     </span>
   </div>
 
-  <div class="text-sm w-7/12 text-input focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
+  <div class="text-sm w-7/12 text-input focus-within:ring-blue-500 focus-within:border-blue-500 <%= disabled ? 'opacity-80 !bg-stone-100 !border-stone-400 cursor-not-allowed' : 'focus-within:ring-1' %>">
     <%= field %>
   </div>
 </div>

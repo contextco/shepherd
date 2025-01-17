@@ -1,39 +1,41 @@
 <%= form_with model: service_object, url:, method: form_method do |form| %>
   <%= form.hidden_field :service_id, value: service_object.service_id  %>
   <div class="flex flex-col gap-6">
-    <%= render UI::FormTextFieldComponent.new(title: 'Name') do |component| %>
+    <%= render UI::FormTextFieldComponent.new(title: 'Name', disabled: enforces_version_consistency?) do |component| %>
       <%= component.with_label do %>
-        Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces.
+        Unique within the project. Must be lower case and contain only letters, numbers, and hyphens with no spaces. Cannot change in future versions.
       <% end %>
       <%= component.with_field do %>
         <%= form.text_field :name,
                             placeholder: 'my-service',
                             required: true,
+                            readonly: enforces_version_consistency?,
                             'data-1p-ignore': true,
                             'data-lpignore': true,
-                            class: 'text-sm w-full !p-0 border-0 focus:ring-0' %>
+                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed focus:border-0': enforces_version_consistency? }] %>
       <% end %>
     <% end %>
 
-    <%= render UI::FormTextFieldComponent.new(title: 'Image') do |component| %>
+    <%= render UI::FormTextFieldComponent.new(title: 'Image', disabled:) do |component| %>
       <%= component.with_label do %>
         Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
       <% end %>
       <%= component.with_field do %>
         <%= form.text_field :image,
                             required: true,
+                            disabled:,
                             placeholder: 'docker.io/library/nginx:1.24.0-alpine3.17',
-                            class: 'text-sm w-full !p-0 border-0 focus:ring-0' %>
+                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed': disabled }] %>
       <% end %>
     <% end %>
 
     <hr class="border-stone-300 my-2">
 
-    <%= render Services::ImageCredentialsComponent.new(form:) %>
+    <%= render Services::ImageCredentialsComponent.new(form:, disabled:) %>
 
     <hr class="border-stone-300 my-2">
 
-    <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory]) %>
+    <%= render UI::FormResourcesComponent.new(form:, fields: %i[cpu memory], disabled:) %>
 
     <hr class="border-stone-300 my-2">
 
@@ -43,6 +45,7 @@
       form:,
       association_name: :environment_variables,
       vertical: true,
+      disabled:,
       model_class: Service::Form::EnvironmentVariableForm,
       child_component: Services::EnvironmentVariableComponent,
       ) do |component| %>
@@ -57,6 +60,7 @@
       title: 'Secrets',
       form:,
       caveat: :optional,
+      disabled:,
       association_name: :secrets,
       model_class: Service::Form::SecretForm,
       child_component: Services::SecretComponent,
@@ -69,7 +73,7 @@
 
     <hr class="border-stone-300 my-2">
 
-    <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command', caveat: :optional) do |component| %>
+    <%= render UI::FormTextFieldComponent.new(title: 'Predeploy Command', caveat: :optional, disabled:) do |component| %>
       <%= component.with_label do %>
         Command to run before deploying the service. For example, database migrations.
       <% end %>
@@ -77,15 +81,16 @@
         <div class="flex items-center gap-2">
           <span class="text-xs mt-0.5">$</span>
           <%= form.text_field :predeploy_command,
-                              placeholder: 'rake db:migrate',
-                              class: 'text-sm w-full !p-0 border-0 focus:ring-0' %>
+                              placeholder: disabled ? nil : 'rake db:migrate',
+                              disabled:,
+                              class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed': disabled }] %>
         </div>
       <% end %>
     <% end %>
 
     <hr class="border-stone-300 my-2">
 
-    <%= render Services::FormDiskComponent.new(form:, options: Service::Form::MOUNT_DISK_OPTIONS) %>
+    <%= render Services::FormDiskComponent.new(form:, options: Service::Form::MOUNT_DISK_OPTIONS, disabled:) %>
 
     <hr class="border-stone-300 my-2">
 
@@ -94,6 +99,7 @@
         title: 'Open Ports',
         caveat: :optional,
         form:,
+        disabled:,
         association_name: :ports,
         model_class: Service::Form::PortForm,
         child_component: Services::PortComponent,
@@ -113,6 +119,11 @@
       <% end %>
     </div>
 
-    <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
+    <%= form.submit update_create_text,
+                    disabled:,
+                    class: [
+                      'px-3 py-2 mt-2 text-stone-100 w-fit',
+                      { 'cursor-pointer bg-stone-700': !disabled, 'cursor-not-allowed bg-stone-500 opacity-90': disabled }
+                    ] %>
   </div>
 <% end %>

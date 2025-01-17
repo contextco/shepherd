@@ -1,7 +1,7 @@
 go 1.23.2
 
 use (
-	./client
+	./agent
 	./gateway
 	./web/sidecar
 )

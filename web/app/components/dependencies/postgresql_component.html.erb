@@ -1,5 +1,5 @@
 <%= form_with model: dependency_instance, method: form_method, scope: :dependency, url:, class: 'flex flex-col gap-6' do |form| %>
-  <%= form.hidden_field :name, value: dependency_info.name %>
+  <%= form.hidden_field :name, disabled:, value: dependency_info.name %>
 
   <% if update? %>
     <div class="flex flex-col gap-6">
@@ -10,23 +10,28 @@
 
   <%= form.fields_for :configs do |config_form| %>
     <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
+      <div class="flex flex-col gap-1 w-4/12">
         <%= config_form.label :app_version, class: 'font-medium text-stone-800 flex-none' %>
         <span class="text-stone-600 text-sm">
         Version of the dependency to use
       </span>
       </div>
 
-      <%= config_form.collection_select :app_version,
-                                 dependency_info.variants.sort_by(&:version).reverse,
-                                 :version,
-                                 -> (v) { "Version #{v.human_visible_version}" },
-                                 {},
-                                 class: 'w-1/2 p-2' %>
+      <div class="<%= 'cursor-not-allowed' if enforces_version_consistency? %> w-7/12">
+        <%= config_form.collection_select :app_version,
+                                   dependency_info.variants.sort_by(&:version).reverse,
+                                   :version,
+                                   -> (v) { "Version #{v.human_visible_version}" },
+                                   {},
+                                   class: [
+                                     'text-sm w-full p-2',
+                                     { 'bg-stone-100 opacity-90 pointer-events-none':  enforces_version_consistency? }
+                                   ] %>
+      </div>
     </div>
 
     <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
+      <div class="flex flex-col gap-1 w-4/12">
         <%= config_form.label :db_name, "Database", class: 'font-medium text-stone-800 flex-none' %>
         <span class="text-stone-600 text-sm">
           PostgreSQL database dbname, random if not provided
@@ -36,11 +41,15 @@
       <%= config_form.text_field :db_name,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          class: 'w-1/2 p-2' %>
+                          readonly: enforces_version_consistency?,
+                          class: [
+                            'text-sm w-7/12 p-2',
+                            { 'cursor-not-allowed bg-stone-100 opacity-90 focus:ring-0 focus:border-stone-500': enforces_version_consistency? }
+                          ] %>
     </div>
 
     <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-1 max-w-96">
+      <div class="flex flex-col gap-1 w-4/12">
         <%= config_form.label :db_user, "User", class: 'font-medium text-stone-800 flex-none' %>
         <span class="text-stone-600 text-sm">
           PostgreSQL database user, random if not provided
@@ -50,16 +59,24 @@
       <%= config_form.text_field :db_user,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          class: 'w-1/2 p-2' %>
+                          readonly: enforces_version_consistency?,
+                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90 focus:ring-0 focus:border-stone-500': enforces_version_consistency? }] %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
       form: config_form,
       disk_options: Dependencies::PostgresqlForm::DISK_OPTIONS,
       cpu_options: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS,
-      memory_options: Dependencies::PostgresqlForm::MEMORY_OPTIONS
+      memory_options: Dependencies::PostgresqlForm::MEMORY_OPTIONS,
+      disabled:,
+      disabled_fields: enforces_version_consistency? ? %i[disk] : [] # disk is disabled if there is a previous version of the dependency
     ) %>
   <% end %>
 
-  <%= form.submit update_create_text, class: 'px-3 py-2 mt-2 bg-stone-700 text-stone-100 cursor-pointer w-fit' %>
+  <%= form.submit update_create_text,
+                  disabled:,
+                  class: [
+                    'px-3 py-2 mt-2 text-stone-100 w-fit',
+                    { 'cursor-pointer bg-stone-700': !disabled, 'cursor-not-allowed bg-stone-500 opacity-90': disabled }
+                  ] %>
 <% end %>

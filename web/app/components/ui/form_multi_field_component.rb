@@ -7,6 +7,8 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   attribute :model_class
   attribute :vertical, default: false
 
+  attribute :disabled, default: false
+
   attribute :caveat, default: nil
 
   attribute :child_component

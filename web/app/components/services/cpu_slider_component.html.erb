@@ -1,6 +1,7 @@
 <%= render UI::StepSliderComponent.new(
   form:,
   steps: options_value,
+  disabled:,
   labels: options_value.map { |m| pluralize(m, 'core') },
   name: :cpu_cores
 ) %>

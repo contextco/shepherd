@@ -8,7 +8,7 @@ import (
 
 	"github.com/akuity/grpc-gateway-client/pkg/grpc/gateway"
 
-	service_pb "onprem/generated/service_pb"
+	service_pb "agent/generated/service_pb"
 )
 
 type Identity struct {
