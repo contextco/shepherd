@@ -3,10 +3,11 @@ package chart
 import (
 	"fmt"
 	"math"
-	"onprem/cluster"
+	"strings"
+
+	"agent/cluster"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
-	"strings"
 
 	"helm.sh/helm/v3/pkg/chartutil"
 )
