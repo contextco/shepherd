@@ -5,10 +5,11 @@ import (
 	"errors"
 	"flag"
 	"io"
-	"onprem/circular"
 	"os"
 	"os/exec"
 	"time"
+
+	"agent/circular"
 )
 
 var ErrNoCommand = errors.New("no command provided")

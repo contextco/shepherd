@@ -3,11 +3,12 @@ package server
 import (
 	"context"
 	"fmt"
-	"onprem/cluster"
 	"sidecar/chart"
 	"sidecar/test/testcluster"
 	"strings"
 	"testing"
+
+	"agent/cluster"
 
 	sidecar_pb "sidecar/generated/sidecar_pb"
 

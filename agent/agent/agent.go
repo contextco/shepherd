@@ -1,12 +1,12 @@
 package agent
 
 import (
+	"agent/backend"
+	"agent/cluster"
+	"agent/generated/service_pb"
+	"agent/periodic"
 	"context"
 	"log"
-	"onprem/backend"
-	"onprem/cluster"
-	"onprem/generated/service_pb"
-	"onprem/periodic"
 	"time"
 
 	"github.com/google/uuid"
