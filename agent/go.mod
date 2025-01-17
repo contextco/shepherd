@@ -1,4 +1,4 @@
-module onprem
+module agent
 
 go 1.23.2
 

@@ -1,7 +1,8 @@
-FROM golang:1.23.4-alpine3.20
+FROM golang:1.23-alpine
 
 COPY . .
 
 RUN --mount=type=cache,target="/root/.cache/go-build" go build
 
-CMD ./onprem
+CMD ./agent
+

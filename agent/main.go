@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"onprem/agent"
-	"onprem/config"
+	"agent/agent"
+	"agent/config"
 )
 
 var (
