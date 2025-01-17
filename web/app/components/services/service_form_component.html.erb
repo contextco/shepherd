@@ -9,10 +9,10 @@
         <%= form.text_field :name,
                             placeholder: 'my-service',
                             required: true,
-                            disabled: enforces_version_consistency?,
+                            readonly: enforces_version_consistency?,
                             'data-1p-ignore': true,
                             'data-lpignore': true,
-                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed': enforces_version_consistency? }] %>
+                            class: ['text-sm w-full !p-0 border-0 focus:ring-0 bg-transparent', { 'cursor-not-allowed focus:border-0': enforces_version_consistency? }] %>
       <% end %>
     <% end %>
 

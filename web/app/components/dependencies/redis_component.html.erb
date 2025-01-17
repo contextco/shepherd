@@ -33,7 +33,8 @@
       disk_options: Dependencies::RedisForm::DISK_OPTIONS,
       cpu_options: Dependencies::RedisForm::CPU_CORES_OPTIONS,
       memory_options: Dependencies::RedisForm::MEMORY_OPTIONS,
-      disabled:
+      disabled:,
+      disabled_fields: enforces_version_consistency? ? %i[disk] : [] # disk is disabled if there is a previous version of the dependency
     ) %>
   <% end %>
 
