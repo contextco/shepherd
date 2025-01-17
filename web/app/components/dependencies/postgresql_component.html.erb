@@ -17,13 +17,17 @@
       </span>
       </div>
 
-      <%= config_form.collection_select :app_version,
-                                 dependency_info.variants.sort_by(&:version).reverse,
-                                 :version,
-                                 -> (v) { "Version #{v.human_visible_version}" },
-                                 {},
-                                 disabled: enforces_version_consistency?,
-                                 class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90':  enforces_version_consistency? }] %>
+      <div class="<%= 'cursor-not-allowed' if enforces_version_consistency? %> w-7/12">
+        <%= config_form.collection_select :app_version,
+                                   dependency_info.variants.sort_by(&:version).reverse,
+                                   :version,
+                                   -> (v) { "Version #{v.human_visible_version}" },
+                                   {},
+                                   class: [
+                                     'text-sm w-full p-2',
+                                     { 'bg-stone-100 opacity-90 pointer-events-none':  enforces_version_consistency? }
+                                   ] %>
+      </div>
     </div>
 
     <div class="flex items-center justify-between">
@@ -37,8 +41,11 @@
       <%= config_form.text_field :db_name,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          disabled: enforces_version_consistency?,
-                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': enforces_version_consistency? }] %>
+                          readonly: enforces_version_consistency?,
+                          class: [
+                            'text-sm w-7/12 p-2',
+                            { 'cursor-not-allowed bg-stone-100 opacity-90 focus:ring-0 focus:border-stone-500': enforces_version_consistency? }
+                          ] %>
     </div>
 
     <div class="flex items-center justify-between">
@@ -52,8 +59,8 @@
       <%= config_form.text_field :db_user,
                           'data-1p-ignore': true,
                           'data-lpignore': true,
-                          disabled: enforces_version_consistency?,
-                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90': enforces_version_consistency? }] %>
+                          readonly: enforces_version_consistency?,
+                          class: ['text-sm w-7/12 p-2', { 'cursor-not-allowed bg-stone-100 opacity-90 focus:ring-0 focus:border-stone-500': enforces_version_consistency? }] %>
     </div>
 
     <%= render UI::FormResourcesComponent.new(
@@ -61,7 +68,8 @@
       disk_options: Dependencies::PostgresqlForm::DISK_OPTIONS,
       cpu_options: Dependencies::PostgresqlForm::CPU_CORES_OPTIONS,
       memory_options: Dependencies::PostgresqlForm::MEMORY_OPTIONS,
-      disabled:
+      disabled:,
+      disabled_fields: enforces_version_consistency? ? %i[disk] : [] # disk is disabled if there is a previous version of the dependency
     ) %>
   <% end %>
 

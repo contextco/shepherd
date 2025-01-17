@@ -44,6 +44,7 @@ class Dependencies::RedisForm < Dependencies::Base
   end
 
   def update_dependency(dependency)
+    # TODO: ensure that we do not update fields you are not allowed to update here (disk version etc.)
     configs = dependency.configs.symbolize_keys.merge(configs_params.except(:db_password)) # don't update password
     dependency.update!(name:, version:, repo_url:, chart_name:, configs:)
   end

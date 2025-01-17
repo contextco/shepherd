@@ -37,13 +37,13 @@
     {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
-      "fingerprint": "ad057d2a4e6d6c3006b0d2dee399aabfd320c4ee84e12696e1712d0efd9d6372",
+      "fingerprint": "d903548112aae474569a786763441bf0ee0582da3a3bc5db0c896d4e37ec6557",
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/dependencies/edit.html.erb",
-      "line": 13,
+      "line": 14,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(action => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form.from_dependency(current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id])), :dependency_info => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info, :form_method => :patch, :disabled => current_team.dependencies.find(params[:id]).project_version.published?), {})",
+      "code": "render(action => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form_component.new(:dependency_instance => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info.form.from_dependency(current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id])), :dependency_info => current_team.dependencies.find(params[:id]).project_version.dependencies.find(params[:id]).info, :form_method => :patch, :version => current_team.dependencies.find(params[:id]).project_version, :disabled => current_team.dependencies.find(params[:id]).project_version.published?), {})",
       "render_path": [
         {
           "type": "controller",
