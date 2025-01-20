@@ -59,7 +59,7 @@ RSpec.describe Chart::Publisher do
         expect(client).to receive(:send) do |_, request|
           expect(request.chart.services.last).to have_attributes(
                                                    image: Sidecar::Image.new(
-                                                     name: "ghcr.io/contextco/onprem",
+                                                     name: "ghcr.io/contextco/shepherd",
                                                      tag: "master",
                                                      pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
                                                    ),
@@ -198,7 +198,7 @@ RSpec.describe Chart::Publisher do
         expect(client).to receive(:send) do |_, request|
           expect(request.chart.services.last).to have_attributes(
                                                    image: Sidecar::Image.new(
-                                                     name: "ghcr.io/contextco/onprem",
+                                                     name: "ghcr.io/contextco/shepherd",
                                                      tag: "master",
                                                      pull_policy: 'IMAGE_PULL_POLICY_ALWAYS'
                                                    ),
