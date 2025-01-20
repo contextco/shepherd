@@ -12,8 +12,8 @@ module ContainerStatus
     def current_status
       # TODO: implement this correctly and refactor container to enum to be consistent
       return @current_status if defined?(@current_status)
-      return @current_status = :offline if containers.all?(&:unhealthy?)
-      return @current_status = :degraded if containers.any?(&:unhealthy?)
+      return @current_status = :offline unless containers.any?(&:healthy?)
+      return @current_status = :degraded unless containers.all?(&:healthy?)
 
       @current_status = :online
     end
@@ -23,7 +23,7 @@ module ContainerStatus
 
       total_operational = group_stats.count { |day_stats| day_stats[:status] == :online }
 
-      @uptime_percentage = ((total_operational.to_f / days) * 100).round(2)
+      @uptime_percentage = ((total_operational.to_f / days) * 100).round(1)
     end
 
     class << self
@@ -42,7 +42,7 @@ module ContainerStatus
       private
 
       def stats(containers, _)
-        containers.map { |container| HeartbeatStats.new(container).generate_status_per_day }
+        a = containers.map { |container| HeartbeatStats.new(container).generate_status_per_day }
       end
 
       def group_stats(constituent_stats, days)
@@ -55,7 +55,7 @@ module ContainerStatus
         uptime_minutes = constituent_stats.sum { |container_status| container_status[day][:uptime_minutes] }
         downtime_minutes = constituent_stats.sum { |container_status| container_status[day][:downtime_minutes] }
         total_minutes = uptime_minutes + downtime_minutes
-        uptime_percentage = total_minutes.zero? ? 0 : ((uptime_minutes / (uptime_minutes + downtime_minutes).to_f) * 100).round(2)
+        uptime_percentage = total_minutes.zero? ? 0 : ((uptime_minutes / (uptime_minutes + downtime_minutes).to_f) * 100).round(1)
 
         return { status: :offline, date:, uptime_minutes:, downtime_minutes:, uptime_percentage: } if all_container_status.include?(:offline)
         return { status: :degraded, date:, uptime_minutes:, downtime_minutes:, uptime_percentage: } if all_container_status.include?(:degraded)

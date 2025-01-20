@@ -45,6 +45,7 @@ class ContainerStatus::HeartbeatStats
     result.each do |_, day_data|
       next if day_data[:status] == :no_data
       day_data[:status] = determine_status(day_data[:downtime_minutes])
+      day_data[:uptime_percentage] = calculate_percentage(day_data[:uptime_minutes], day_data[:downtime_minutes])
     end
   end
 
@@ -105,7 +106,7 @@ class ContainerStatus::HeartbeatStats
     total = uptime + downtime
     return 0 if total.zero?
 
-    (uptime / total.to_f * 100).round(2)
+    (uptime / total.to_f * 100).round(1)
   end
 
   def calculate_first_day_uptime(first_heartbeat, downtime)
