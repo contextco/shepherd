@@ -6,7 +6,7 @@ module AgentProto
       name: "shepherd-agent",
       replica_count: 1,
       image: Sidecar::Image.new(
-        name: "ghcr.io/contextco/onprem",
+        name: "ghcr.io/contextco/shepherd",
         tag: "master",
         pull_policy: Sidecar::ImagePullPolicy::IMAGE_PULL_POLICY_ALWAYS
       ),
