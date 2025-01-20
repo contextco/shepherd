@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Containers::IndividualContainerStatusComponent < ApplicationComponent
-  attribute :name
   attribute :status_bars
   attribute :container
 
@@ -9,7 +8,7 @@ class Containers::IndividualContainerStatusComponent < ApplicationComponent
 
   def current_status
     return @current_status if defined?(@current_status)
-    return @current_status = :offline if container&.unhealthy?
+    return @current_status = :offline unless container&.healthy?
 
     @current_status = :online
   end
@@ -27,7 +26,9 @@ class Containers::IndividualContainerStatusComponent < ApplicationComponent
     with_data_bars = status_bars.filter { |bar| bar[:status] != :no_data }
     return 0 if with_data_bars.empty?
 
-    with_data_bars.sum { |bar| bar[:uptime_percentage] } / with_data_bars.size
+    percentage = with_data_bars.sum { |bar| bar[:uptime_percentage] } / with_data_bars.size
+
+    percentage.round(1)
   end
 
   def bg_classes(status)
