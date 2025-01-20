@@ -68,6 +68,10 @@ class ProjectService < ApplicationRecord
     DockerImageUrlParser.new(image).to_s(with_tag: false)
   end
 
+  def compare(other)
+    Comparisons::Service.compare(self, other)
+  end
+
   private
 
   def set_pvc_name
