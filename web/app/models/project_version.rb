@@ -65,4 +65,12 @@ class ProjectVersion < ApplicationRecord
   def deployable?
     services.any?
   end
+
+  # Compares the current project version with an incoming version.
+  #
+  # @param incoming_version [ProjectVersion] The version to compare against.
+  # @return [Comparisons::Version::VersionComparison] The comparison result.
+  def compare(incoming_version)
+    Comparisons::Version::VersionComparison.from(self, incoming_version)
+  end
 end

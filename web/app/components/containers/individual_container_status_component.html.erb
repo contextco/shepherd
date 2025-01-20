@@ -1,14 +1,7 @@
 <div class="flex flex-col gap-2 mt-1">
-  <% if name.present? %>
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-stone-100 font-semibold mt-1"><%= name %></span>
-      <span class="<%= text_classes(current_status) %>"><%= status_text(current_status) %></span>
-    </div>
-
-  <% end %>
-  <div class="flex justify-center items-center gap-1.5 h-10 grow">
+  <div class="flex justify-center items-center gap-[5px] h-10 grow">
     <% status_bars.each do |status_bar| %>
-      <div class="relative group max-w-2 min-w-1 w-full h-full <%= bg_classes(status_bar[:status]) %>">
+      <div class="relative group max-w-2 min-w-[3px] w-full h-full <%= bg_classes(status_bar[:status]) %>">
         <div class="absolute flex flex-col gap-0.5 top-10 left-0 border border-stone-400 rounded-md bg-stone-800 text-stone-100 text-xs rounded px-2 py-1 whitespace-nowrap z-40 opacity-0 group-hover:opacity-100">
           <%= status_bar[:date].strftime('%B %d, %Y') %>
           <div class="flex justify-between items-baseline gap-2">
