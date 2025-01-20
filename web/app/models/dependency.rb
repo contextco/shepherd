@@ -26,5 +26,9 @@ class Dependency < ApplicationRecord
     "v#{info.human_visible_version(configs["app_version"])}" if configs["app_version"].present?
   end
 
+  def compare(other)
+    Comparisons::Dependency.compare(self, other)
+  end
+
   delegate :human_visible_name, :icon, :form_component, to: :info
 end

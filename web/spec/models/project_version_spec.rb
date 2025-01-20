@@ -120,4 +120,38 @@ RSpec.describe ProjectVersion do
       )
     end
   end
+
+  describe '#compare' do
+    let(:base_version) { create(:project_version, project:) }
+    let(:incoming_version) { create(:project_version, project:) }
+
+    context 'with service changes' do
+      context 'when a service is added' do
+        let!(:incoming_service) do
+          create(:project_service,
+                 project_version: incoming_version,
+                 name: 'web',
+                 image: 'nginx:1.20',
+                 environment_variables: [ { 'name' => 'ENV', 'value' => 'staging' } ])
+        end
+
+        subject(:comparison) { base_version.compare(incoming_version) }
+
+        it 'has one comparison' do
+          expect(comparison.comparisons.size).to eq(1)
+        end
+
+        it 'detects added service' do
+          expect(comparison.has_changes?).to be true
+
+          added = comparison.comparisons.find { |c| c.name == 'web' }
+          expect(added).to have_attributes(
+                             type: :service,
+                             status: :added,
+                             changes: be_empty
+                           )
+        end
+      end
+    end
+  end
 end

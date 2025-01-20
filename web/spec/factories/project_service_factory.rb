@@ -9,6 +9,7 @@ FactoryBot.define do
     pvc_size_bytes { nil }
     pvc_mount_path { nil }
     pvc_name { 'standard-pvc-name' }
+    ports { [ 80 ] }
 
     transient do
       team { nil }
