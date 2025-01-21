@@ -5,6 +5,13 @@ module AgentProto
     Sidecar::ServiceParams.new(
       name: "shepherd-agent",
       replica_count: 1,
+      persistent_volume_claims: [
+        Sidecar::PersistentVolumeClaimParams.new(
+          name: "pvc-shepherd-agent",
+          size_bytes: 1.gigabyte,
+          path: "/mnt/data"
+        )
+      ],
       image: Sidecar::Image.new(
         name: "ghcr.io/contextco/shepherd",
         tag: "master",
