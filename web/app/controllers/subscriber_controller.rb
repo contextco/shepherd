@@ -12,6 +12,15 @@ class SubscriberController < ApplicationController
     @most_recent_published_version = @subscriber.project.published_versions.first
   end
 
+  def deploy
+    @subscriber = current_team.subscribers.find(params[:id])
+    @agent_instance = @subscriber.agent_instances.most_recently_active
+    base_version = @subscriber.project_version
+    candidate_version = current_team.project_versions.find(params[:project_version_id])
+
+    @version_comparison = base_version.compare(candidate_version)
+  end
+
   def assign_new_version
     @version = current_team.project_versions.find(params[:project_version_id])
     @subscriber = current_team.subscribers.find(params[:id])

@@ -30,7 +30,7 @@
           <div class="text-xs text-stone-600">Note: This will be immediately deployed to the <%= subscriber.name %> deployment.</div>
         </div>
 
-        <%= form_with url: assign_new_version_subscriber_path, method: :post, class: 'flex flex-col gap-1 items-start' do |form| %>
+        <%= form_with url: deploy_subscriber_path, method: :get, class: 'flex flex-col gap-1 items-start' do |form| %>
           <div class="flex gap-4 items-center">
             <%= form.collection_select :project_version_id,
                 subscriber.project.project_versions.published.order(created_at: :desc).excluding(subscriber.project_version),
@@ -40,11 +40,9 @@
                 class: 'p-1 pl-2 pr-8 min-w-32'
             %>
             <%= form.button :submit,
-                            class: 'bg-white p-1 px-2 border border-stone-500 hover:shadow hover:bg-stone-50 duration-200',
-                            disabled: !subscriber.eligible_for_new_action?,
-                            data: { turbo_confirm: 'Are you sure you want to deploy a new version?' } do %>
-              Deploy ->
-            <% end  %>
+                            class: 'bg-white p-1 px-2 border border-stone-500 hover:shadow hover:bg-stone-50 duration-200' do %>
+              Compare and Deploy ->
+            <% end %>
           </div>
           <div class="text-xs text-stone-600">
             Currently running version

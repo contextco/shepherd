@@ -125,4 +125,23 @@ RSpec.describe SubscriberController, type: :request do
       end
     end
   end
+
+  describe 'GET #deploy' do
+    subject { get deploy_subscriber_path(subscriber, project_version_id: project_version.id) }
+
+    it 'returns a success response' do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'assigns the subscriber' do
+      subject
+      expect(assigns(:version_comparison).base_version).to eq(subscriber.project_version)
+    end
+
+    it 'assigns the candidate version' do
+      subject
+      expect(assigns(:version_comparison).incoming_version).to eq(project_version)
+    end
+  end
 end

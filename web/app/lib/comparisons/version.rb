@@ -27,6 +27,7 @@ module Comparisons::Version
         all_service_names.map do |name|
           base_object = base_objects[name]
           incoming_object = incoming_objects[name]
+          object_id = incoming_object&.id || base_object&.id
 
           # default to modified, if not added or removed and not actually modified. we exit early.
           status = :modified
@@ -37,7 +38,7 @@ module Comparisons::Version
           changes = base_object.compare(incoming_object) if status == :modified
           next if changes.empty? && status == :modified
 
-          Comparisons::ObjectComparison.new(name:, type:, status:, changes:)
+          Comparisons::ObjectComparison.new(name:, type:, status:, changes:, object_id:)
         end
       end
     end
