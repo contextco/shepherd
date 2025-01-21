@@ -72,7 +72,6 @@
     </div>
 
     <% if @subscriber.agent_instances.most_recently_active.present? %>
-      <%# should we disable if the instance is offline? %>
       <%= render AgentInstance::StatusComponent.new(agent_instance: @subscriber.agent_instances.most_recently_active) %>
     <% end %>
   </div>

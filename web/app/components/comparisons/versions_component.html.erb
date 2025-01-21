@@ -1,0 +1,54 @@
+<div class="flex flex-wrap gap-4">
+  <% version_comparison.comparisons.each do |service_comparisons| %>
+    <div class="border p-4 flex w-[488px]">
+      <div class="w-10">
+        <div class="border-b p-1 pb-3">
+          <%= heroicon icon(service_comparisons), class: icon_classes(service_comparisons) %>
+        </div>
+      </div>
+
+      <div class="w-full flex flex-col gap-2">
+        <div class="flex items-center gap-1 border-b pb-3">
+          <%= service_comparisons.name %>
+          <span class="text-stone-500 text-sm">
+            (<%= service_comparisons.status.to_s %>)
+          </span>
+        </div>
+
+        <% if service_comparisons.modified?  %>
+          <div class="flex flex-col gap-3 text-sm overflow-y-scroll max-h-80">
+            <% service_comparisons.changes.each do |change| %>
+              <div class="flex flex-col gap-1">
+                <span><%= change.field %></span>
+
+                <div class="flex items-center gap-1">
+                  <% if change.modified? || change.removed? %>
+                    <div class="<%= change_text_classes(change) %>"><%= change.old_value %></div>
+                  <% end %>
+                  <%= '->' if change.modified? %>
+                  <% if change.modified? || change.added? %>
+                    <div class="<%= change_text_classes(change) %>"><%= change.new_value %></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="w-full h-full flex flex-col justify-center">
+            <div class="flex justify-center">
+              <% if service_comparisons.service? %>
+                <%= link_to edit_project_service_path(service_comparisons.object_id), class: 'button !border-stone-300' do %>
+                  Go to service
+                <% end %>
+              <% else %>
+                <%= link_to edit_dependency_path(service_comparisons.object_id), class: 'button !border-stone-300' do %>
+                  Go to dependency
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
