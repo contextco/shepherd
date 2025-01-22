@@ -4,12 +4,10 @@ import (
 	"agent/backend"
 	"agent/cluster"
 	"agent/generated/service_pb"
+	"agent/lifecycleid"
 	"agent/periodic"
 	"context"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,7 +85,7 @@ func (a *Agent) apply(ctx context.Context) {
 }
 
 func NewAgent(cfg AgentConfig) (*Agent, error) {
-	lifecycleID := getOrCreateLifecycleID(cfg.LifecycleIDFilePath)
+	lifecycleID := lifecycleid.NewLifecycleIDGenerator(cfg.LifecycleIDFilePath).Generate()
 	sessionID := uuid.New().String()
 
 	log.Printf("Creating client with backend address %s, and token: %s", cfg.BackendAddr, cfg.BearerToken)
@@ -136,30 +134,30 @@ func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error
 	return nil
 }
 
-func getOrCreateLifecycleID(filePath string) string {
-	const (
-		DirectoryPermissions = 0755 // Owner can read/write/execute, others can read/execute
-		FilePermissions      = 0644 // Owner can read/write, others can read only
-	)
+// func getOrCreateLifecycleID(filePath string) string {
+// 	const (
+// 		DirectoryPermissions = 0755 // Owner can read/write/execute, others can read/execute
+// 		FilePermissions      = 0644 // Owner can read/write, others can read only
+// 	)
     
-    // Try to read existing ID
-    content, err := os.ReadFile(filePath)
-    if err == nil && len(content) > 0 {
-        return strings.TrimSpace(string(content))
-    }
+//     // Try to read existing ID
+//     content, err := os.ReadFile(filePath)
+//     if err == nil && len(content) > 0 {
+//         return strings.TrimSpace(string(content))
+//     }
     
-    newID := uuid.New().String()
+//     newID := uuid.New().String()
     
-    // Ensure directory exists
-    if err := os.MkdirAll(filepath.Dir(filePath), DirectoryPermissions); err != nil {
-        log.Printf("Failed to create directory: %v", err)
-        return newID
-    }
+//     // Ensure directory exists
+//     if err := os.MkdirAll(filepath.Dir(filePath), DirectoryPermissions); err != nil {
+//         log.Printf("Failed to create directory: %v", err)
+//         return newID
+//     }
     
-    // Write new ID to file
-    if err := os.WriteFile(filePath, []byte(newID), FilePermissions); err != nil {
-        log.Printf("Failed to write lifecycle ID: %v", err)
-    }
+//     // Write new ID to file
+//     if err := os.WriteFile(filePath, []byte(newID), FilePermissions); err != nil {
+//         log.Printf("Failed to write lifecycle ID: %v", err)
+//     }
     
-    return newID
-}
+//     return newID
+// }
