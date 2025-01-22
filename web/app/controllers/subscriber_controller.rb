@@ -37,7 +37,8 @@ class SubscriberController < ApplicationController
 
   def create
     @version = current_team.project_versions.find(subscriber_params[:project_version_id])
-    @version.subscribers.create!(subscriber_params)
+    subscriber = @version.subscribers.create!(subscriber_params)
+    subscriber.setup_helm_repo!
 
     flash[:notice] = "Subscriber \"#{subscriber_params[:name]}\"added"
     redirect_to subscribers_path

@@ -42,6 +42,12 @@ RSpec.describe SubscriberController, type: :request do
       expect(subscriber.full_agent?).to be true
     end
 
+    it 'creates a helm repo' do
+      subject
+      subscriber = project_version.subscribers.order(:created_at).last
+      expect(subscriber.helm_repo).to be_present
+    end
+
     context 'when agent is false' do
       subject { post project_subscribers_path(project), params: { project_subscriber: { name: 'test', project_version_id: project_version.id, auth: true, agent: 'no' } } }
 
