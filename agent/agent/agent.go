@@ -4,6 +4,7 @@ import (
 	"agent/backend"
 	"agent/cluster"
 	"agent/generated/service_pb"
+	"agent/lifecycleid"
 	"agent/periodic"
 	"context"
 	"log"
@@ -14,6 +15,7 @@ import (
 
 type Agent struct {
 	LifecycleID string
+	SessionID   string
 
 	client *backend.Client // gRPC client which sends heartbeats
 
@@ -29,6 +31,8 @@ type AgentConfig struct {
 	HeartbeatInterval time.Duration
 	PlanInterval      time.Duration
 	VersionID         string
+
+	LifecycleIDFilePath string
 }
 
 func (a *Agent) Start(ctx context.Context) {
@@ -61,6 +65,7 @@ func (a *Agent) Start(ctx context.Context) {
 func (a *Agent) heartbeat(ctx context.Context) {
 	log.Printf("Sending heartbeat for %s", a.cfg.Name)
 	log.Printf("Lifecycle ID: %s", a.LifecycleID)
+	log.Printf("Session ID: %s", a.SessionID)
 
 	if err := a.client.Heartbeat(ctx); err != nil {
 		// Eat the error, we don't want to crash the agent.
@@ -80,11 +85,13 @@ func (a *Agent) apply(ctx context.Context) {
 }
 
 func NewAgent(cfg AgentConfig) (*Agent, error) {
-	id := uuid.New().String()
+	lifecycleID := lifecycleid.NewLifecycleIDGenerator(cfg.LifecycleIDFilePath).Generate()
+	sessionID := uuid.New().String()
 
 	log.Printf("Creating client with backend address %s, and token: %s", cfg.BackendAddr, cfg.BearerToken)
 	client, err := backend.NewClient(cfg.BackendAddr, cfg.BearerToken, backend.Identity{
-		LifecycleID: id,
+		LifecycleID: lifecycleID,
+		SessionID:   sessionID,
 		Name:        cfg.Name,
 		VersionID:   cfg.VersionID,
 	})
@@ -93,7 +100,8 @@ func NewAgent(cfg AgentConfig) (*Agent, error) {
 	}
 
 	return &Agent{
-		LifecycleID: id,
+		LifecycleID: lifecycleID,
+		SessionID:   sessionID,
 		client:      client,
 		cfg:         cfg,
 	}, nil

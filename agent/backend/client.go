@@ -13,6 +13,7 @@ import (
 
 type Identity struct {
 	LifecycleID string
+	SessionID   string
 	Name        string
 	VersionID   string
 }
@@ -43,6 +44,7 @@ func (c *Client) Apply(ctx context.Context) (*service_pb.Action, error) {
 	resp, err := c.client.Apply(ctx, &service_pb.ApplyRequest{
 		Identity: &service_pb.Identity{
 			LifecycleId: c.identity.LifecycleID,
+			SessionId:   c.identity.SessionID,
 			Name:        c.identity.Name,
 			VersionId:   c.identity.VersionID,
 		},
@@ -58,6 +60,7 @@ func (c *Client) Heartbeat(ctx context.Context) error {
 	_, err := c.client.Heartbeat(ctx, &service_pb.HeartbeatRequest{
 		Identity: &service_pb.Identity{
 			LifecycleId: c.identity.LifecycleID,
+			SessionId:   c.identity.SessionID,
 			Name:        c.identity.Name,
 			VersionId:   c.identity.VersionID,
 		},
