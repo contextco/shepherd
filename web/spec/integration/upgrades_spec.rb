@@ -28,7 +28,7 @@ RSpec.describe 'Upgrades' do
   end
 
   it 'upgrades a subscriber', uses_transactional_fixtures: false, truncate: true do
-    new_version = version.fork!(version: '0.0.2')
+    new_version = version.reload.fork!(version: '0.0.2')
     new_version
       .services
       .find_by(name: 'nginx')

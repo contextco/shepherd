@@ -21,7 +21,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.metaEnvironmentFields.enabled }}
+      serviceAccountName: {{ include "test.fullname" . }}-agent-serviceaccount
+      {{- else }}
       serviceAccountName: {{ include "test.serviceAccountName" . }}
+      {{- end }}
       {{- if and .Values.initConfig (gt (len .Values.initConfig.initCommands) 0) }}
       initContainers:
         {{- range .Values.initConfig.initCommands }}
@@ -49,6 +53,14 @@ spec:
                 configMapKeyRef:
                   name: {{ $.Release.Name }}-{{ $.Chart.Name }}-config
                   key: {{ $key }}
+            {{- end }}
+            {{- if .Values.metaEnvironmentFields.enabled }}
+            {{- range .Values.metaEnvironmentFields.fields }}
+            - name: {{ .name }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ .fieldPath }}
+            {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.secrets }}
             - name: {{ $value.environmentKey }}

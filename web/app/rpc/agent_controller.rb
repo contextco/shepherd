@@ -3,7 +3,7 @@ class AgentController < RpcController
   bind OnPrem::Service
 
   def heartbeat
-    record_heartbeat(request.message.identity.version_id)
+    record_heartbeat(request.message.identity.version_id, request.message.identity.session_id)
     HeartbeatResponse.new
   end
 
@@ -22,9 +22,9 @@ class AgentController < RpcController
 
   private
 
-  def record_heartbeat(version_id)
+  def record_heartbeat(version_id, session_id)
     current_subscriber.transaction do
-      agent_instance.event_logs.create!(event_type: :heartbeat, project_version_id:  version_id)
+      agent_instance.event_logs.create!(event_type: :heartbeat, project_version_id:  version_id, session_id:)
     end
   end
 

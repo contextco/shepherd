@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_15_152201) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_21_164114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,7 +55,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_152201) do
     t.jsonb "payload", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "session_id"
     t.index ["agent_instance_id"], name: "index_event_logs_on_agent_instance_id"
+    t.index ["session_id"], name: "index_event_logs_on_session_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
