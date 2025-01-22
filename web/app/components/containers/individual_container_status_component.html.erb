@@ -2,7 +2,7 @@
   <div class="flex justify-center items-center gap-[5px] h-10 grow">
     <% status_bars.each do |status_bar| %>
       <div class="relative group max-w-2 min-w-[3px] w-full h-full <%= bg_classes(status_bar[:status]) %>">
-        <div class="absolute flex flex-col gap-0.5 top-10 left-0 border border-stone-400 rounded-md bg-stone-800 text-stone-100 text-xs rounded px-2 py-1 whitespace-nowrap z-40 opacity-0 group-hover:opacity-100">
+        <div class="absolute hidden flex-col gap-0.5 top-10 left-0 border border-stone-400 rounded-md bg-stone-800 text-stone-100 text-xs rounded px-2 py-1 whitespace-nowrap z-40 opacity-0 group-hover:opacity-100 group-hover:flex">
           <%= status_bar[:date].strftime('%B %d, %Y') %>
           <div class="flex justify-between items-baseline gap-2">
             <div class="text-xs <%= text_classes(status_bar[:status]) %>"> <%= status_text(status_bar[:status]) %> </div>
