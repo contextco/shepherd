@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     resources :subscribers, only: [ :new, :create, :show, :destroy, :edit, :update ], shallow: true, controller: "subscriber" do
       get "/client_values_yaml/:project_version_id", to: "subscriber#client_values_yaml", on: :member, as: :client_values_yaml
       post :assign_new_version, on: :member
+      get :deploy, on: :member
     end
   end
 
@@ -61,10 +62,6 @@ Rails.application.routes.draw do
   resources :user, only: [ :index ] do
     resources :ssh_key, only: [ :create, :destroy, :new ]
     delete :leave_team, on: :collection
-  end
-
-  namespace :api, path: "api/v1", defaults: { format: :json } do
-    post :heartbeat, to: "ingress#heartbeat"
   end
 
   devise_for :users,

@@ -1,0 +1,60 @@
+<div class="h-full w-full flex flex-col gap-6 sm:px-20 px-8 py-8 max-w-6xl mx-auto mb-12">
+  <div class="flex w-full justify-between items-center">
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-col">
+        <span class="text-sm text-stone-400 font-medium text-stone-100"><%= @subscriber.project.name %></span>
+        <div class="flex items-center gap-2 text-2xl">
+          <span class="font-medium text-stone-700 w-fit">Upgrade Deployment</span>
+          <span class="text-stone-500"><%= @subscriber.name %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 pb-4 w-full">
+    <div class="text-stone-600 text-xs flex flex-col gap-1">
+      <% if !@subscriber.eligible_for_new_action? %>
+          Agent is unavailable for a new action right now.
+      <% elsif !@agent_instance&.healthy? %>
+          Agent is offline.
+      <% end %>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <div class="text-sm">
+        <% if @version_comparison.has_changes? %>
+          <span class="font-medium"><%= @version_comparison.comparisons.count %></span>
+          changes for upgrade
+        <% else %>
+          There are no changes for the upgrade
+        <% end %>
+        <%= link_to version_path(@version_comparison.base_version) do %>
+          <span class="font-mono px-1 py-0.5 border hover:bg-stone-100 duration-200"><%= @version_comparison.base_version.version %></span>
+        <% end %>
+        ->
+        <%= link_to version_path(@version_comparison.incoming_version) do %>
+          <span class="font-mono px-1 py-0.5 border hover:bg-stone-100 duration-200"><%= @version_comparison.incoming_version.version %></span>
+        <% end %>
+        for
+        <span class="font-medium"><%= @subscriber.project.name %></span>.
+      </div>
+
+      <div class="flex items-center gap-2">
+
+      <%= link_to subscriber_path(@subscriber), class: 'bg-white text-base p-1 px-2 border border-stone-400 hover:shadow hover:bg-stone-50 duration-200' do %>
+        Cancel
+      <% end %>
+
+      <%= button_to assign_new_version_subscriber_path(@subscriber, project_version_id: @version_comparison.incoming_version),
+                    data: { turbo_confirm: "Are you sure you want to deploy version #{@version_comparison.incoming_version.version}?" },
+                    class: 'bg-stone-700 text-white p-1 px-2 border border-stone-700 hover:shadow hover:bg-stone-800 duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+                    disabled: !@subscriber.eligible_for_new_action? || !@agent_instance&.healthy?,
+                    method: :post do %>
+        Deploy ->
+      <% end %>
+      </div>
+    </div>
+
+    <%= render Comparisons::VersionsComponent.new(version_comparison: @version_comparison) if @version_comparison.has_changes? %>
+  </div>
+</div>

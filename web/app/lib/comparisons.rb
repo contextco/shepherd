@@ -9,7 +9,19 @@ module Comparisons
   #   @return [Object] the old value of the field
   # @!attribute [r] new_value
   #   @return [Object] the new value of the field
-  Change = Struct.new(:field, :old_value, :new_value, keyword_init: true)
+  Change = Struct.new(:field, :old_value, :new_value, keyword_init: true) do
+    def modified?
+      old_value.present? && new_value.present?
+    end
+
+    def added?
+      old_value.blank? && new_value.present?
+    end
+
+    def removed?
+      old_value.present? && new_value.blank?
+    end
+  end
 
   # Represents a comparison of an object (service or dependency) between two versions.
   #
@@ -21,11 +33,14 @@ module Comparisons
   #   @return [Symbol] the status of the object (:added, :modified, or :removed)
   # @!attribute [r] changes
   #   @return [Array<Change>] the list of changes for the object
+  # @!attribute [r] object_id
+  #  @return [Integer] the ID of the object
   ObjectComparison = Struct.new(
     :name,
     :type,
     :status,
     :changes,
+    :object_id,
     keyword_init: true
   ) do
     # Checks if the object is a dependency.

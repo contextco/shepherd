@@ -46,12 +46,15 @@ message ApplyChartRequest {
     bytes chart = 1;
 }
 
-// Next ID: 5
+// Next ID: 6
 message Identity {
     reserved 2;
 
-    // ID that persists for the lifetime of the process.
+    // ID that persists for the lifetime of the deployment.
     string lifecycle_id = 1;
+
+    // ID that persists for the lifetime of the process.
+    string session_id = 5;
 
     // Human-readable name for the identity. This is provided by the vendor as a friendly name to identify a container type.
     // Eg: "worker", "web", "db", etc.

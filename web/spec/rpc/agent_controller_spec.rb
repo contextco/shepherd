@@ -6,7 +6,8 @@ RSpec.describe AgentController do
   let(:project_subscriber) { create(:project_subscriber) }
 
   describe 'heartbeat' do
-    let(:request_message) { HeartbeatRequest.new(identity: { lifecycle_id: 'my-lifecycle', name: 'web' }) }
+    let(:identity) { Identity.new(lifecycle_id: 'my-lifecycle', name: 'web', session_id: 'my-session-id') }
+    let(:request_message) { HeartbeatRequest.new(identity:) }
 
     subject(:heartbeat) { run_rpc(:Heartbeat, request_message, **authorization_options_for(project_subscriber)) }
 
@@ -16,6 +17,11 @@ RSpec.describe AgentController do
 
     it 'records a heartbeat' do
       expect { heartbeat }.to change { project_subscriber.heartbeat_logs.count }.by(1)
+    end
+
+    it 'records the session id' do
+      heartbeat
+      expect(project_subscriber.heartbeat_logs.last.session_id).to eq('my-session-id')
     end
 
     it 'creates a container' do
