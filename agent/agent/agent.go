@@ -7,6 +7,9 @@ import (
 	"agent/periodic"
 	"context"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,6 +17,7 @@ import (
 
 type Agent struct {
 	LifecycleID string
+	SessionID   string
 
 	client *backend.Client // gRPC client which sends heartbeats
 
@@ -29,6 +33,8 @@ type AgentConfig struct {
 	HeartbeatInterval time.Duration
 	PlanInterval      time.Duration
 	VersionID         string
+
+	LifecycleIDFilePath string
 }
 
 func (a *Agent) Start(ctx context.Context) {
@@ -61,6 +67,7 @@ func (a *Agent) Start(ctx context.Context) {
 func (a *Agent) heartbeat(ctx context.Context) {
 	log.Printf("Sending heartbeat for %s", a.cfg.Name)
 	log.Printf("Lifecycle ID: %s", a.LifecycleID)
+	log.Printf("Session ID: %s", a.SessionID)
 
 	if err := a.client.Heartbeat(ctx); err != nil {
 		// Eat the error, we don't want to crash the agent.
@@ -80,11 +87,13 @@ func (a *Agent) apply(ctx context.Context) {
 }
 
 func NewAgent(cfg AgentConfig) (*Agent, error) {
-	id := uuid.New().String()
+	lifecycleID := getOrCreateLifecycleID(cfg.LifecycleIDFilePath)
+	sessionID := uuid.New().String()
 
 	log.Printf("Creating client with backend address %s, and token: %s", cfg.BackendAddr, cfg.BearerToken)
 	client, err := backend.NewClient(cfg.BackendAddr, cfg.BearerToken, backend.Identity{
-		LifecycleID: id,
+		LifecycleID: lifecycleID,
+		SessionID:   sessionID,
 		Name:        cfg.Name,
 		VersionID:   cfg.VersionID,
 	})
@@ -93,7 +102,8 @@ func NewAgent(cfg AgentConfig) (*Agent, error) {
 	}
 
 	return &Agent{
-		LifecycleID: id,
+		LifecycleID: lifecycleID,
+		SessionID:   sessionID,
 		client:      client,
 		cfg:         cfg,
 	}, nil
@@ -124,4 +134,32 @@ func applyChart(ctx context.Context, action *service_pb.ApplyChartRequest) error
 	log.Printf("Chart applied.")
 
 	return nil
+}
+
+func getOrCreateLifecycleID(filePath string) string {
+	const (
+		DirectoryPermissions = 0755 // Owner can read/write/execute, others can read/execute
+		FilePermissions      = 0644 // Owner can read/write, others can read only
+	)
+    
+    // Try to read existing ID
+    content, err := os.ReadFile(filePath)
+    if err == nil && len(content) > 0 {
+        return strings.TrimSpace(string(content))
+    }
+    
+    newID := uuid.New().String()
+    
+    // Ensure directory exists
+    if err := os.MkdirAll(filepath.Dir(filePath), DirectoryPermissions); err != nil {
+        log.Printf("Failed to create directory: %v", err)
+        return newID
+    }
+    
+    // Write new ID to file
+    if err := os.WriteFile(filePath, []byte(newID), FilePermissions); err != nil {
+        log.Printf("Failed to write lifecycle ID: %v", err)
+    }
+    
+    return newID
 }
