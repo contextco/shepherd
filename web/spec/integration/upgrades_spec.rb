@@ -28,6 +28,7 @@ RSpec.describe 'Upgrades' do
   end
 
   it 'upgrades a subscriber', uses_transactional_fixtures: false, truncate: true do
+    lifecycle_id = subscriber.agent_instances.last.lifecycle_id
     new_version = version.reload.fork!(version: '0.0.2')
     new_version
       .services
@@ -41,5 +42,8 @@ RSpec.describe 'Upgrades' do
     subscriber.assign_to_new_version!(new_version)
 
     wait_for_agent_to_come_online(subscriber)
+
+    expect(subscriber.agent_instances.reload.last.lifecycle_id).to eq(lifecycle_id)
+    expect(subscriber.agent_instances.count).to eq(1)
   end
 end
