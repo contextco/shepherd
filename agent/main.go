@@ -42,6 +42,11 @@ var (
 			"",
 			"The version of the shepherd project",
 		),
+		LifecycleIDFilePath: config.Define(
+			"life-cycle-id-file-path",
+			"/mnt/data/lifecycle_id",
+			"The file path to store the life cycle id",
+		),
 	}
 )
 
@@ -51,12 +56,13 @@ func main() {
 	log.Printf("Starting agent with name %s", cfg.Name.MustValue())
 
 	agent, err := agent.NewAgent(agent.AgentConfig{
-		Name:              cfg.Name.MustValue(),
-		BackendAddr:       cfg.BackendAddr.MustValue(),
-		BearerToken:       cfg.BearerToken.MustValue(),
-		HeartbeatInterval: cfg.HeartbeatInterval.MustValue(),
-		PlanInterval:      cfg.PlanInterval.MustValue(),
-		VersionID:         cfg.Version.MustValue(),
+		Name:                cfg.Name.MustValue(),
+		BackendAddr:         cfg.BackendAddr.MustValue(),
+		BearerToken:         cfg.BearerToken.MustValue(),
+		HeartbeatInterval:   cfg.HeartbeatInterval.MustValue(),
+		PlanInterval:        cfg.PlanInterval.MustValue(),
+		VersionID:         	 cfg.Version.MustValue(),
+		LifecycleIDFilePath: cfg.LifecycleIDFilePath.MustValue(),
 	})
 	if err != nil {
 		log.Fatalf("Failed to create agent: %s", err)
@@ -68,10 +74,11 @@ func main() {
 }
 
 type Config struct {
-	Name              *config.ConfigVar[string]
-	BearerToken       *config.ConfigVar[string]
-	BackendAddr       *config.ConfigVar[string]
-	HeartbeatInterval *config.ConfigVar[time.Duration]
-	PlanInterval      *config.ConfigVar[time.Duration]
-	Version           *config.ConfigVar[string]
+	Name              	*config.ConfigVar[string]
+	BearerToken       	*config.ConfigVar[string]
+	BackendAddr       	*config.ConfigVar[string]
+	HeartbeatInterval 	*config.ConfigVar[time.Duration]
+	PlanInterval      	*config.ConfigVar[time.Duration]
+	Version           	*config.ConfigVar[string]
+	LifecycleIDFilePath *config.ConfigVar[string]
 }

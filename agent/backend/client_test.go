@@ -23,6 +23,7 @@ func TestNewClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := NewClient(tt.addr, tt.bearerToken, Identity{
 				LifecycleID: "test-lifecycle-id",
+				SessionID:  "test-session-id",
 				Name:        "test-name",
 			})
 			if !tt.wantErr && err != nil {
