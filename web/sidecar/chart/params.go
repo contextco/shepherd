@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"agent/cluster"
+	"sidecar/chart/predeploycmd"
 	"sidecar/generated/sidecar_pb"
 	"sidecar/values"
 
@@ -109,9 +110,12 @@ type InitConfig struct {
 func (i InitConfig) toValues() map[string]interface{} {
 	m := []map[string]interface{}{}
 	for i, v := range i.InitCommands {
+		predeploycmd, _ := predeploycmd.New(v)
+		command := predeploycmd.Generate()
+
 		m = append(m, map[string]interface{}{
 			"name":    fmt.Sprintf("init-command-%d", i),
-			"command": strings.Split(v, " "),
+			"command": command,
 		})
 	}
 	return map[string]interface{}{

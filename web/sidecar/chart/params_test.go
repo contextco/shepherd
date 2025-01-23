@@ -56,7 +56,7 @@ func TestParams_toValues(t *testing.T) {
 					"initCommands": []map[string]interface{}{
 						{
 							"name":    "init-command-0",
-							"command": []string{"ls"},
+							"command": []string{"/bin/sh", "-c", "ls"},
 						},
 					},
 				},
@@ -196,7 +196,7 @@ func TestParams_toValues(t *testing.T) {
 					"initCommands": []map[string]interface{}{
 						{
 							"name":    "init-command-0",
-							"command": []string{"ls"},
+							"command": []string{"/bin/sh", "-c", "ls"},
 						},
 					},
 				},
@@ -286,6 +286,8 @@ ingress:
 initConfig:
   initCommands:
   - command:
+    - /bin/sh
+    - -c
     - ls
     name: init-command-0
 metaEnvironmentFields:
