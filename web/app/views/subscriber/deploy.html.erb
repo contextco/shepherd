@@ -55,6 +55,21 @@
       </div>
     </div>
 
+    <% if @version_comparison.warnings.any? %>
+      <div class="flex flex-col gap-4 p-4 border border-amber-400 border-opacity-70">
+        <div class="flex items-center gap-2 border-b border-amber-400 border-opacity-40 pb-4">
+          <%= heroicon "exclamation-circle", class: 'size-4 text-amber-500 stroke-2' %>
+          <span class="text-sm text-stone-600 "> Warning </span>
+        </div>
+
+        <% @version_comparison.warnings.each do |warning| %>
+          <div class="flex items-center gap-2 ml-6">
+            <span class="text-sm text-stone-500"> <%= warning %> </span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <%= render Comparisons::VersionsComponent.new(version_comparison: @version_comparison) if @version_comparison.has_changes? %>
   </div>
 </div>
