@@ -7,6 +7,8 @@ ingress:
 initConfig:
   initCommands:
   - command:
+    - /bin/sh
+    - -c
     - ls
     name: init-command-0
 metaEnvironmentFields:
