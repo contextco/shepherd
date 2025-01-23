@@ -5,6 +5,7 @@ module Comparisons::Version
     :base_version,
     :incoming_version,
     :comparisons,
+    :warnings,
     keyword_init: true
   ) do
     class << self
@@ -14,7 +15,9 @@ module Comparisons::Version
           compare_objects(base_version.dependencies, incoming_version.dependencies, type: :dependency)
         ].flatten.compact
 
-        new(base_version:, incoming_version:, comparisons:)
+        warnings = Comparisons::Warning.new(comparisons).warnings
+
+        new(base_version:, incoming_version:, comparisons:, warnings:)
       end
 
       private

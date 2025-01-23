@@ -1,7 +1,21 @@
 <div class="flex <%= vertical ? 'flex-col gap-4' : 'gap-8' %> items-start justify-between">
   <div class="flex flex-col gap-1">
     <div class="flex flex-col">
-      <span class="font-medium text-stone-800 flex-none"><%= title %></span>
+      <div class="flex items-center gap-2">
+        <span class="font-medium text-stone-800 flex-none"><%= title %></span>
+        <% if warning.present? %>
+        <div class="relative w-fit" data-controller="sidebar-icon">
+          <div data-action="mouseenter->sidebar-icon#showTooltip mouseleave->sidebar-icon#hideTooltip">
+            <%= heroicon "exclamation-circle", class: 'size-4 text-red-600 stroke-2' %>
+          </div>
+          <div class="w-80 transition-opacity opacity-0 pointer-events-none left-1/2 -translate-x-1/2 left-full mt-2 font-normal text-sm p-1 bg-stone-700 rounded-md text-slate-100 px-2 duration-400 absolute z-50" data-sidebar-icon-target="tooltip">
+            <div class="absolute left-0 rotate-45 bg-stone-700 -translate-y-1.5 left-1/2 -translate-x-3 size-1.5"></div>
+            <%= warning %>
+          </div>
+        </div>
+
+        <% end %>
+      </div>
       <% if caveat.present? %>
         <span class="text-stone-500 text-xs font-medium uppercase"><%= caveat %></span>
       <% end %>

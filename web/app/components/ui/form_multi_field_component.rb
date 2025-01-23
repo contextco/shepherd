@@ -10,6 +10,7 @@ class UI::FormMultiFieldComponent < ApplicationComponent
   attribute :disabled, default: false
 
   attribute :caveat, default: nil
+  attribute :warning, default: nil
 
   attribute :child_component
 

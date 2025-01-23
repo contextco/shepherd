@@ -58,6 +58,7 @@
 
     <%= render UI::FormMultiFieldComponent.new(
       title: 'Secrets',
+      warning: update? ? "Adding or editing secrets is not advised. Clients will have to manually add secrets to their deployment. Consider accepting new secrets in the application layer and storing in a database." : nil,
       form:,
       caveat: :optional,
       disabled:,
@@ -98,6 +99,7 @@
       <%= render UI::FormMultiFieldComponent.new(
         title: 'Open Ports',
         caveat: :optional,
+        warning: update? ? "Removing or editing existing ports may not be backwards compatible." : nil,
         form:,
         disabled:,
         association_name: :ports,
