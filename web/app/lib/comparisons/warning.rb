@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Comparisons::Warning
-
   CHANGE_RULES = {
     "Port" => {
       message: "One or more ports have been modified or removed. This may impact the clients deployment if they rely on these ports being open.",
