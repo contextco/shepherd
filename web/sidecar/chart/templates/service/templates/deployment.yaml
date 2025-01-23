@@ -31,7 +31,10 @@ spec:
         {{- range .Values.initConfig.initCommands }}
         - name: {{ .name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}"
-          command: {{ .command }}
+          command:
+            {{- range .command }}
+            - {{ . | quote }}
+            {{- end }}
         {{- end }}
       {{- end }}
       containers:
