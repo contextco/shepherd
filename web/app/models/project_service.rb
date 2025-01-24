@@ -61,11 +61,11 @@ class ProjectService < ApplicationRecord
   end
 
   def image_tag
-    DockerImageUrlParser.new(image).tag
+    DockerImage::UrlParser.new(image).tag
   end
 
   def image_without_tag
-    DockerImageUrlParser.new(image).to_s(with_tag: false)
+    DockerImage::UrlParser.new(image).to_s(with_tag: false)
   end
 
   def compare(other)

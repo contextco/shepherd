@@ -183,8 +183,8 @@ class Service::Form
 
   def image_format
     begin
-      url = DockerImageUrlParser.new(image)
-    rescue DockerImageUrlParser::InvalidDockerImageURLError
+      url = DockerImage::UrlParser.new(image)
+    rescue DockerImage::UrlParser::InvalidDockerImageURLError
       return errors.add(:image, "is not a valid docker image")
     end
     return if url.tag.present?
