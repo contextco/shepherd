@@ -68,6 +68,10 @@ class ProjectService < ApplicationRecord
     DockerImage::UrlParser.new(image).to_s(with_tag: false)
   end
 
+  def image_registry_stub
+    DockerImage::UrlParser.new(image).registry_stub
+  end
+
   def compare(other)
     Comparisons::Service.compare(self, other)
   end
