@@ -102,7 +102,7 @@ class Chart::Publisher
   end
 
   def rpc_image_credential(service)
-    return nil if service.image_username.blank? || service.image_password.blank?
+    return nil if service.image_username.blank? && service.image_password.blank?
 
     Sidecar::ImageCredentials.new(
       username: service.image_username,

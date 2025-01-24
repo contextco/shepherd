@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class DockerImage::ImageValidator::Github
-  def initialize(registry, image, tag, credentials = nil)
-    @registry = registry # this really always has to be ghcr.io
+  def initialize(image, tag, credentials = nil)
     @image = image
     @tag = tag
     @credentials = credentials
@@ -21,7 +20,7 @@ class DockerImage::ImageValidator::Github
   private
 
   def fetch_auth_token
-    auth_url = "https://#{@registry}/token?scope=repository:#{@image}:pull"
+    auth_url = "https://ghcr.io/token?scope=repository:#{@image}:pull"
     uri = URI.parse(auth_url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -46,7 +45,7 @@ class DockerImage::ImageValidator::Github
 
 
   def check_image_existence(token)
-    uri = URI.parse("https://#{@registry}/v2/#{@image}/manifests/#{@tag}")
+    uri = URI.parse("https://ghcr.io/v2/#{@image}/manifests/#{@tag}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
 
