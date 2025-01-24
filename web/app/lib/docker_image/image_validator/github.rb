@@ -36,11 +36,11 @@ class DockerImage::ImageValidator::Github
 
     case response
     when Net::HTTPSuccess
-      [JSON.parse(response.body)["token"], nil]
+      [ JSON.parse(response.body)["token"], nil ]
     when Net::HTTPUnauthorized
-      [nil, @credentials ? "Invalid credentials" : "Failed to get token for repository"]
+      [ nil, @credentials ? "Invalid credentials" : "Failed to get token for repository" ]
     else
-      [nil, "Failed to authenticate with registry"]
+      [ nil, "Failed to authenticate with registry" ]
     end
   end
 
@@ -58,13 +58,13 @@ class DockerImage::ImageValidator::Github
 
     case response
     when Net::HTTPSuccess
-      [true, nil]
+      [ true, nil ]
     when Net::HTTPUnauthorized
-      [false, @credentials ? "Invalid credentials" : "Unauthorized - image may be private."]
+      [ false, @credentials ? "Invalid credentials" : "Unauthorized - image may be private." ]
     when Net::HTTPNotFound
-      [false, "Image not found."]
+      [ false, "Image not found." ]
     else
-      [false, "Failed to verify image existence."]
+      [ false, "Failed to verify image existence." ]
     end
   end
 end
