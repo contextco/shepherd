@@ -1,0 +1,27 @@
+<div class="w-full flex items-center gap-4" id="<%= COMPONENT_ID %>" data-controller="loading-button">
+  <%= submit_tag 'Validate',
+                 formaction: validate_image_project_services_path,
+                 formmethod: :post,
+                 data: {
+                   loading_button_target: "button",
+                   action: "click->loading-button#startLoading turbo:submit-end->loading-button#stopLoading"
+                 },
+                 class: 'button !text-stone-500 flex items-center gap-1' %>
+  <div class="flex items-center gap-2 w-full justify-center">
+
+    <div data-loading-button-target="spinner" class="hidden">
+      <%= heroicon "arrow-path", class: "animate-spin h-5 w-5" %>
+    </div>
+
+    <div class="flex items-center gap-2 w-full justify-center" data-loading-button-target="result">
+      <%= heroicon "check-circle", class: "size-5 stroke-2 text-green-500" if image_valid?  %>
+      <%= heroicon "exclamation-circle", class: "size-4 stroke-2 text-yellow-500" if image_invalid? %>
+
+      <% if validation_result.present? %>
+        <span class="text-stone-700 flex">
+          <%= image_validation_message %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

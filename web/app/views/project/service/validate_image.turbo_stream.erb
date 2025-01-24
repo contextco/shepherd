@@ -1,0 +1,3 @@
+<%= turbo_stream.replace Services::ImageValidationComponent::COMPONENT_ID do %>
+  <%= render Services::ImageValidationComponent.new(validation_result: @validation) %>
+<% end %>

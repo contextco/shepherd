@@ -16,6 +16,8 @@
       <% end %>
     <% end %>
 
+    <hr class="border-stone-300 my-2">
+
     <%= render UI::FormTextFieldComponent.new(title: 'Image', disabled:) do |component| %>
       <%= component.with_label do %>
         Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
@@ -29,9 +31,16 @@
       <% end %>
     <% end %>
 
-    <hr class="border-stone-300 my-2">
-
     <%= render Services::ImageCredentialsComponent.new(form:, disabled:) %>
+
+    <%= render UI::FormTextFieldComponent.new(title: 'Image Validation', disabled: false) do |component| %>
+      <%= component.with_label do %>
+        Check to see if the image is accessible given the provided credentials.
+      <% end %>
+      <%= component.with_field do %>
+        <%= render Services::ImageValidationComponent.new %>
+      <% end %>
+    <% end %>
 
     <hr class="border-stone-300 my-2">
 

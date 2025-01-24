@@ -101,6 +101,12 @@ class Service::Form
     f
   end
 
+  def validate_image
+    credentials = image_username.present? ? { username: image_username, password: image_password } : nil
+
+    DockerImage::ImageValidator.new(image, credentials).valid_image?
+  end
+
   def build_service
     ProjectService.new(**service_params.merge(id: service_id))
   end
