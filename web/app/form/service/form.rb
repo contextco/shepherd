@@ -102,7 +102,7 @@ class Service::Form
   end
 
   def validate_image
-    credentials = image_username.present? ? { username: image_username, password: image_password } : nil
+    credentials = image_password.present? ? { username: image_username, password: image_password } : nil
 
     DockerImage::ImageValidator.new(image, credentials).valid_image?
   end

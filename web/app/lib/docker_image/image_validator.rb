@@ -6,7 +6,8 @@ class DockerImage::ImageValidator
   ValidationResult = Struct.new(:valid, :error_message, keyword_init: true)
 
   REGISTRY_MAPPING = {
-    "registry.hub.docker.com" => DockerImage::ImageValidator::DockerHub
+    "registry.hub.docker.com" => DockerImage::ImageValidator::DockerHub,
+    "ghcr.io" => DockerImage::ImageValidator::Github
   }.freeze
 
   def initialize(image_name, credentials = nil)
