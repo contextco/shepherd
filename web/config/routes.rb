@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       get :deploy, on: :member
     end
   end
+  post "/services/validate_image", to: "project/service#validate_image", as: :validate_image_project_services
 
   resources :subscribers, only: [ :index ], controller: "subscriber"
 

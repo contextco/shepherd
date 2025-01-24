@@ -16,7 +16,8 @@ class DockerImage::ImageValidator
 
   def valid_image?
     validator = REGISTRY_MAPPING[registry]
-    return ValidationResult.new(valid: false, error_message: "Unsupported registry: #{registry}") if validator.nil?
+    error_message = "Cannot do validation for registry: #{registry}"
+    return ValidationResult.new(valid: false, error_message:) if validator.nil?
 
     validator.new(registry, image, tag, @credentials).validate_image
   end

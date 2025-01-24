@@ -48,6 +48,10 @@ class Project::ServiceController < ApplicationController
     redirect_to version_path(@version)
   end
 
+  def validate_image
+    @validation = form.validate_image
+  end
+
   private
 
   def form
