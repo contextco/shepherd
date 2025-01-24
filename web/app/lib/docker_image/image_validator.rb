@@ -6,7 +6,7 @@ class DockerImage::ImageValidator
   ValidationResult = Struct.new(:valid, :error_message, keyword_init: true)
 
   REGISTRY_MAPPING = {
-    "registry.hub.docker.com" => DockerImage::ImageValidator::DockerHub,
+    "docker.io" => DockerImage::ImageValidator::DockerHub,
     "ghcr.io" => DockerImage::ImageValidator::Github
   }.freeze
 
@@ -20,7 +20,7 @@ class DockerImage::ImageValidator
     error_message = "Cannot do validation for registry: #{registry}"
     return ValidationResult.new(valid: false, error_message:) if validator.nil?
 
-    validator.new(registry, image, tag, @credentials).validate_image
+    validator.new(image, tag, @credentials).validate_image
   end
 
   private
@@ -36,7 +36,7 @@ class DockerImage::ImageValidator
 
   def registry
     # if there is no registry, we assume it's Docker Hub, this is inline with the Docker CLI behaviour
-    @registry ||= @url_parser.registry || "registry.hub.docker.com"
+    @registry ||= @url_parser.registry || "docker.io"
   end
 
   def image

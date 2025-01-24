@@ -2,7 +2,7 @@
 
 class DockerImage::UrlParser
   # Known registries help distinguish between registry and username
-  KNOWN_REGISTRIES = %w[registry.hub.docker.com docker.io ghcr.io quay.io gcr.io registry.gitlab.com]
+  KNOWN_REGISTRIES = %w[docker.io ghcr.io quay.io gcr.io registry.gitlab.com]
 
   DOCKER_IMAGE_REGEX = %r{
     ^(?:(?<registry>(?:#{KNOWN_REGISTRIES.join('|')})/))? # Only match known registries

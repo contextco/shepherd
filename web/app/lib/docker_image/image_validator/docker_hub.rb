@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class DockerImage::ImageValidator::DockerHub
-  def initialize(registry, image, tag, credentials = nil)
-    @registry = registry
+  def initialize(image, tag, credentials = nil)
     @image = image
     @tag = tag
     @credentials = credentials
@@ -12,7 +11,7 @@ class DockerImage::ImageValidator::DockerHub
     token, error_message = fetch_auth_token(@image, @credentials)
     return DockerImage::ImageValidator::ValidationResult.new(valid: false, error_message:) if token.nil?
 
-    success, error_message = check_image_existence(@registry, @image, @tag, token)
+    success, error_message = check_image_existence(@image, @tag, token)
     return DockerImage::ImageValidator::ValidationResult.new(valid: false, error_message:) unless success
 
     DockerImage::ImageValidator::ValidationResult.new(valid: true)
@@ -45,8 +44,8 @@ class DockerImage::ImageValidator::DockerHub
     end
   end
 
-  def check_image_existence(registry, repository, tag, token)
-    uri = URI.parse("https://#{registry}/v2/#{repository}/manifests/#{tag}")
+  def check_image_existence(repository, tag, token)
+    uri = URI.parse("https://registry.hub.docker.com/v2/#{repository}/manifests/#{tag}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
 
