@@ -121,6 +121,12 @@ enum IngressPreference {
     IMAGE_PULL_POLICY_NEVER = 2;
  }
 
+ enum RegistryType {
+    REGISTRY_TYPE_DOCKER = 0;
+    REGISTRY_TYPE_GITHUB = 1;
+    REGISTRY_TYPE_GITLAB = 2;
+}
+
 // Next ID: 5
 message IngressParams {
     IngressPreference preference = 3;
@@ -179,6 +185,7 @@ message Image {
 message ImageCredentials {
     string username = 1;
     string password = 2;
+    RegistryType registry_type = 3;
 }
 
 message Resources {
