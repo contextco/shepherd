@@ -2,6 +2,7 @@
 
 class DockerImage::UrlParser
   # Known registries help distinguish between registry and username
+  # this will cause problems with self-hosted registries (e.g. GitLab)
   KNOWN_REGISTRIES = %w[docker.io ghcr.io quay.io gcr.io registry.gitlab.com]
 
   DOCKER_IMAGE_REGEX = %r{
