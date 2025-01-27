@@ -1,18 +1,22 @@
-<div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
-  <div class="flex w-full justify-between">
-    <div class="flex flex-col">
-      <span class="text-sm text-stone-400 font-medium">Application</span>
-      <span class="text-2xl font-medium w-fit"><%= @app.name %></span>
-    </div>
-  </div>
-
-  <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
-    <div class="flex flex-col gap-1">
-      <span class="font-medium text-lg">Application Deletion</span>
-      <span class="text-stone-600 text-sm">Once you delete an Application, it cannot be undone. Please be absolutely certain before proceeding.</span>
-    </div>
-    <%= button_to project_path(@app), method: :delete, class: 'button-destructive' do %>
-      Delete Application
+<%= render layout: 'layouts/project' do %>
+  <div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
+    <%= render UI::PageTitleNavigationComponent.new(
+      back_path: version_path(@app.latest_project_version),
+      back_text: "Application",
+      ) do |component| %>
+      <% component.with_title do %>
+        <span class="text-2xl font-medium text-stone-700 w-fit"><%= @app.name %></span>
+      <% end %>
     <% end %>
+
+    <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
+      <div class="flex flex-col gap-1">
+        <span class="font-medium text-lg">Application Deletion</span>
+        <span class="text-stone-600 text-sm">Once you delete an Application, it cannot be undone. Please be absolutely certain before proceeding.</span>
+      </div>
+      <%= button_to project_path(@app), method: :delete, class: 'button-destructive' do %>
+        Delete Application
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

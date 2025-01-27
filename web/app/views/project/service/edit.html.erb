@@ -1,10 +1,18 @@
-<div class="w-full flex flex-col gap-10 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
-  <div class="flex w-full justify-between">
+<%= render layout: 'layouts/project' do %>
+  <div class="flex w-full justify-between mb-10">
     <div class="flex flex-col gap-2">
-      <div class="flex flex-col">
-        <span class="text-xs sm:text-sm text-stone-400 font-medium">Edit Service</span>
-        <span class="sm:text-2xl font-medium w-fit"><%= @service.name %></span>
-      </div>
+      <%= render UI::PageTitleNavigationComponent.new(
+        back_path: version_path(@version),
+        back_text: "Version #{@version.version}",
+        ) do |component| %>
+        <% component.with_title do %>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl font-medium text-stone-700 w-fit">Edit</span>
+            <span class="text-2xl font-medium text-stone-700 w-fit"><%= @service.name %></span>
+          </div>
+        <% end %>
+      <% end %>
+
       <div class="relative" data-controller="sidebar-icon">
         <div data-action="mouseenter->sidebar-icon#showTooltip mouseleave->sidebar-icon#hideTooltip">
           <%= render CopyTextComponent.new(snippet: @service.k8s_service_names.first) if @service.k8s_service_names.any? %>
@@ -20,7 +28,7 @@
   <%= render Services::ServiceFormComponent.new(service_form_object: Service::Form.from_service(@service), form_method: :patch, version: @version, disabled: @disabled) %>
 
   <% unless @disabled %>
-    <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white">
+    <div class="flex flex-col gap-4 p-4 border-stone-300 border bg-white mt-10">
       <div class="flex flex-col gap-1">
         <span class="font-medium text-lg">Service Deletion</span>
         <span class="text-stone-600 text-sm">Once you delete an Service, it cannot be undone. Please be absolutely certain before proceeding.</span>
@@ -30,4 +38,4 @@
       <% end %>
     </div>
   <% end %>
-</div>
+<% end %>
