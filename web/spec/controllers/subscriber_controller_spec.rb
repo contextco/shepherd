@@ -88,7 +88,7 @@ RSpec.describe SubscriberController, type: :request do
   end
 
   describe 'GET #new' do
-    subject { get new_project_subscriber_path(project) }
+    subject { get new_project_subscriber_path(project, version_id: project_version.id) }
 
     it 'returns a success response' do
       subject
