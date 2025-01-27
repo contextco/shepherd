@@ -107,7 +107,7 @@ class Chart::Publisher
     Sidecar::ImageCredentials.new(
       username: service.image_username,
       password: service.image_password,
-      registry: service.image_registry_stub
+      registry_type: service.image_registry_stub
     )
   end
 
