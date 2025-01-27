@@ -1,8 +1,12 @@
 <div class="h-full w-full flex flex-col gap-14 sm:px-20 px-8 py-8 max-w-6xl mx-auto">
-  <div class="flex w-full justify-between flex-col">
-    <span class="text-sm text-stone-400 font-medium">New</span>
-    <span class="text-2xl font-medium w-fit">New Application</span>
-  </div>
+  <%= render UI::PageTitleNavigationComponent.new(
+    back_path: project_index_path,
+    back_text: "Applications",
+    ) do |component| %>
+    <% component.with_title do %>
+      <span class="text-2xl font-medium text-stone-700 w-fit">New Application</span>
+    <% end %>
+  <% end %>
 
   <%= render Applications::CreateApplicationFormComponent.new %>
 </div>

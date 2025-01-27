@@ -1,10 +1,15 @@
 <div class="flex flex-col gap-10 sm:px-20 mx-auto max-w-6xl p-8">
-  <div class="flex items-center space-x-2 justify-between">
-    <div class="flex items-center gap-1">
-      <div class="font-semibold">Customer Deployment</div>
-      <div class="text-stone-400">for <%= @app.name %></div>
-    </div>
-  </div>
+  <%= render UI::PageTitleNavigationComponent.new(
+    back_path: version_path(@version),
+    back_text: "Version #{@version.version}",
+    ) do |component| %>
+    <% component.with_title do %>
+      <div class="flex items-baseline gap-2">
+        <span class="text-2xl font-medium text-stone-700 w-fit">Customer Deployment</span>
+        <span class="text-2xl font-normal text-stone-500 w-fit"><%= @app.name %></span>
+      </div>
+    <% end %>
+  <% end %>
 
   <%= form_for ProjectSubscriber.new, url: project_subscribers_path(@app), method: :post do |form| %>
     <div class='flex flex-col gap-6'>

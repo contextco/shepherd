@@ -1,11 +1,16 @@
 <%= render layout: 'layouts/project' do %>
   <div class="flex flex-col gap-10">
-    <div class="flex items-center space-x-2 justify-between">
-      <div class="flex items-center gap-1">
-        <div class="font-semibold">New Version</div>
-        <div class="text-stone-400">for <%= @app.name %></div>
-      </div>
-    </div>
+    <%= render UI::PageTitleNavigationComponent.new(
+      back_path: version_path(@app.latest_project_version),
+      back_text: "Application",
+      ) do |component| %>
+      <% component.with_title do %>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-medium text-stone-700 w-fit">New Version</span>
+          <span class="text-2xl font-normal text-stone-500 w-fit"><%= @app.name %></span>
+        </div>
+      <% end %>
+    <% end %>
     <%= form_with model: @previous_version, url: project_version_index_path(project_id: @app), method: :post do |form| %>
       <div class="flex flex-col gap-6">
         <div class="flex items-center justify-between">
