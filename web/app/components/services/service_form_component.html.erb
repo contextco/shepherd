@@ -20,7 +20,7 @@
 
     <%= render UI::FormTextFieldComponent.new(title: 'Image', disabled:) do |component| %>
       <%= component.with_label do %>
-        Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed.
+        Valid docker image url with version tag. <span class="font-mono">:latest</span> is not allowed. Supports Docker Hub, Github and GitLab registries.
       <% end %>
       <%= component.with_field do %>
         <%= form.text_field :image,
