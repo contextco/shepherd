@@ -7,7 +7,8 @@ class DockerImage::ImageValidator
 
   REGISTRY_MAPPING = {
     "docker.io" => DockerImage::ImageValidator::DockerHub,
-    "ghcr.io" => DockerImage::ImageValidator::Github
+    "ghcr.io" => DockerImage::ImageValidator::Github,
+    "registry.gitlab.com" => DockerImage::ImageValidator::Gitlab
   }.freeze
 
   def initialize(image_name, credentials = nil)
