@@ -228,6 +228,7 @@ func (i Image) toValues() map[string]interface{} {
 	}
 
 	if i.Credential != nil {
+		values["registry"] = i.Credential.Registry
 		values["credential"] = map[string]interface{}{
 			"username": i.Credential.Username,
 			"password": i.Credential.Password,
@@ -240,6 +241,7 @@ func (i Image) toValues() map[string]interface{} {
 type ImageCredential struct {
 	Username string
 	Password string
+	Registry string
 }
 
 func (p *Params) toYaml() (string, error) {
@@ -376,6 +378,7 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 			credential = &ImageCredential{
 				Username: service.GetImage().GetCredential().GetUsername(),
 				Password: service.GetImage().GetCredential().GetPassword(),
+				Registry: registryTypeToValues(service.GetImage().GetCredential().GetRegistryType()),
 			}
 		}
 
@@ -415,6 +418,19 @@ func NewFromProto(name, version string, proto *sidecar_pb.ChartParams) (*ParentC
 	}
 
 	return parentChart, nil
+}
+
+func registryTypeToValues(registryType sidecar_pb.RegistryType) string {
+	switch registryType {
+	case sidecar_pb.RegistryType_REGISTRY_TYPE_GITHUB:
+		return "github"
+	case sidecar_pb.RegistryType_REGISTRY_TYPE_GITLAB:
+		return "gitlab"
+	case sidecar_pb.RegistryType_REGISTRY_TYPE_DOCKER:
+		return "docker"
+	default:
+		return "docker"
+	}
 }
 
 func firstNonEmpty[T comparable](values ...T) T {

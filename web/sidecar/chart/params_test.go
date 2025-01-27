@@ -151,6 +151,7 @@ func TestParams_toValues(t *testing.T) {
 					Credential: &ImageCredential{
 						Username: "user",
 						Password: "pass",
+						Registry: "docker",
 					},
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
@@ -177,6 +178,7 @@ func TestParams_toValues(t *testing.T) {
 					"repository": "test-image/thing",
 					"tag":        "latest",
 					"pullPolicy": "IfNotPresent",
+					"registry":   "docker",
 					"credential": map[string]interface{}{
 						"username": "user",
 						"password": "pass",
@@ -359,6 +361,7 @@ services:
 					Credential: &ImageCredential{
 						Username: "user",
 						Password: "pass",
+						Registry: "gitlab",
 					},
 				},
 				ReplicaCount: 3,
@@ -382,6 +385,7 @@ image:
     password: pass
     username: user
   pullPolicy: IfNotPresent
+  registry: gitlab
   repository: test-image
   tag: latest
 imagePullSecrets:
@@ -450,12 +454,14 @@ func TestImage_toValues(t *testing.T) {
 				Credential: &ImageCredential{
 					Username: "user",
 					Password: "pass",
+					Registry: "github",
 				},
 			},
 			want: map[string]interface{}{
 				"repository": "test-image",
 				"tag":        "latest",
 				"pullPolicy": "IfNotPresent",
+				"registry":   "github",
 				"credential": map[string]interface{}{
 					"username": "user",
 					"password": "pass",
