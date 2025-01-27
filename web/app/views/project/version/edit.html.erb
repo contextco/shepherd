@@ -1,3 +1,20 @@
-<%= render layout: 'layouts/project_version' do %>
-  <%= render Applications::EditApplicationVersionFormComponent.new(project_version: @version) %>
+<%= render layout: 'layouts/project' do %>
+  <div class="h-full w-full flex flex-col gap-10">
+    <%= render UI::PageTitleNavigationComponent.new(
+      back_path: version_path(@version),
+      back_text: "Version #{@version.version}",
+      ) do |component| %>
+      <% component.with_title do %>
+        <div class="flex gap-2 items-center text-2xl font-medium text-stone-700 w-fit">
+          <span class=" font-medium w-fit">Edit</span>
+          <div class="flex items-baseline gap-1">
+            <span class="font-medium text-stone-500 w-fit font-mono"> <%= @app.name %>:</span>
+            <span class="font-medium text-stone-500 w-fit font-mono"> <%= @version.version %></span>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= render Applications::EditApplicationVersionFormComponent.new(project_version: @version) %>
+  </div>
 <% end %>
