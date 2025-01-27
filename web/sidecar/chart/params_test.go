@@ -361,6 +361,7 @@ services:
 					Credential: &ImageCredential{
 						Username: "user",
 						Password: "pass",
+						Registry: "gitlab",
 					},
 				},
 				ReplicaCount: 3,
@@ -384,6 +385,7 @@ image:
     password: pass
     username: user
   pullPolicy: IfNotPresent
+  registry: gitlab
   repository: test-image
   tag: latest
 imagePullSecrets:
@@ -452,12 +454,14 @@ func TestImage_toValues(t *testing.T) {
 				Credential: &ImageCredential{
 					Username: "user",
 					Password: "pass",
+					Registry: "github",
 				},
 			},
 			want: map[string]interface{}{
 				"repository": "test-image",
 				"tag":        "latest",
 				"pullPolicy": "IfNotPresent",
+				"registry":   "github",
 				"credential": map[string]interface{}{
 					"username": "user",
 					"password": "pass",
