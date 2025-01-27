@@ -151,6 +151,7 @@ func TestParams_toValues(t *testing.T) {
 					Credential: &ImageCredential{
 						Username: "user",
 						Password: "pass",
+						Registry: "docker",
 					},
 					PullPolicy: sidecar_pb.ImagePullPolicy_IMAGE_PULL_POLICY_IF_NOT_PRESENT,
 				},
@@ -177,6 +178,7 @@ func TestParams_toValues(t *testing.T) {
 					"repository": "test-image/thing",
 					"tag":        "latest",
 					"pullPolicy": "IfNotPresent",
+					"registry":   "docker",
 					"credential": map[string]interface{}{
 						"username": "user",
 						"password": "pass",
