@@ -33,6 +33,7 @@ class SubscriberController < ApplicationController
 
   def new
     @app = current_team.projects.find(params[:project_id])
+    @version = current_team.project_versions.find(params[:version_id])
   end
 
   def create
