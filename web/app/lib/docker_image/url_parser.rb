@@ -13,6 +13,12 @@ class DockerImage::UrlParser
     (?::(?<tag>[^/]+))?$      # Optional tag/version
   }x
 
+  PROTOS_STUB_REGISTRY_MAPPING = {
+    "docker.io" => Sidecar::RegistryType::REGISTRY_TYPE_DOCKER,
+    "ghcr.io" => Sidecar::RegistryType::REGISTRY_TYPE_GITHUB,
+    "registry.gitlab.com" => Sidecar::RegistryType::REGISTRY_TYPE_GITLAB
+  }.freeze
+
   attr_reader :registry, :image, :tag
 
   def initialize(image_url)
@@ -36,6 +42,13 @@ class DockerImage::UrlParser
     return without_tag unless with_tag && @tag
 
     "#{without_tag}:#{@tag}"
+  end
+
+  def registry_stub
+    # Default to Docker registry
+    return Sidecar::RegistryType::REGISTRY_TYPE_DOCKER if @registry.nil?
+
+    PROTOS_STUB_REGISTRY_MAPPING[@registry]
   end
 
   class InvalidDockerImageURLError < StandardError; end

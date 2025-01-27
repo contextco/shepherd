@@ -120,6 +120,33 @@ RSpec.describe DockerImage::UrlParser do
     end
   end
 
+  describe '#registry_stub' do
+    it 'returns the correct registry stub for Docker Hub' do
+      parser = described_class.new('nginx:latest')
+      expect(parser.registry_stub).to eq(Sidecar::RegistryType::REGISTRY_TYPE_DOCKER)
+    end
+
+    it 'returns the correct registry stub for GitHub Container Registry' do
+      parser = described_class.new('ghcr.io/owner/app:latest')
+      expect(parser.registry_stub).to eq(Sidecar::RegistryType::REGISTRY_TYPE_GITHUB)
+    end
+
+    it 'returns the correct registry stub for Google Container Registry' do
+      parser = described_class.new('gcr.io/project/image:tag')
+      expect(parser.registry_stub).to be_nil
+    end
+
+    it 'returns the correct registry stub for GitLab registry' do
+      parser = described_class.new('registry.gitlab.com/group/project:latest')
+      expect(parser.registry_stub).to eq(Sidecar::RegistryType::REGISTRY_TYPE_GITLAB)
+    end
+
+    it 'returns the correct registry stub for unknown registries' do
+      parser = described_class.new('example.com/image:tag')
+      expect(parser.registry_stub).to eq(Sidecar::RegistryType::REGISTRY_TYPE_DOCKER)
+    end
+  end
+
   describe 'edge cases' do
     it 'handles tags with dots' do
       parser = described_class.new('image:1.2.3')
