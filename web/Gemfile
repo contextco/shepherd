@@ -100,4 +100,4 @@ gem "rails-controller-testing"
 
 gem "google-cloud-storage", "~> 1.54"
 
-gem "maintenance_tasks", "~> 2.10"
+gem "maintenance_tasks", "~> 2.11"
