@@ -74,7 +74,7 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    appsignal (4.3.3)
+    appsignal (4.4.0)
       logger
       rack
     ast (2.4.2)
@@ -382,7 +382,7 @@ GEM
     puma (6.5.0)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.1.8)
+    rack (3.1.9)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
@@ -585,7 +585,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  appsignal (~> 4.3)
+  appsignal (~> 4.4)
   bootsnap
   brakeman
   capybara
