@@ -235,7 +235,7 @@ GEM
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.69.0)
-    gruf (2.20.1)
+    gruf (2.21.0)
       activesupport (> 4)
       concurrent-ruby (> 1)
       grpc (~> 1.10)
@@ -603,7 +603,7 @@ DEPENDENCIES
   groupdate (~> 6.5.1)
   grpc (~> 1.69)
   grpc-tools
-  gruf (~> 2.20.1)
+  gruf (~> 2.21.0)
   gruf-rspec (~> 1.0)
   hotwire-livereload (~> 2.0)
   importmap-rails
