@@ -83,7 +83,7 @@ gem "faraday", "~> 2.12"
 
 gem "hotwire-livereload", "~> 2.0", group: :development
 
-gem "appsignal", "~> 4.3"
+gem "appsignal", "~> 4.4"
 
 gem "flipper"
 gem "flipper-active_record"
